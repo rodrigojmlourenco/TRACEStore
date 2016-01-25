@@ -6,10 +6,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.trace.store.security.Role;
+import org.trace.store.security.Secured;
 import org.trace.store.services.api.BeaconLocation;
 import org.trace.store.services.api.GeoLocation;
 import org.trace.store.services.api.PrivacyPolicies;
@@ -59,30 +60,10 @@ public class TRACEStoreService {
 		throw new UnsupportedOperationException();
 	}
 	
-	/**
-	 *  Enables a tracking application to initiate a session. The received sessionID will 
-	 *  then be used to identify all the information tracked by that specific application,
-	 *  and during that session.
-	 *   
-	 * @param username The user's unique username.
-	 * @param password The user's corresponding password.
-	 * 
-	 * @return Reponse object, whose body contains the session identifier.
-	 */
 	@POST
-	@Path("/login")
-	public Response login(@QueryParam("username") String username, @QueryParam("password") String password){
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 * Terminates a user's session.
-	 * 
-	 * @return
-	 */
-	@POST
-	@Path("/logout")
-	public Response logout(){
+	@Secured(Role.user)
+	@Path("/session")
+	public Response generateSessionId(){
 		throw new UnsupportedOperationException();
 	}
 	
@@ -92,6 +73,9 @@ public class TRACEStoreService {
 	 * @param policies The privacy policies.
 	 * @return Response notifying if the policies submission was successful or not.
 	 */
+	@POST
+	@Secured(Role.user)
+	@Path("/privacy")
 	public Response setPrivacyPolicies(PrivacyPolicies policies){
 		throw new UnsupportedOperationException();
 	}
@@ -114,6 +98,7 @@ public class TRACEStoreService {
 	 * @see GeoLocation
 	 */
 	@POST
+	@Secured(Role.user)
 	@Path("/put/geo/{sessionId}")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response put(@PathParam("sessionId") String sessionId, GeoLocation location){
@@ -131,6 +116,7 @@ public class TRACEStoreService {
 	 * @see BeaconLocation
 	 */
 	@POST
+	@Secured(Role.user)
 	@Path("/put/beacon/{sessionId}")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response put(@PathParam("sessionId") String sessionId, BeaconLocation location){
@@ -148,6 +134,7 @@ public class TRACEStoreService {
 	 * @see TraceTrack
 	 */
 	@POST
+	@Secured(Role.user)
 	@Path("/put/track/{sessionId}")
 	public Response put(@PathParam("sessionId") String sessionId, TraceTrack track){
 		throw new UnsupportedOperationException();
@@ -168,6 +155,7 @@ public class TRACEStoreService {
 	 * @return
 	 */
 	@GET
+	@Secured(Role.user)
 	@Path("/query")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response query(TRACEQuery query){

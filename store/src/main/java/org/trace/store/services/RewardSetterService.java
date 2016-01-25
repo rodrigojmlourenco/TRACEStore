@@ -7,6 +7,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.trace.store.security.Role;
+import org.trace.store.security.Secured;
 import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.UserRegistryRequest;
 
@@ -46,32 +48,6 @@ public class RewardSetterService {
 		throw new UnsupportedOperationException();
 	}
 	
-	/**
-	 * Enables an interested third party application to authenticate themselves.  
-	 *   
-	 * @param username The user's unique username.
-	 * @param password The user's corresponding password.
-	 * 
-	 * @return
-	 */
-	@POST
-	@Path("/login")
-	public Response login(@QueryParam("username") String username, @QueryParam("password") String password){
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 * Terminates a rewarders' session.
-	 * 
-	 * @return
-	 */
-	@POST
-	@Path("/logout")
-	public Response logout(){
-		throw new UnsupportedOperationException();
-	}
-	
-	
 	/*
 	 ************************************************************************
 	 ************************************************************************
@@ -87,6 +63,7 @@ public class RewardSetterService {
 	 * @return
 	 */
 	@POST
+	@Secured(Role.rewarder)
 	@Path("/set/location")
 	public Response setBaseLocation(
 			@QueryParam("lat")double latitude, @QueryParam("lon")double longitude){
@@ -102,6 +79,7 @@ public class RewardSetterService {
 	 */
 	@POST
 	@Path("/set/location")
+	@Secured(Role.rewarder)
 	public Response setBaseLocation(@QueryParam("beaconId") long beaconId){
 		throw new UnsupportedOperationException();
 	}
@@ -117,6 +95,7 @@ public class RewardSetterService {
 	 */
 	@POST
 	@Path("/set/reward")
+	@Secured(Role.rewarder)
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response setBaseLocation(RewardingPolicy policy){
 		throw new UnsupportedOperationException();

@@ -5,10 +5,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.trace.store.security.Role;
+import org.trace.store.security.Secured;
 import org.trace.store.services.api.TRACEQuery;
 import org.trace.store.services.api.UserRegistryRequest;
 
@@ -58,32 +59,7 @@ private final String LOG_TAG = "UrbanPlannerService";
 	public Response registerUser(UserRegistryRequest request){
 		throw new UnsupportedOperationException();
 	}
-	
-	/**
-	 * Enables urban planners to authenticate themselves into TRACE.
-	 *   
-	 * @param username The user's unique username.
-	 * @param password The user's corresponding password.
-	 * 
-	 * @return Reponse object, whose body contains the session identifier.
-	 */
-	@POST
-	@Path("/login")
-	public Response login(@QueryParam("username") String username, @QueryParam("password") String password){
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 * Terminates a user's session.
-	 * 
-	 * @return
-	 */
-	@POST
-	@Path("/logout")
-	public Response logout(){
-		throw new UnsupportedOperationException();
-	}
-	
+		
 	/**
 	 * Enables urban planners to lookup statistical data based on the provided 
 	 * planner queries
@@ -93,8 +69,9 @@ private final String LOG_TAG = "UrbanPlannerService";
 	 */
 	@GET
 	@Path("/get")
+	@Secured(Role.planner)
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response get(TRACEQuery query){
 		throw new UnsupportedOperationException();
-	}
+	}	
 }
