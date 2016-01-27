@@ -12,6 +12,7 @@ import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
 import org.trace.store.middleware.drivers.exceptions.UnknownUserIdentifierException;
 import org.trace.store.middleware.drivers.exceptions.UserRegistryException;
 import org.trace.store.security.Role;
+import org.trace.store.services.api.PrivacyPolicies;
 
 public interface UserDriver {
 
@@ -99,4 +100,16 @@ public interface UserDriver {
 	
 	
 	public boolean isValidPassword(String identifier, String password) throws InvalidIdentifierException, UnableToPerformOperation;
+	
+	public boolean isValidRole(String identifier, Role role) throws UnableToPerformOperation;
+	
+	/**
+	 * Allows users to set security and privacy policies about their data.
+	 *  
+	 * @param identifier The user's unique identifier, either its username or email.
+	 * @param policies The privacy policies.
+	 * 
+	 * @return True if the privacy policies were successfully added, false otherwise.
+	 */
+	public boolean setPrivacyPolicies(String identifier, PrivacyPolicies policies);
 }

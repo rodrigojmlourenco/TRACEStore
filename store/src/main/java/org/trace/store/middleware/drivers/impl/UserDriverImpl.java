@@ -1,4 +1,4 @@
-package org.trace.store.middleware.drivers;
+package org.trace.store.middleware.drivers.impl;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -15,6 +15,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.EmailAlreadyRegisteredException;
 import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
 import org.trace.store.middleware.drivers.exceptions.InvalidEmailException;
@@ -27,13 +28,16 @@ import org.trace.store.middleware.drivers.exceptions.PasswordReuseException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.middleware.drivers.exceptions.UnableToRegisterUserException;
 import org.trace.store.middleware.drivers.exceptions.UnableToUnregisterUserException;
+import org.trace.store.middleware.drivers.exceptions.UnknownSecurityRoleException;
 import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
 import org.trace.store.middleware.drivers.exceptions.UnknownUserIdentifierException;
 import org.trace.store.middleware.drivers.exceptions.UserRegistryException;
 import org.trace.store.middleware.drivers.exceptions.UsernameAlreadyRegisteredException;
 import org.trace.store.middleware.drivers.utils.FormFieldValidator;
+import org.trace.store.middleware.drivers.utils.SecurityRoleUtils;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
 import org.trace.store.security.Role;
+import org.trace.store.services.api.PrivacyPolicies;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -107,211 +111,6 @@ public class UserDriverImpl implements UserDriver{
 	public static UserDriver getDriver(){
 		return DRIVER;
 	}
-
-
-	private boolean isUsernameRegistered(String username) throws SQLException{
-
-		boolean exists;
-		PreparedStatement statement = 
-				conn.prepareStatement("SELECT * FROM users WHERE Username=?");
-
-		statement.setString(1, username);
-		ResultSet set = statement.executeQuery();
-		exists = set.next();
-		statement.close();
-
-		return exists;
-	}
-
-
-	private boolean isEmailRegistered(String email) throws SQLException{
-
-		boolean exists;
-		PreparedStatement statement = 
-				conn.prepareStatement("SELECT * FROM users WHERE Email=?");
-
-		statement.setString(1, email);
-		ResultSet set = statement.executeQuery();
-		exists = set.next();
-		statement.close();
-
-		return exists;
-	}
-
-	private void validateFields(String username, String email, String pass1, String pass2) 
-			throws InvalidEmailException, InvalidUsernameException, InvalidPasswordException, UsernameAlreadyRegisteredException, EmailAlreadyRegisteredException, NonMatchingPasswordsException, SQLException{
-
-		if(!FormFieldValidator.isValidEmail(email))
-			throw new InvalidEmailException(email);
-
-		if(!FormFieldValidator.isValidUsername(username))
-			throw new InvalidUsernameException(username);
-
-		if(!FormFieldValidator.isValidPassword(pass1)) 
-			throw new InvalidPasswordException();
-
-		if(!FormFieldValidator.isValidPassword(pass2))
-			throw new InvalidPasswordException();
-
-		if(isUsernameRegistered(username))
-			throw new UsernameAlreadyRegisteredException(username);
-
-		if(isEmailRegistered(email))
-			throw new EmailAlreadyRegisteredException(email);
-
-		if(!pass1.equals(pass2))
-			throw new NonMatchingPasswordsException();
-	}
-
-	
-	private int insertUser(String username, String email, String passwordHash, String salt)
-			throws SQLException{
-
-
-		PreparedStatement statement = 
-				conn.prepareStatement(
-						"INSERT INTO users (Username, Email, Password, Salt) "+
-								"VALUES (?,?,?,?)", java.sql.Statement.RETURN_GENERATED_KEYS);
-
-
-		statement.setString(1, username);
-		statement.setString(2, email);
-		statement.setString(3, passwordHash);
-		statement.setString(4, salt);
-
-		statement.executeUpdate();
-		ResultSet keys = statement.getGeneratedKeys();
-		statement.close();
-
-		if(keys.next()) 
-			return keys.getInt(1);
-		else 
-			return -1;
-
-	}
-
-	private boolean insertUserDetails(int userId, String name, String address, String phone) throws SQLException{
-
-		PreparedStatement statement = 
-				conn.prepareStatement(
-						"INSERT INTO user_details (Id, Name, Address, Phone) "+
-						"VALUES (?,?,?,?)");
-
-
-		statement.setInt(1, userId);
-		statement.setString(2, name);
-		statement.setString(3, address);
-		statement.setString(4, phone);
-
-		int success = statement.executeUpdate();
-		statement.close();
-
-		return success == 1;
-	}
-
-	private boolean updateUserRole(int userId, Role role) throws SQLException{
-
-		String dbRole = "";
-
-		switch (role) {
-		case user:
-			dbRole = "User";
-			break;
-		case rewarder:
-			dbRole = "Rewarder";
-			break;
-		case planner:
-			dbRole = "UrbanPlanner";
-			break;
-		case admin:
-			dbRole = "admin";
-			break;
-		default:
-			return false;
-		}
-
-		PreparedStatement statement = 
-				conn.prepareStatement(
-						"INSERT INTO user_roles (Id, "+dbRole+") "+
-						"VALUES (?,?)");
-
-
-		statement.setInt(1, userId);
-		statement.setBoolean(2, true);
-		int success = statement.executeUpdate();
-		statement.close();
-
-		return success == 1;
-	}
-
-	private boolean insertValidationRequest(int userId, String token) throws SQLException{
-		PreparedStatement statement =
-				conn.prepareStatement(
-						"INSERT INTO activation (Id, Token, Expiration) "
-								+ "VALUES (?,?,?)");
-
-		statement.setLong(1, userId);
-		statement.setString(2, token);
-		statement.setDate(3, new Date(SecurityUtils.getExpirationDate(1).getTime()) );
-
-		int count = statement.executeUpdate();
-		statement.close();
-
-		return count > 0;
-	}
-
-	private boolean deleteUser(long userID) throws SQLException{
-
-		PreparedStatement statement = 
-				conn.prepareStatement("DELETE FROM users WHERE Id=?");
-
-		statement.setLong(1, userID);
-		int count = statement.executeUpdate();
-		statement.close();
-
-		return count > 0;
-
-	}
-
-	private int getUserIDfromUsername(String username) throws SQLException{
-
-		int result;
-		PreparedStatement statement =
-				conn.prepareStatement("SELECT Id FROM users WHERE username = ?");
-
-		statement.setString(1, username);
-		ResultSet set = statement.executeQuery();
-
-
-		if(set.next()){
-			result = set.getInt(1);
-		}else 
-			result = -1;
-
-		statement.close();
-		return result;
-	}
-
-	private int getUserIDfromEmail(String email) throws SQLException{
-
-		int result;
-		PreparedStatement statement =
-				conn.prepareStatement("SELECT Id FROM users WHERE email = ?");
-
-		statement.setString(0, email);
-		ResultSet set = statement.executeQuery();
-
-
-		if(set.next()){
-			result = set.getInt("Id");
-		}else 
-			result = -1;
-
-		statement.close();
-		return result;
-	}
-
-
 
 	@Override
 	public String registerUser(
@@ -479,48 +278,7 @@ public class UserDriverImpl implements UserDriver{
 		return result;
 	}
 
-	private boolean isTokenExpired(String token) throws NoSuchTokenException, SQLException  {
-
-		boolean result;
-		PreparedStatement statement = 
-				conn.prepareStatement(
-						"SELECT Id, ExpirationDate FROM users_emails "
-								+ "WHERE Token=? AND RecoveryPassword='0'");
-
-		statement.setString(1, token);
-		ResultSet set = statement.executeQuery();
-		statement.close();
-
-		if(set.next()){
-			long expires = set.getDate(2).getTime();
-			result = (expires - (new java.util.Date()).getTime()) <= 0;
-			return result;
-		}else
-			throw new NoSuchTokenException();
-	}
-
-	private int getTokenActivationID(String token) throws SQLException, NoSuchTokenException {
-
-		int result;
-		PreparedStatement statement = 
-				conn.prepareStatement(
-						"SELECT Id "
-								+ "FROM activation "
-								+ "WHERE Token = ?");
-
-		statement.setString(1, token);
-		ResultSet set = statement.executeQuery();
-
-
-		if(set.next())
-			result = set.getInt(1);
-		else
-			throw new NoSuchTokenException();
-
-
-		statement.close();
-		return result;
-	}
+	
 	
 
 	@Override
@@ -560,20 +318,20 @@ public class UserDriverImpl implements UserDriver{
 	public boolean changePassword(String username, String oldPass, String newPass, String confirmPass)
 			throws NonMatchingPasswordsException, PasswordReuseException, UnknownUserIdentifierException {
 		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Not implemented yet!");
 	}
 
 	@Override
 	public String recoverPassword(String email) throws UnknownUserIdentifierException, UnableToPerformOperation {
 		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Not implemented yet!");
 	}
 
 	@Override
 	public boolean resetPassword(String username, String token, String newPass, String confirmPass)
 			throws ExpiredTokenException, UnknownUserIdentifierException {
 		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Not implemented yet!");
 	}
 
 
@@ -637,8 +395,291 @@ public class UserDriverImpl implements UserDriver{
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
+	
+	@Override
+	public boolean isValidRole(String identifier, Role role) throws UnableToPerformOperation {
+		int userId;
+		String dbRole;
+		
+		try {
+			dbRole = SecurityRoleUtils.translateRole(role);
+		} catch (UnknownSecurityRoleException e) {
+			return false;
+		}
+		
+		userId = getUserID(identifier);
+		try{
+		PreparedStatement statement = conn.prepareStatement(
+				"SELECT "+dbRole+" "
+				+"FROM user_roles "
+				+ "WHERE Id = ?");
+		
+		statement.setInt(1, userId);
+		ResultSet set = statement.executeQuery();
+		statement.close();
+		
+		
+		if(set.next())
+			return set.getBoolean(1);
+		else
+			return false;
+		}catch(SQLException e){
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
+	
+	@Override
+	public boolean setPrivacyPolicies(String identifier, PrivacyPolicies policies) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
+
+	/*
+	 **************************************************************************
+	 **************************************************************************
+	 **************************************************************************
+	 **************************************************************************
+	 */
+	
+	private boolean isUsernameRegistered(String username) throws SQLException{
+
+		boolean exists;
+		PreparedStatement statement = 
+				conn.prepareStatement("SELECT * FROM users WHERE Username=?");
+
+		statement.setString(1, username);
+		ResultSet set = statement.executeQuery();
+		exists = set.next();
+		statement.close();
+
+		return exists;
+	}
+
+
+	private boolean isEmailRegistered(String email) throws SQLException{
+
+		boolean exists;
+		PreparedStatement statement = 
+				conn.prepareStatement("SELECT * FROM users WHERE Email=?");
+
+		statement.setString(1, email);
+		ResultSet set = statement.executeQuery();
+		exists = set.next();
+		statement.close();
+
+		return exists;
+	}
+
+	private void validateFields(String username, String email, String pass1, String pass2) 
+			throws InvalidEmailException, InvalidUsernameException, InvalidPasswordException, UsernameAlreadyRegisteredException, EmailAlreadyRegisteredException, NonMatchingPasswordsException, SQLException{
+
+		if(!FormFieldValidator.isValidEmail(email))
+			throw new InvalidEmailException(email);
+
+		if(!FormFieldValidator.isValidUsername(username))
+			throw new InvalidUsernameException(username);
+
+		if(!FormFieldValidator.isValidPassword(pass1)) 
+			throw new InvalidPasswordException();
+
+		if(!FormFieldValidator.isValidPassword(pass2))
+			throw new InvalidPasswordException();
+
+		if(isUsernameRegistered(username))
+			throw new UsernameAlreadyRegisteredException(username);
+
+		if(isEmailRegistered(email))
+			throw new EmailAlreadyRegisteredException(email);
+
+		if(!pass1.equals(pass2))
+			throw new NonMatchingPasswordsException();
+	}
 
 	
+	private int insertUser(String username, String email, String passwordHash, String salt)
+			throws SQLException{
+
+
+		PreparedStatement statement = 
+				conn.prepareStatement(
+						"INSERT INTO users (Username, Email, Password, Salt) "+
+								"VALUES (?,?,?,?)", java.sql.Statement.RETURN_GENERATED_KEYS);
+
+
+		statement.setString(1, username);
+		statement.setString(2, email);
+		statement.setString(3, passwordHash);
+		statement.setString(4, salt);
+
+		statement.executeUpdate();
+		ResultSet keys = statement.getGeneratedKeys();
+		statement.close();
+
+		if(keys.next()) 
+			return keys.getInt(1);
+		else 
+			return -1;
+
+	}
+
+	private boolean insertUserDetails(int userId, String name, String address, String phone) throws SQLException{
+
+		PreparedStatement statement = 
+				conn.prepareStatement(
+						"INSERT INTO user_details (Id, Name, Address, Phone) "+
+						"VALUES (?,?,?,?)");
+
+
+		statement.setInt(1, userId);
+		statement.setString(2, name);
+		statement.setString(3, address);
+		statement.setString(4, phone);
+
+		int success = statement.executeUpdate();
+		statement.close();
+
+		return success == 1;
+	}
+
+	private boolean updateUserRole(int userId, Role role) throws SQLException{
+
+		String dbRole;
+		try {
+			dbRole = SecurityRoleUtils.translateRole(role);
+		} catch (UnknownSecurityRoleException e) {
+			return false;
+		}
+
+		PreparedStatement statement = 
+				conn.prepareStatement(
+						"INSERT INTO user_roles (Id, "+dbRole+") "+
+						"VALUES (?,?)");
+
+
+		statement.setInt(1, userId);
+		statement.setBoolean(2, true);
+		int success = statement.executeUpdate();
+		statement.close();
+
+		return success == 1;
+	}
+
+	private boolean insertValidationRequest(int userId, String token) throws SQLException{
+		PreparedStatement statement =
+				conn.prepareStatement(
+						"INSERT INTO activation (Id, Token, Expiration) "
+								+ "VALUES (?,?,?)");
+
+		statement.setLong(1, userId);
+		statement.setString(2, token);
+		statement.setDate(3, new Date(SecurityUtils.getExpirationDate(1).getTime()) );
+
+		int count = statement.executeUpdate();
+		statement.close();
+
+		return count > 0;
+	}
+
+	private boolean deleteUser(long userID) throws SQLException{
+
+		PreparedStatement statement = 
+				conn.prepareStatement("DELETE FROM users WHERE Id=?");
+
+		statement.setLong(1, userID);
+		int count = statement.executeUpdate();
+		statement.close();
+
+		return count > 0;
+
+	}
+
+	private int getUserIDfromUsername(String username) throws SQLException{
+
+		int result;
+		PreparedStatement statement =
+				conn.prepareStatement("SELECT Id FROM users WHERE username = ?");
+
+		statement.setString(1, username);
+		ResultSet set = statement.executeQuery();
+
+
+		if(set.next()){
+			result = set.getInt(1);
+		}else 
+			result = -1;
+
+		statement.close();
+		return result;
+	}
+
+	private int getUserIDfromEmail(String email) throws SQLException{
+
+		int result;
+		PreparedStatement statement =
+				conn.prepareStatement("SELECT Id FROM users WHERE email = ?");
+
+		statement.setString(0, email);
+		ResultSet set = statement.executeQuery();
+
+
+		if(set.next()){
+			result = set.getInt("Id");
+		}else 
+			result = -1;
+
+		statement.close();
+		return result;
+	}
+	
+	private boolean isTokenExpired(String token) throws NoSuchTokenException, SQLException  {
+
+		boolean result;
+		PreparedStatement statement = 
+				conn.prepareStatement(
+						"SELECT Id, ExpirationDate FROM users_emails "
+								+ "WHERE Token=? AND RecoveryPassword='0'");
+
+		statement.setString(1, token);
+		ResultSet set = statement.executeQuery();
+		statement.close();
+
+		if(set.next()){
+			long expires = set.getDate(2).getTime();
+			result = (expires - (new java.util.Date()).getTime()) <= 0;
+			return result;
+		}else
+			throw new NoSuchTokenException();
+	}
+
+	private int getTokenActivationID(String token) throws SQLException, NoSuchTokenException {
+
+		int result;
+		PreparedStatement statement = 
+				conn.prepareStatement(
+						"SELECT Id "
+								+ "FROM activation "
+								+ "WHERE Token = ?");
+
+		statement.setString(1, token);
+		ResultSet set = statement.executeQuery();
+
+
+		if(set.next())
+			result = set.getInt(1);
+		else
+			throw new NoSuchTokenException();
+
+
+		statement.close();
+		return result;
+	}
+
+	/*
+	 **************************************************************************
+	 **************************************************************************
+	 **************************************************************************
+	 **************************************************************************
+	 */
 
 	public static void main(String[] args){
 		UserDriver d = UserDriverImpl.getDriver();
