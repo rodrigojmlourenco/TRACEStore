@@ -9,14 +9,23 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.trace.store.security.Role;
-import org.trace.store.security.Secured;
+import org.trace.store.middleware.TRACESecurityManager;
+import org.trace.store.middleware.TRACEStore;
+import org.trace.store.middleware.drivers.TRACETrackingDriver;
+import org.trace.store.middleware.drivers.UserDriver;
+import org.trace.store.middleware.drivers.exceptions.NonMatchingPasswordsException;
+import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.middleware.drivers.exceptions.UnableToRegisterUserException;
+import org.trace.store.middleware.drivers.exceptions.UserRegistryException;
+import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.services.api.BeaconLocation;
 import org.trace.store.services.api.GeoLocation;
 import org.trace.store.services.api.PrivacyPolicies;
 import org.trace.store.services.api.TRACEQuery;
 import org.trace.store.services.api.TraceTrack;
 import org.trace.store.services.api.UserRegistryRequest;
+import org.trace.store.services.security.Role;
+import org.trace.store.services.security.Secured;
 
 /**
  * In order for higher-level information to be acquired, the data acquired by 
@@ -27,16 +36,20 @@ import org.trace.store.services.api.UserRegistryRequest;
  */
 @Path("/trace")
 public class TRACEStoreService {
-	
+
 	private final String LOG_TAG = "TRACEStoreService"; 
-	
+
+	private UserDriver uDriver = UserDriverImpl.getDriver();
+	private TRACETrackingDriver mDriver = TRACEStore.getTRACEStore();
+	private TRACESecurityManager secMan = TRACESecurityManager.getManager();
+
 	@Path("/test")
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String test(){
 		return "Welcome to the "+LOG_TAG;
 	}
-	
+
 	/*
 	 ************************************************************************
 	 ************************************************************************
@@ -44,7 +57,7 @@ public class TRACEStoreService {
 	 ************************************************************************
 	 ************************************************************************
 	 */
-	
+
 	/**
 	 * Allows TRACE users to register themselves into TRACE’s system. 
 	 *  
@@ -57,16 +70,42 @@ public class TRACEStoreService {
 	@Path("/register")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response registerUser(UserRegistryRequest request){
-		throw new UnsupportedOperationException();
+
+		String activationToken;
+
+		try {
+
+			activationToken = 
+					uDriver.registerUser(
+							request.getUsername(),
+							request.getEmail(),
+							request.getPassword(),
+							request.getConfirm(),
+							request.getName(), 
+							request.getAddress(),
+							request.getPhone(),
+							Role.user);
+
+			return Response.ok(activationToken).build();
+
+		} catch (UserRegistryException e) {
+			return Response.ok(e.getMessage()).build();
+		} catch (NonMatchingPasswordsException e) {
+			return Response.ok(e.getMessage()).build();
+		} catch (UnableToRegisterUserException e) {
+			return Response.ok(e.getMessage()).build();
+		} catch (UnableToPerformOperation e) {
+			return Response.ok(e.getMessage()).build();
+		}
 	}
-	
+
 	@POST
 	@Secured(Role.user)
 	@Path("/session")
 	public Response generateSessionId(){
-		throw new UnsupportedOperationException();
+		return Response.ok(secMan.generateSessionPseudonym()).build();
 	}
-	
+
 	/**
 	 * Allows users to set security and privacy policies about their data. 
 	 *   
@@ -79,7 +118,7 @@ public class TRACEStoreService {
 	public Response setPrivacyPolicies(PrivacyPolicies policies){
 		throw new UnsupportedOperationException();
 	}
-	
+
 	/*
 	 ************************************************************************
 	 ************************************************************************
@@ -87,7 +126,7 @@ public class TRACEStoreService {
 	 ************************************************************************
 	 ************************************************************************
 	 */
-	
+
 	/**
 	 * Enables a tracking application to report its location, at a specific moment in time.
 	 * @param sessionId The user's session identifier, which operates as a pseudonym.
@@ -104,7 +143,7 @@ public class TRACEStoreService {
 	public Response put(@PathParam("sessionId") String sessionId, GeoLocation location){
 		throw new UnsupportedOperationException();
 	}
-	
+
 	/**
 	 * Enables a tracking application to report its location, at a specific moment in time.
 	 * 
@@ -122,7 +161,7 @@ public class TRACEStoreService {
 	public Response put(@PathParam("sessionId") String sessionId, BeaconLocation location){
 		throw new UnsupportedOperationException();
 	}
-	
+
 	/**
 	 * Enables a tracking application to report a traced tracked, as a whole.
 	 *  
@@ -139,7 +178,7 @@ public class TRACEStoreService {
 	public Response put(@PathParam("sessionId") String sessionId, TraceTrack track){
 		throw new UnsupportedOperationException();
 	}
-	
+
 	/*
 	 ************************************************************************
 	 ************************************************************************

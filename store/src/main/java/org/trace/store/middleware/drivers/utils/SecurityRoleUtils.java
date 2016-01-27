@@ -1,7 +1,7 @@
 package org.trace.store.middleware.drivers.utils;
 
 import org.trace.store.middleware.drivers.exceptions.UnknownSecurityRoleException;
-import org.trace.store.security.Role;
+import org.trace.store.services.security.Role;
 
 public interface SecurityRoleUtils {
 

@@ -11,8 +11,8 @@ import org.trace.store.middleware.drivers.exceptions.UnableToUnregisterUserExcep
 import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
 import org.trace.store.middleware.drivers.exceptions.UnknownUserIdentifierException;
 import org.trace.store.middleware.drivers.exceptions.UserRegistryException;
-import org.trace.store.security.Role;
 import org.trace.store.services.api.PrivacyPolicies;
+import org.trace.store.services.security.Role;
 
 public interface UserDriver {
 

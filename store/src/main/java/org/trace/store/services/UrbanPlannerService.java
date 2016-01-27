@@ -8,10 +8,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.trace.store.security.Role;
-import org.trace.store.security.Secured;
 import org.trace.store.services.api.TRACEQuery;
 import org.trace.store.services.api.UserRegistryRequest;
+import org.trace.store.services.security.Role;
+import org.trace.store.services.security.Secured;
 
 /**
  * TRACE has the potential to acquire extensive and very rich information 

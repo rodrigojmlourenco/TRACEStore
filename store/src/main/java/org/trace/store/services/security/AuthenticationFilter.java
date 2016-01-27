@@ -1,4 +1,4 @@
-package org.trace.store.security;
+package org.trace.store.services.security;
 
 import java.io.IOException;
 

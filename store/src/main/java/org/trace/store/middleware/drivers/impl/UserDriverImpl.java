@@ -36,8 +36,8 @@ import org.trace.store.middleware.drivers.exceptions.UsernameAlreadyRegisteredEx
 import org.trace.store.middleware.drivers.utils.FormFieldValidator;
 import org.trace.store.middleware.drivers.utils.SecurityRoleUtils;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
-import org.trace.store.security.Role;
 import org.trace.store.services.api.PrivacyPolicies;
+import org.trace.store.services.security.Role;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -207,8 +207,8 @@ public class UserDriverImpl implements UserDriver{
 			}catch(SQLException e){
 				throw new UnableToRegisterUserException();
 			}
-		}
-		return token;
+		}else
+			return token;
 
 	}
 

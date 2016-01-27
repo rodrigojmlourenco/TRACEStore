@@ -2,8 +2,8 @@ package org.trace.store;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
-import org.trace.store.security.AuthenticationFilter;
-import org.trace.store.security.AuthorizationFilter;
+import org.trace.store.services.security.AuthenticationFilter;
+import org.trace.store.services.security.AuthorizationFilter;
 
 public class TraceStoreApp extends ResourceConfig{
 

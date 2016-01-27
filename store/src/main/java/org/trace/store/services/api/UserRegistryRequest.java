@@ -5,7 +5,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class UserRegistryRequest {
 
-	private String 	username,
+	private String 	name,
+					username,
 					email,
 					password,
 					confirm,
@@ -15,10 +16,12 @@ public class UserRegistryRequest {
 	public UserRegistryRequest(){}
 	
 	public UserRegistryRequest(
+			String name,
 			String username, String email,
 			String password, String confirm,
 			String phone, String address){
 		
+		this.name = name;
 		this.username = username;
 		this.email = email;
 		this.password = password;
@@ -74,4 +77,14 @@ public class UserRegistryRequest {
 	public void setAddress(String address) {
 		this.address = address;
 	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	
 }

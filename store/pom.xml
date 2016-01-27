@@ -66,6 +66,11 @@
 			<artifactId>commons-codec</artifactId>
 			<version>1.10</version>
 		</dependency>
+		<dependency>
+			<groupId>org.opentripplanner</groupId>
+			<artifactId>otp</artifactId>
+			<version>0.20.0-CYCLEOURCITY</version>
+		</dependency>
 	</dependencies>
 
 	<build>

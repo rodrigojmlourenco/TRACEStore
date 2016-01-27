@@ -5,7 +5,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import org.trace.store.security.Secured;
+import org.trace.store.services.security.Secured;
 
 @Path("/auth")
 public class AuthenticationEndpoint {

@@ -7,10 +7,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.trace.store.security.Role;
-import org.trace.store.security.Secured;
 import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.UserRegistryRequest;
+import org.trace.store.services.security.Role;
+import org.trace.store.services.security.Secured;
 
 /**
  * Local  businesses,  for  instance  shop  owners,  may  leverage  TRACE
