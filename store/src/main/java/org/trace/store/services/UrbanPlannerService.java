@@ -67,7 +67,7 @@ private final String LOG_TAG = "UrbanPlannerService";
 	 * @param query
 	 * @return
 	 */
-	@GET
+	@POST
 	@Path("/get")
 	@Secured(Role.planner)
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

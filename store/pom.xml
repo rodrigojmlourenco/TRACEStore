@@ -69,7 +69,12 @@
 		<dependency>
 			<groupId>org.opentripplanner</groupId>
 			<artifactId>otp</artifactId>
-			<version>0.20.0-CYCLEOURCITY</version>
+			<version>0.20.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>INESC</groupId>
+			<artifactId>Trace-v1</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

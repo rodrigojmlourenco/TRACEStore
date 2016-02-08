@@ -1,6 +1,6 @@
 package org.trace.store.middleware.backend.exceptions;
 
-public class UnableToGenerateGraphException extends Exception {
+public class UnableToGenerateGraphException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1746891842857543933L;
 	

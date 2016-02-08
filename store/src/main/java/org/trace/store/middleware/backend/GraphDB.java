@@ -1,22 +1,44 @@
 package org.trace.store.middleware.backend;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.standalone.CommandLineParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.trace.store.middleware.backend.exceptions.UnableToGenerateGraphException;
+
+import trace.DBMapAPI;
+import trace.TraceDB;
+import trace.TraceEdge;
+import trace.TraceVertex;
 
 public class GraphDB {
 
+	private static final Logger LOG = LoggerFactory.getLogger(GraphDB.class); 
+	
 	private static GraphDB CONN = new GraphDB();
+	private final DBMapAPI map;
+	private final TraceDB graphDB;
 
 	private GraphDB(){
 
-	}
+		graphDB = new TraceDB();
 
+		//
+		if(!graphDB.initialize()){
+			throw new RuntimeException("Unable to initialize the Trace database");
+		}
+
+		
+		map = new DBMapAPI(graphDB.getClient());
+		LOG.info("Connection with the graph database successfull.");
+	}
 	public static GraphDB getConnection(){
 		return CONN;
 	}
@@ -37,23 +59,31 @@ public class GraphDB {
 			GraphBuilder builder = GraphBuilder.forDirectory(params, osmInput);
 			builder.run();
 			graph = builder.getGraph();
+			LOG.info("Temporary graph successfully generated from files found in "+osmInput.getAbsolutePath());
 		}catch(Exception e){
 			throw new UnableToGenerateGraphException(e.getMessage());
 		}
 
+		List<TraceVertex> vertices = new ArrayList<>();
+		List<TraceEdge> edges = new ArrayList<>();
 		//Step 2 - Given the OTP graph add all vertices to the graph DB
+		String id;
 		for(Vertex v : graph.getVertices()){
-			//TODO: add to the db
-			System.out.println(v);
+			id = v.getLabel().split(":")[1];
+			vertices.add(new TraceVertex(id, v.getY(), v.getX()));
 		}
 
 		//Step 3 - Given the OTP graph add all street edges to the graph DB
 		for(StreetEdge e : graph.getStreetEdges()){
-			//TODO: add to the db
-			System.out.println(e);
+			edges.add(new TraceEdge(e.getName(), Long.toString(e.getStartOsmNodeId()), Long.toString(e.getEndOsmNodeId())));
 		}
+		
+		map.addVertices(vertices);
+		map.addEdges(edges);
+		
+		LOG.info("All vertices and edges successfully added to the graph database.");
 	}
-	
+
 	/**
 	 * Checks if the graph database is still empty, i.e., if the
 	 * database has still not been populated.
@@ -61,8 +91,6 @@ public class GraphDB {
 	 * @return True if the database is empty, false otherwise.
 	 */
 	public boolean isEmptyGraph(){
-		//TODO: not implemented yet
-		return false;
+		return map.isEmpty();
 	}
-
 }

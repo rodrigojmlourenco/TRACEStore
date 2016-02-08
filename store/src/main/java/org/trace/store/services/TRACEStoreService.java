@@ -193,7 +193,7 @@ public class TRACEStoreService {
 	 * 
 	 * @return
 	 */
-	@GET
+	@POST
 	@Secured(Role.user)
 	@Path("/query")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})

@@ -2,12 +2,19 @@ package org.trace.store;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
+import org.trace.store.middleware.TRACESecurityManager;
+import org.trace.store.middleware.TRACEStore;
 import org.trace.store.services.security.AuthenticationFilter;
 import org.trace.store.services.security.AuthorizationFilter;
 
 public class TraceStoreApp extends ResourceConfig{
 
 	public TraceStoreApp(){
+		
+		//Force eager initialization of the middleware
+		TRACEStore.getTRACEStore();
+		TRACESecurityManager.getManager();
+		
 		 // Register resources and providers using package-scanning.
         packages("org.trace.store.services");
  

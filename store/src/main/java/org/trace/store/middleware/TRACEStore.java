@@ -1,7 +1,10 @@
 package org.trace.store.middleware;
 
+import java.io.File;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.drivers.TRACEPlannerDriver;
 import org.trace.store.middleware.drivers.TRACERewardDriver;
@@ -18,12 +21,17 @@ import org.trace.store.services.api.data.Session;
 
 public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACEPlannerDriver{
 
+	private static final Logger LOG = LoggerFactory.getLogger(TRACEStore.class);
+	
 	private static TRACEStore MANAGER = new TRACEStore();
 	
 	private final GraphDB graph = GraphDB.getConnection();
 	
 	private TRACEStore(){
-		//TODO: check if the graph is empty, and if so, populate the graph
+		if(graph.isEmptyGraph()){
+			LOG.info("Graph database is empty, populating the map with OSM data before the server is initiated.");
+			graph.populateFromOSM(new File("/var/otp"));
+		}
 	}
 		
 	

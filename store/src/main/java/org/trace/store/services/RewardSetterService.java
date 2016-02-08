@@ -78,7 +78,7 @@ public class RewardSetterService {
 	 * @return
 	 */
 	@POST
-	@Path("/set/location")
+	@Path("/set/beacon")
 	@Secured(Role.rewarder)
 	public Response setBaseLocation(@QueryParam("beaconId") long beaconId){
 		throw new UnsupportedOperationException();
