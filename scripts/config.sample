@@ -1,0 +1,7 @@
+<config>
+	<repository>
+		<user val='insert user'/>
+		<password val='insert pass'/>
+	</repository>	
+</config>
+
