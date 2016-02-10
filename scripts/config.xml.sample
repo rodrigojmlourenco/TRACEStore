@@ -1,7 +1,16 @@
 <config>
 	<repository>
-		<user val='insert user'/>
-		<password val='insert pass'/>
+		<user val='root'/>
+		<password val='password'/>
 	</repository>	
+	<map>
+		<bottom-left lat="38.7260" lon="-9.1620"/>
+		<top-right lat="38.7553" lon="-9.1249"/>
+	</map>
+	<server>
+		<host>IP/FQDN</host>
+		<port>PORT</port>
+		<mail>EMAIL ADDRESS</mail>
+	</server>
 </config>
 
