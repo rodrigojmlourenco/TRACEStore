@@ -30,8 +30,8 @@ public class GraphDB {
 
 		graphDB = new TraceDB();
 
-		//
-		if(!graphDB.initialize()){
+		//TODO: the path should not be hard-coded
+		if(!graphDB.initializePath("/var/traceDB/conf/remote.yaml")){
 			throw new RuntimeException("Unable to initialize the Trace database");
 		}
 
@@ -92,5 +92,9 @@ public class GraphDB {
 	 */
 	public boolean isEmptyGraph(){
 		return map.isEmpty();
+	}
+	
+	public static void main(String[] args){
+		
 	}
 }
