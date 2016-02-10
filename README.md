@@ -12,4 +12,4 @@ Since TRACEstore is responsible for data mining, interested third parties can le
 execute complex query  lookups for semantic data. However, due to security concerns, both read 
 and  write  operations  are  done  in  a  controlled  manner.
 
-![alt text](./resources/TRACEStore.png, "architecture")
+<img src="./resources/TRACEStore.png"/>
