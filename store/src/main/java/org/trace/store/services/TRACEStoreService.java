@@ -1,5 +1,7 @@
 package org.trace.store.services;
 
+import java.util.Date;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -14,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trace.store.middleware.TRACESecurityManager;
 import org.trace.store.middleware.TRACEStore;
+import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.drivers.TRACETrackingDriver;
 import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.NonMatchingPasswordsException;
@@ -37,7 +40,7 @@ import org.trace.store.services.security.Secured;
  * of  operations  supported  by  TRACEstore  for  the  uploading  and  querying
  * of information. 
  */
-@Path("/trace")
+@Path("/tracker")
 public class TRACEStoreService {
 
 	private final String LOG_TAG = "TRACEStoreService"; 
@@ -53,6 +56,14 @@ public class TRACEStoreService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String test(){
 		return "Welcome to the "+LOG_TAG;
+	}
+	
+	//TODO: remover
+	@GET
+	@Path("/sample")
+	@Produces(MediaType.APPLICATION_JSON)
+	public GeoLocation getGeoLocationSample(){
+		return new GeoLocation(38.7368192, -9.138705, System.currentTimeMillis());
 	}
 
 	/*
@@ -148,24 +159,28 @@ public class TRACEStoreService {
 	 * @see GeoLocation
 	 */
 	@POST
-	@Secured(Role.user)
+	//@Secured(Role.user) TODO: descomentar
 	@Path("/put/geo/{sessionId}")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response put(@PathParam("sessionId") String sessionId, GeoLocation location){
 		
 		LOG.debug(sessionId);
 		Log.debug(location.toString());
+		boolean success;
+		GraphDB conn = GraphDB.getConnection();
+		success = conn.getTrackingAPI().put(
+						sessionId,
+						new Date(location.getTimestamp()),
+						location.getLatitude(),
+						location.getLongitude());
 		
-		throw new UnsupportedOperationException();
+		if(success)
+			return Response.ok("Location successfully inserted.").build();
+		else
+			return Response.ok("Location insertion failed.").build();
+		
 	}
 	
-	//TODO: remover
-	@GET
-	@Path("/sample")
-	@Produces(MediaType.APPLICATION_JSON)
-	public GeoLocation getGeoLocationSample(){
-		return new GeoLocation(38.7368192, -9.138705, System.currentTimeMillis());
-	}
 
 	/**
 	 * Enables a tracking application to report its location, at a specific moment in time.
@@ -209,6 +224,7 @@ public class TRACEStoreService {
 	 ************************************************************************
 	 ************************************************************************
 	 */
+	
 	/**
 	 * Enables users to query aspects such as previously taken routes 
 	 * 
