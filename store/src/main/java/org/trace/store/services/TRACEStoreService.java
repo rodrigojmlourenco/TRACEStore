@@ -86,6 +86,12 @@ public class TRACEStoreService {
 							request.getPhone(),
 							Role.user);
 
+			mDriver.registerUser(request.getUsername(),
+									request.getPassword(),
+									request.getName(),
+									request.getAddress());
+			
+
 			return Response.ok(activationToken).build();
 
 		} catch (UserRegistryException e) {

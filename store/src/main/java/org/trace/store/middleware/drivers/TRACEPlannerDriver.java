@@ -15,7 +15,7 @@ import org.trace.store.services.api.TRACEPlannerResultSet;
  * higher-level information, in a flexible manner.
  */
 public interface TRACEPlannerDriver {
-
+	
 	/**
 	 *  Enables urban planners to lookup statistical data based on the provided
 	 *  planner queries.

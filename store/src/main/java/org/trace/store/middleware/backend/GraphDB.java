@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.trace.store.middleware.backend.exceptions.UnableToGenerateGraphException;
 
 import trace.DBMapAPI;
+import trace.DBTrackingAPI;
 import trace.TraceDB;
 import trace.TraceEdge;
 import trace.TraceVertex;
@@ -25,7 +26,8 @@ public class GraphDB {
 	private static GraphDB CONN = new GraphDB();
 	private final DBMapAPI map;
 	private final TraceDB graphDB;
-
+	private final DBTrackingAPI tracking;
+	
 	private GraphDB(){
 
 		graphDB = new TraceDB();
@@ -37,10 +39,15 @@ public class GraphDB {
 
 		
 		map = new DBMapAPI(graphDB.getClient());
+		tracking = new DBTrackingAPI(graphDB.getClient());
 		LOG.info("Connection with the graph database successfull.");
 	}
 	public static GraphDB getConnection(){
 		return CONN;
+	}
+	
+	public DBTrackingAPI getTrackingAPI(){
+		return tracking;
 	}
 
 	/**
@@ -64,6 +71,7 @@ public class GraphDB {
 			throw new UnableToGenerateGraphException(e.getMessage());
 		}
 
+		
 		List<TraceVertex> vertices = new ArrayList<>();
 		List<TraceEdge> edges = new ArrayList<>();
 		//Step 2 - Given the OTP graph add all vertices to the graph DB

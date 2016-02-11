@@ -5,11 +5,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.services.security.Secured;
 
 @Path("/auth")
 public class AuthenticationEndpoint {
 
+
+
+	
 	/**
 	 *   
 	 * @param username The user's unique username.
@@ -20,7 +24,11 @@ public class AuthenticationEndpoint {
 	@POST
 	@Path("/login")
 	public Response login(@QueryParam("username") String username, @QueryParam("password") String password){
-		throw new UnsupportedOperationException();
+		
+		GraphDB graphDB = GraphDB.getConnection();
+		String session = graphDB.getTrackingAPI().login(username, password);
+		return Response.ok(session).build();
+		
 	}
 	
 	/**

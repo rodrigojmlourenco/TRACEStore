@@ -19,6 +19,9 @@ import org.trace.store.services.api.data.Attributes;
 import org.trace.store.services.api.data.Beacon;
 import org.trace.store.services.api.data.Session;
 
+import trace.TraceSession;
+
+
 public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACEPlannerDriver{
 
 	private static final Logger LOG = LoggerFactory.getLogger(TRACEStore.class);
@@ -90,9 +93,11 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 	 *************************************************************************
 	 *************************************************************************
 	 */
+	
 	@Override
 	public boolean put(Session session, Date timestamp, float latitude, float longitude) {
-		// TODO Auto-generated method stub
+		//TODO:
+		
 		return false;
 	}
 
@@ -129,5 +134,11 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 	public TRACEResultSet query(TRACEQuery query) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+		
+	@Override
+	public boolean registerUser(String username, String password, String name, String address){
+		return graph.getTrackingAPI().register(username, password, name, address);
 	}
 }
