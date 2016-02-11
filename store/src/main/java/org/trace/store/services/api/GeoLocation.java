@@ -72,6 +72,10 @@ public class GeoLocation {
 		return (JsonObject) parser.parse(getAttributes());
 	}
 	
+	@Override
+	public String toString() {
+		return "{ latitude: "+getLatitude()+", longitude: "+longitude+", timestamp: "+timestamp+"}";
+	}
 	
 	
 }

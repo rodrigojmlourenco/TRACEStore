@@ -9,6 +9,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.tinkerpop.shaded.minlog.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.trace.store.middleware.TRACESecurityManager;
 import org.trace.store.middleware.TRACEStore;
 import org.trace.store.middleware.drivers.TRACETrackingDriver;
@@ -39,6 +42,8 @@ public class TRACEStoreService {
 
 	private final String LOG_TAG = "TRACEStoreService"; 
 
+	private final Logger LOG = LoggerFactory.getLogger(TRACEStoreService.class); 
+	
 	private UserDriver uDriver = UserDriverImpl.getDriver();
 	private TRACETrackingDriver mDriver = TRACEStore.getTRACEStore();
 	private TRACESecurityManager secMan = TRACESecurityManager.getManager();
@@ -147,6 +152,10 @@ public class TRACEStoreService {
 	@Path("/put/geo/{sessionId}")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response put(@PathParam("sessionId") String sessionId, GeoLocation location){
+		
+		LOG.debug(sessionId);
+		Log.debug(location.toString());
+		
 		throw new UnsupportedOperationException();
 	}
 
