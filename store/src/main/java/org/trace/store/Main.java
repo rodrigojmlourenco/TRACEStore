@@ -13,7 +13,7 @@ import org.glassfish.jersey.server.ResourceConfig;
  */
 public class Main {
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://localhost:8081/trace/";
+    public static final String BASE_URI = "http://146.193.41.50:8081/trace/";
 
     /**
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.

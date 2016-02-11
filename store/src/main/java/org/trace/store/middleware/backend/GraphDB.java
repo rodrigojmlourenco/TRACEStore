@@ -86,10 +86,9 @@ public class GraphDB {
 			edges.add(new TraceEdge(e.getName(), Long.toString(e.getStartOsmNodeId()), Long.toString(e.getEndOsmNodeId())));
 		}
 		
-		map.addVertices(vertices);
-		map.addEdges(edges);
+		//map.addVertices(vertices);
+		//map.addEdges(edges);
 
-		System.out.println("------------------------->"+edges.size());
 		
 		LOG.info("All vertices and edges successfully added to the graph database.");
 	}
