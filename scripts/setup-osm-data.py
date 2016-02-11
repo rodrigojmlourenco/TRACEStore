@@ -40,7 +40,7 @@ if os.path.exists('../resources/city/map.osm'):
 	os.remove('../resources/city/map.osm')
 
 
-basedir = os.environ['HOME'] + "/otp" 
+basedir = "/var/otp" 
 dist = basedir+'/map.osm'
 
 if not os.path.exists(basedir):
@@ -55,7 +55,7 @@ try:
 except OSError:
 	pass
 
-if not os.path.exists(basedir+'/graph'):
-	os.makedirs(basedir+'/graph')
-	os.makedirs(basedir+'/graph/new')
-	os.makedirs(basedir+'/graph/old')
+#if not os.path.exists(basedir+'/graph'):
+#	os.makedirs(basedir+'/graph')
+#	os.makedirs(basedir+'/graph/new')
+#	os.makedirs(basedir+'/graph/old')
