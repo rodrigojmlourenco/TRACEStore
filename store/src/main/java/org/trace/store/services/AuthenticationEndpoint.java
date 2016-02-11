@@ -5,14 +5,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.services.security.Secured;
 
 @Path("/auth")
 public class AuthenticationEndpoint {
 
-
-
+	private final Logger LOG = LoggerFactory.getLogger(AuthenticationEndpoint.class); 
 	
 	/**
 	 *   
@@ -27,7 +28,13 @@ public class AuthenticationEndpoint {
 		
 		GraphDB graphDB = GraphDB.getConnection();
 		String session = graphDB.getTrackingAPI().login(username, password);
-		return Response.ok(session).build();
+		
+		LOG.debug("{ username: "+username+", password: "+password+"}");
+		
+		if(!session.isEmpty())
+			return Response.ok(session).build();
+		else
+			return Response.ok("Failed to login").build();
 		
 	}
 	
