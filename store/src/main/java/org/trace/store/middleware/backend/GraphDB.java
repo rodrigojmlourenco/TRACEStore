@@ -77,7 +77,7 @@ public class GraphDB {
 		//Step 2 - Given the OTP graph add all vertices to the graph DB
 		String id;
 		for(Vertex v : graph.getVertices()){
-			id = v.getLabel().split(":")[1];
+			id = v.getLabel().split(":")[2];
 			vertices.add(new TraceVertex(id, v.getY(), v.getX()));
 		}
 
@@ -88,6 +88,8 @@ public class GraphDB {
 		
 		map.addVertices(vertices);
 		map.addEdges(edges);
+
+		System.out.println("------------------------->"+edges.size());
 		
 		LOG.info("All vertices and edges successfully added to the graph database.");
 	}

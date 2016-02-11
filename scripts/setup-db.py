@@ -42,7 +42,7 @@ if input == 'n' or input == 'N':
 	sys.exit()
 	
 
-cleanup = "DROP DATABASE "+database
+cleanup = "DROP DATABASE IF EXISTS "+database
 cursor.execute(cleanup)
 mariadb_connection.commit()
 
