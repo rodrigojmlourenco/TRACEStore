@@ -158,6 +158,14 @@ public class TRACEStoreService {
 		
 		throw new UnsupportedOperationException();
 	}
+	
+	//TODO: remover
+	@GET
+	@Path("/sample")
+	@Produces(MediaType.APPLICATION_JSON)
+	public GeoLocation getGeoLocationSample(){
+		return new GeoLocation(38.7368192, -9.138705, System.currentTimeMillis());
+	}
 
 	/**
 	 * Enables a tracking application to report its location, at a specific moment in time.

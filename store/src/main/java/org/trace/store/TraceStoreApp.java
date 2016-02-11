@@ -19,8 +19,8 @@ public class TraceStoreApp extends ResourceConfig{
         packages("org.trace.store.services");
  
         // Register my custom provider - not needed if it's in my.package.
-        register(AuthenticationFilter.class);
-        register(AuthorizationFilter.class);
+        //register(AuthenticationFilter.class); TODO: descomentar
+        //register(AuthorizationFilter.class);  TODO: descomentar
         
         // Register an instance of LoggingFilter.
         //register(new LoggingFilter(LOGGER, true));
