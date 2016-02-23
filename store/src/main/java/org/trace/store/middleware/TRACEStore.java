@@ -19,7 +19,7 @@ import org.trace.store.services.api.data.Attributes;
 import org.trace.store.services.api.data.Beacon;
 import org.trace.store.services.api.data.Session;
 
-import trace.TraceSession;
+import com.google.gson.JsonArray;
 
 
 public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACEPlannerDriver{
@@ -140,5 +140,26 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 	@Override
 	public boolean registerUser(String username, String password, String name, String address){
 		return graph.getTrackingAPI().register(username, password, name, address);
+	}
+
+
+	@Override
+	public JsonArray getRouteBySession(String sessionId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public JsonArray getUserSessions(String username) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public JsonArray getAllSessions() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

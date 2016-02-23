@@ -9,6 +9,8 @@ import org.trace.store.services.api.data.Attributes;
 import org.trace.store.services.api.data.Beacon;
 import org.trace.store.services.api.data.Session;
 
+import com.google.gson.JsonArray;
+
 /**
  * In order for higher-level information to be acquired, the data acquired by
  * the tracking applications must  be  aggregated  and interpreted  in  a  
@@ -109,4 +111,31 @@ public interface TRACETrackingDriver {
 	 * @see TRACEResultSet
 	 */
 	public TRACEResultSet query(TRACEQuery query);
+	
+	/**
+	 * Fetches the coordinates sequence that makes up the route associated
+	 * with the specified session.
+	 * 
+	 * @param sessionId The tracking session identifier.
+	 * 
+	 * @return Route as a Json Array
+	 */
+	public JsonArray getRouteBySession(String sessionId);
+	
+	/**
+	 * Fetches the list of tracking sessions that are associated with the
+	 * specified user.
+	 * 
+	 * @param username The user's username.
+	 * 
+	 * @return List of sessions as a Json array.
+	 */
+	public JsonArray getUserSessions(String username);
+	
+	/**
+	 * Fetches the list of all tracking sessions.
+	 * 
+	 * @return List of sessions as a Json array.
+	 */
+	public JsonArray getAllSessions();
 }
