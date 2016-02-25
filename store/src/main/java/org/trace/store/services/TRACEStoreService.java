@@ -33,6 +33,8 @@ import org.trace.store.services.api.UserRegistryRequest;
 import org.trace.store.services.security.Role;
 import org.trace.store.services.security.Secured;
 
+import com.google.gson.JsonArray;
+
 /**
  * In order for higher-level information to be acquired, the data acquired by 
  * the tracking applications must  be  aggregated  and  interpreted  in  a 
@@ -239,4 +241,51 @@ public class TRACEStoreService {
 	public Response query(TRACEQuery query){
 		throw new UnsupportedOperationException();
 	}	
+	
+	
+	/*
+	 ************************************************************************
+	 ************************************************************************
+	 *** REUNIÃO 23/02/2016												  ***
+	 ************************************************************************
+	 ************************************************************************
+	 */
+	
+	/**
+	 * Fetches the coordinates sequence that makes up the route associated
+	 * with the provided session identifyer
+	 */
+	@GET
+	@Path("/route/{sessionId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonArray getRouteBySession(@PathParam("sessionId") String sessionId){
+		return mDriver.getRouteBySession(sessionId);
+	}
+	
+	/**
+	 * Fetches the list of tracking sessions that are associated with the
+	 * specified user.
+	 * 
+	 * @param username The user's username.
+	 * 
+	 * @return List of sessions as a Json array.
+	 */
+	@GET
+	@Path("/sessions/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonArray getUserSessions(@PathParam("sessionId") String username){
+		return mDriver.getUserSessions(username);
+	}
+	
+	/**
+	 * Fetches the list of all tracking sessions.
+	 * 
+	 * @return List of sessions as a Json array.
+	 */
+	@GET
+	@Path("/sessions")
+	@Produces(MediaType.APPLICATION_JSON)
+	public JsonArray getAllSessions(){
+		return mDriver.getAllSessions();
+	}
 }

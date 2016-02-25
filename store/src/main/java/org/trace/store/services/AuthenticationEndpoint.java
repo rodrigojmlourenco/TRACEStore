@@ -34,7 +34,7 @@ public class AuthenticationEndpoint {
 		if(!session.isEmpty())
 			return Response.ok(session).build();
 		else
-			return Response.ok("Failed to login").build();
+			return Response.ok("-1").build();
 		
 	}
 	
