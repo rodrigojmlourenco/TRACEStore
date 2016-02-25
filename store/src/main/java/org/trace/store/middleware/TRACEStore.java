@@ -171,7 +171,7 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 		for(TraceVertex vertex : vertices)
 			results.add(vertexAsJson(vertex));
 		
-		return null;
+		return results;
 	}
 
 
