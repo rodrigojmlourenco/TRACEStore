@@ -33,6 +33,7 @@ import org.trace.store.services.api.UserRegistryRequest;
 import org.trace.store.services.security.Role;
 import org.trace.store.services.security.Secured;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 
 /**
@@ -258,8 +259,9 @@ public class TRACEStoreService {
 	@GET
 	@Path("/route/{sessionId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonArray getRouteBySession(@PathParam("sessionId") String sessionId){
-		return mDriver.getRouteBySession(sessionId);
+	public String getRouteBySession(@PathParam("sessionId") String sessionId){
+		Gson gson = new Gson();
+		return gson.toJson(mDriver.getRouteBySession(sessionId));
 	}
 	
 	/**
@@ -273,8 +275,10 @@ public class TRACEStoreService {
 	@GET
 	@Path("/sessions/{username}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonArray getUserSessions(@PathParam("sessionId") String username){
-		return mDriver.getUserSessions(username);
+	public String getUserSessions(@PathParam("sessionId") String username){
+		Gson gson = new Gson();
+		return gson.toJson(mDriver.getUserSessions(username));
+		
 	}
 	
 	/**
@@ -285,7 +289,8 @@ public class TRACEStoreService {
 	@GET
 	@Path("/sessions")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JsonArray getAllSessions(){
-		return mDriver.getAllSessions();
+	public String getAllSessions(){
+		Gson gson = new Gson();
+		return gson.toJson(mDriver.getAllSessions());
 	}
 }
