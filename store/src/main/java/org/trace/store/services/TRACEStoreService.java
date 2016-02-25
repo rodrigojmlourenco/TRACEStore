@@ -275,7 +275,7 @@ public class TRACEStoreService {
 	@GET
 	@Path("/sessions/{username}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getUserSessions(@PathParam("sessionId") String username){
+	public String getUserSessions(@PathParam("username") String username){
 		Gson gson = new Gson();
 		return gson.toJson(mDriver.getUserSessions(username));
 		
