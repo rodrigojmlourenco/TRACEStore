@@ -7,7 +7,6 @@ import org.trace.store.services.api.TRACEResultSet;
 import org.trace.store.services.api.TraceTrack;
 import org.trace.store.services.api.data.Attributes;
 import org.trace.store.services.api.data.Beacon;
-import org.trace.store.services.api.data.Session;
 
 import com.google.gson.JsonArray;
 
@@ -41,7 +40,7 @@ public interface TRACETrackingDriver {
 	 * 
 	 * @return True if the user's location was successfully added, false otherwise.
 	 */
-	public boolean put(Session session, Date timestamp, float latitude, float longitude);
+	public boolean put(String session, Date timestamp, float latitude, float longitude);
 	
 	/**
 	 * Enables a tracking application to report its location, at a specific
@@ -57,7 +56,7 @@ public interface TRACETrackingDriver {
 	 * 
 	 * @return True if the user's location was successfully added, false otherwise.
 	 */
-	public boolean put(Session session, Date timestamp, float latitude, float longitude, Attributes attributes);
+	public boolean put(String session, Date timestamp, float latitude, float longitude, Attributes attributes);
 	
 	/**
 	 * Enables a participating tracking application to report its location with relation to a 
@@ -69,7 +68,7 @@ public interface TRACETrackingDriver {
 	 * 
 	 * @return True if the user's location was successfully added, false otherwise.
 	 */
-	public boolean put(Session session, Date timestamp, Beacon beacon);
+	public boolean put(String session, Date timestamp, Beacon beacon);
 	
 	/**
 	 * Enables a tracking application to report its location, at a specific
@@ -84,7 +83,7 @@ public interface TRACETrackingDriver {
 	 * 
 	 * @return True if the user's location was successfully added, false otherwise.
 	 */
-	public boolean put(Session session, Date timestamp, Beacon beacon, Attributes attributes);
+	public boolean put(String session, Date timestamp, Beacon beacon, Attributes attributes);
 	
 	/**
 	 *  Enables a tracking application to report a traced tracked, as a whole.
@@ -98,7 +97,7 @@ public interface TRACETrackingDriver {
 	 * 
 	 * @return True if the user's location was successfully added, false otherwise.
 	 */
-	public boolean put(Session session, TraceTrack track);
+	public boolean put(String session, TraceTrack track);
 	
 	/**
 	 * Enables users to query aspects such as previously taken routes. 

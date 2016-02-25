@@ -2,6 +2,7 @@ package org.trace.store.middleware;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +18,11 @@ import org.trace.store.services.api.TRACEResultSet;
 import org.trace.store.services.api.TraceTrack;
 import org.trace.store.services.api.data.Attributes;
 import org.trace.store.services.api.data.Beacon;
-import org.trace.store.services.api.data.Session;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import trace.TraceVertex;
 
 
 public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACEPlannerDriver{
@@ -95,36 +98,34 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 	 */
 	
 	@Override
-	public boolean put(Session session, Date timestamp, float latitude, float longitude) {
-		//TODO:
-		
-		return false;
+	public boolean put(String session, Date timestamp, float latitude, float longitude) {
+		return graph.getTrackingAPI().put(session, timestamp, latitude, longitude);		
 	}
 
 
 	@Override
-	public boolean put(Session session, Date timestamp, float latitude, float longitude, Attributes attributes) {
+	public boolean put(String session, Date timestamp, float latitude, float longitude, Attributes attributes) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 
 	@Override
-	public boolean put(Session session, Date timestamp, Beacon beacon) {
+	public boolean put(String session, Date timestamp, Beacon beacon) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 
 	@Override
-	public boolean put(Session session, Date timestamp, Beacon beacon, Attributes attributes) {
+	public boolean put(String session, Date timestamp, Beacon beacon, Attributes attributes) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 
 	@Override
-	public boolean put(Session session, TraceTrack track) {
+	public boolean put(String session, TraceTrack track) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -143,23 +144,56 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 	}
 
 
+	private JsonObject vertexAsJson(TraceVertex vertex){
+		JsonObject result = new JsonObject();
+		
+		result.addProperty("name", vertex.getName());
+		result.addProperty("type", vertex.getType());
+		result.addProperty("latitude", vertex.getYCoord());
+		result.addProperty("longitude", vertex.getXCoord());
+		result.addProperty("beaconId", vertex.getBeaconID().getBeaconID());
+		
+		
+		return result;
+	}
+	
 	@Override
 	public JsonArray getRouteBySession(String sessionId) {
-		// TODO Auto-generated method stub
+
+		JsonArray results = new JsonArray();
+		
+		List<TraceVertex> vertices = graph.getTrackingAPI().getRouteBySession(sessionId);
+		
+		for(TraceVertex vertex : vertices)
+			results.add(vertexAsJson(vertex));
+		
 		return null;
 	}
 
 
 	@Override
 	public JsonArray getUserSessions(String username) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		JsonArray results = new JsonArray();
+		
+		List<String> sessions = graph.getTrackingAPI().getUserSessions(username);
+		
+		for(String session : sessions)
+			results.add(session);
+		
+		return results;
 	}
 
 
 	@Override
 	public JsonArray getAllSessions() {
-		// TODO Auto-generated method stub
-		return null;
+		JsonArray results = new JsonArray();
+		
+		List<String> sessions = graph.getTrackingAPI().getAllSessions();
+		
+		for(String session : sessions)
+			results.add(session);
+		
+		return results;
 	}
 }
