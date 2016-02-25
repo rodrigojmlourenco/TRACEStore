@@ -22,6 +22,7 @@ import org.trace.store.services.api.data.Beacon;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import trace.TraceBeaconID;
 import trace.TraceVertex;
 
 
@@ -151,7 +152,10 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 		result.addProperty("type", vertex.getType());
 		result.addProperty("latitude", vertex.getYCoord());
 		result.addProperty("longitude", vertex.getXCoord());
-		result.addProperty("beaconId", vertex.getBeaconID().getBeaconID());
+		
+		TraceBeaconID beaconID = vertex.getBeaconID();
+		if(beaconID != null)
+			result.addProperty("beaconId", vertex.getBeaconID().getBeaconID());
 		
 		
 		return result;
