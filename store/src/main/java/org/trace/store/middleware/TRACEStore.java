@@ -174,7 +174,7 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 		return results;
 	}
 
-
+	//TODO: passa a questionar a mariaDB
 	@Override
 	public JsonArray getUserSessions(String username) {
 		
@@ -188,7 +188,7 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 		return results;
 	}
 
-
+	//TODO: passa a questionar a mariaDB
 	@Override
 	public JsonArray getAllSessions() {
 		JsonArray results = new JsonArray();

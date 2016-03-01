@@ -132,9 +132,6 @@ public class UserDriverImpl implements UserDriver{
 			} catch (SQLException e) {
 				error = e;
 				success = false;
-			} catch (UnsupportedEncodingException e) {
-				error = e;
-				success = false;
 			}
 		}
 
