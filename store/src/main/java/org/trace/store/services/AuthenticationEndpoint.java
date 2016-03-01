@@ -58,7 +58,7 @@ public class AuthenticationEndpoint {
 			error.append("success", true);
 			return error;
 		} catch (JSONException e) {			
-			e.printStackTrace();
+			LOG.error(e.getMessage());
 			return null;
 		}
 	}
@@ -144,6 +144,9 @@ public class AuthenticationEndpoint {
 	@Path("/activate")
 	@Produces(MediaType.APPLICATION_JSON)
 	public JSONObject activate(@QueryParam("token") String token){
+		
+		LOG.debug("Activating the account with activation token "+token);
+		
 		try {
 			if(userDriver.activateAccount(token))
 				return generateSuccess();
