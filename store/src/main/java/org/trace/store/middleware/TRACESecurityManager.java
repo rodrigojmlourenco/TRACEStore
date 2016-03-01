@@ -107,7 +107,7 @@ public class TRACESecurityManager{
 			return false;
 		}
 		
-		return uDriver.isPendingActivation(userID);
+		return !uDriver.isPendingActivation(userID);
 	}
 	
 	public boolean validateUser(String username, String password){
