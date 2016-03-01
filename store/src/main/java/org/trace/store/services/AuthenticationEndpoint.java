@@ -21,8 +21,6 @@ import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
 import org.trace.store.services.security.Secured;
 
-import com.amazonaws.util.json.JSONException;
-import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -101,8 +99,10 @@ public class AuthenticationEndpoint {
 		
 		try {
 			sessionDriver.openTrackingSession(userDriver.getUserID(username), session);
+			
 			GraphDB graphDB = GraphDB.getConnection();
 			graphDB.getTrackingAPI().login(username, session.substring(1, 16));
+			
 		} catch (UnableToPerformOperation e) {
 			return generateError(4, e.getMessage());
 		} catch (Exception e) {
@@ -114,14 +114,9 @@ public class AuthenticationEndpoint {
 		Log.debug("Session { "+authToken+" } attributted to user "+username+", the token contains the session.");
 		
 		
-		JSONObject token = new JSONObject();
-		try {
-			token.append("success", true);
-			token.append("token", authToken);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
+		JsonObject token = new JsonObject();
+		token.addProperty("success", true);
+		token.addProperty("token", authToken);
 		return gson.toJson(token);
 	}
 	
