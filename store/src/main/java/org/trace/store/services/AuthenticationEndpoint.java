@@ -7,7 +7,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.tinkerpop.shaded.minlog.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trace.store.middleware.TRACESecurityManager;
@@ -101,17 +100,6 @@ public class AuthenticationEndpoint {
 			sessionDriver.openTrackingSession(userDriver.getUserID(username), session);
 			
 			GraphDB graphDB = GraphDB.getConnection();
-			LOG.debug("<<<>>>");
-			int i=0, limit =10;
-			for(String s : graphDB.getTrackingAPI().getAllSessions()){
-				if(!s.startsWith("0.")){
-				LOG.debug(s);
-				if(i >= limit)
-					break;
-				else
-					i++;
-				}
-			}
 			graphDB.getTrackingAPI().login(username, session.substring(1, 16));
 			
 		} catch (UnableToPerformOperation e) {
@@ -120,16 +108,17 @@ public class AuthenticationEndpoint {
 			return generateError(5, e.getMessage());
 		}
 		
-		Log.debug("Session store in TitanDb and MariaDB");
+		LOG.debug("Session store in TitanDb and MariaDB");
 		
 		String authToken = manager.issueToken(username, session);
 		
-		Log.debug("Session { "+authToken+" } attributted to user "+username+", the token contains the session.");
+		LOG.debug("Session { "+authToken+" } attributted to user "+username+", the token contains the session.");
 		
 		
 		JsonObject token = new JsonObject();
 		token.addProperty("success", true);
 		token.addProperty("token", authToken);
+		
 		return gson.toJson(token);
 	}
 	
