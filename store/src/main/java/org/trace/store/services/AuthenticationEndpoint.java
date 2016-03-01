@@ -14,6 +14,7 @@ import org.trace.store.middleware.TRACESecurityManager;
 import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.UserDriver;
+import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
@@ -49,6 +50,20 @@ public class AuthenticationEndpoint {
 			return null;
 		}
 	}
+	
+	private JSONObject generateSuccess(){
+		JSONObject error = new JSONObject();
+		
+		try {
+			error.append("success", true);
+			return error;
+		} catch (JSONException e) {			
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
 	/**
 	 *   
 	 * @param username The user's unique username.
@@ -127,7 +142,18 @@ public class AuthenticationEndpoint {
 	
 	@POST
 	@Path("/activate")
-	public Response activate(@QueryParam("token") String token){
-		throw new UnsupportedOperationException();
+	@Produces(MediaType.APPLICATION_JSON)
+	public JSONObject activate(@QueryParam("token") String token){
+		try {
+			if(userDriver.activateAccount(token))
+				return generateSuccess();
+			else
+				return generateError(3, "User was not successfully activated");
+						
+		} catch (ExpiredTokenException e) {
+			return generateError(1, e.getMessage());
+		} catch (UnableToPerformOperation e) {
+			return generateError(2, e.getMessage());
+		}
 	}
 }
