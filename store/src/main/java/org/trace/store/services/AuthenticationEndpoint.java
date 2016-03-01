@@ -100,7 +100,7 @@ public class AuthenticationEndpoint {
 			sessionDriver.openTrackingSession(userDriver.getUserID(username), session);
 			
 			GraphDB graphDB = GraphDB.getConnection();
-			graphDB.getTrackingAPI().login(username, session.substring(1, 16));
+			graphDB.getTrackingAPI().login(username, session);
 			
 		} catch (UnableToPerformOperation e) {
 			return generateError(4, e.getMessage());
@@ -112,7 +112,7 @@ public class AuthenticationEndpoint {
 		
 		String authToken;
 		try{
-			authToken = manager.issueToken(username);
+			authToken = manager.issueToken(username,session);
 		LOG.debug("Session { "+authToken+" } attributted to user "+username+", the token contains the session.");
 		}catch(Exception e){
 			return generateError(6, e.getMessage());
