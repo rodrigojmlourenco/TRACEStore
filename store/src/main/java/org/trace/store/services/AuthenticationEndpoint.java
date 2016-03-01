@@ -148,9 +148,10 @@ public class AuthenticationEndpoint {
 		LOG.debug("Activating the account with activation token "+token);
 		
 		try {
-			if(userDriver.activateAccount(token))
+			if(userDriver.activateAccount(token)){
+				LOG.info("User account activated.");
 				return generateSuccess();
-			else
+			}else
 				return generateError(3, "User was not successfully activated");
 						
 		} catch (ExpiredTokenException e) {
