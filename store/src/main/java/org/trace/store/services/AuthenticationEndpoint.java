@@ -1,5 +1,6 @@
 package org.trace.store.services;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -69,8 +70,8 @@ public class AuthenticationEndpoint {
 	 */
 	@POST
 	@Path("/login")
-	@Produces(MediaType.APPLICATION_JSON)
-	public String login(@QueryParam("username") String username, @QueryParam("password") String password){
+	@Produces(MediaType.APPLICATION_FORM_URLENCODED)
+	public String login(@FormParam("username") String username, @FormParam("password") String password){
 		
 		//Step 1 - Check if the user's account is activated
 		if(!manager.isActiveUser(username))
