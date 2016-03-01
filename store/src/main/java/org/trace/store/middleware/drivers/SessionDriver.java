@@ -3,6 +3,7 @@ package org.trace.store.middleware.drivers;
 import java.util.Date;
 import java.util.List;
 
+import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 
 public interface SessionDriver {
@@ -13,7 +14,7 @@ public interface SessionDriver {
 	 * @param sessionToken The tracking session pseudonym.
 	 * @throws UnableToPerformOperation
 	 */
-	public void openTrackingSession(String username, String sessionToken) throws UnableToPerformOperation;
+	public void openTrackingSession(int userId, String sessionToken) throws UnableToPerformOperation;
 	
 	/**
 	 * Closes a currently active tracking session identified by its session token.
@@ -26,8 +27,9 @@ public interface SessionDriver {
 	 * Checks if the tracking session identified by the session token is closed or still active.
 	 * @param sessionToken The tracking session's token.
 	 * @return True is the tracking session is closed, false otherwise.
+	 * @throws SessionNotFoundException 
 	 */
-	public boolean isTrackingSessionClosed(String sessionToken) throws UnableToPerformOperation;
+	public boolean isTrackingSessionClosed(String sessionToken) throws UnableToPerformOperation, SessionNotFoundException;
 	
 	/**
 	 * Checks is a tracking session exists for the specified session token.
@@ -46,11 +48,18 @@ public interface SessionDriver {
 	public void clearTrackingSessionsCreatedBefore(Date date) throws UnableToPerformOperation;
 	
 	/**
-	 * Fetches all closed tracking sessions' tokens.
+	 * Fetches all tracking sessions' tokens.
 	 * @return List of all tracking sessions.
 	 * @throws UnableToPerformOperation
 	 */
 	public List<String> getAllTrackingSessions() throws UnableToPerformOperation;
+	
+	/**
+	 * Fetches all closed tracking sessions' tokens.
+	 * @return List of all tracking sessions.
+	 * @throws UnableToPerformOperation
+	 */
+	public List<String> getAllClosedTrackingSessions() throws UnableToPerformOperation;
 	
 	/**
 	 * Fetches all closed tracking sessions' tokens associeted with a specific user.

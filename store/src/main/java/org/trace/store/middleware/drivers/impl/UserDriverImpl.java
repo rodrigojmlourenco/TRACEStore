@@ -7,6 +7,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.apache.commons.codec.binary.Base64;
 import org.trace.store.middleware.drivers.UserDriver;
@@ -124,8 +125,7 @@ public class UserDriverImpl implements UserDriver{
 			try {
 				token = SecurityUtils.generateSecureActivationToken(25);
 				byte[] hashedToken = SecurityUtils.hashSHA1(token);
-				token = Base64.encodeBase64String(hashedToken);
-				success = insertValidationRequest(userId, token);
+				success = insertValidationRequest(userId, Base64.encodeBase64String(hashedToken));
 			} catch (NoSuchAlgorithmException e) {
 				error = e;
 				success = false;
@@ -576,8 +576,8 @@ public class UserDriverImpl implements UserDriver{
 		boolean result;
 		PreparedStatement statement = 
 				conn.prepareStatement(
-						"SELECT Id, ExpirationDate FROM users_emails "
-								+ "WHERE Token=? AND RecoveryPassword='0'");
+						"SELECT Id, Expiration FROM activation "
+								+ "WHERE Token=?");
 
 		statement.setString(1, token);
 		ResultSet set = statement.executeQuery();
@@ -594,6 +594,7 @@ public class UserDriverImpl implements UserDriver{
 	private int getTokenActivationID(String token) throws SQLException, NoSuchTokenException {
 
 		int result;
+		
 		PreparedStatement statement = 
 				conn.prepareStatement(
 						"SELECT Id "
@@ -620,12 +621,35 @@ public class UserDriverImpl implements UserDriver{
 	 **************************************************************************
 	 **************************************************************************
 	 */
+	
+	protected void clearAll(){
+		try {
+			Statement statement = conn.createStatement();
+			statement.executeQuery("DELETE FROM users");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 
 	public static void main(String[] args){
-		UserDriver d = UserDriverImpl.getDriver();
+		UserDriverImpl d = (UserDriverImpl)UserDriverImpl.getDriver();
 
 		try {
-			System.out.println(d.registerUser("bonobo", "bonobo@somemail.com", "passWord123#", "passWord123#", "Bonobo da Silva", "Av Alves Redol n9", "+351919999999", Role.user));
+			
+			int id;
+			d.clearAll();
+			String activation = d.registerUser("bonobo", "bonobo@somemail.com", "passWord123#", "passWord123#", "Bonobo da Silva", "Av Alves Redol n9", "+351919999999", Role.user);
+			System.out.println(activation);
+			d.activateAccount(activation);
+			System.out.println(id=d.getUserID("bonobo"));
+			
+			if(!d.isPendingActivation(id) && d.isValidPassword("bonobo", "passWord123#"))
+				System.out.println("YES IT IS CORRECT");
+			else
+				System.out.println("SOMETHING IS NOT RIGHT!");
+			
 		} catch (UserRegistryException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -636,6 +660,12 @@ public class UserDriverImpl implements UserDriver{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnableToPerformOperation e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExpiredTokenException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidIdentifierException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
