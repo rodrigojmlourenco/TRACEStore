@@ -90,7 +90,7 @@ public class AuthenticationFilter implements ContainerRequestFilter{
 
 
 	private String validateToken(String token) throws Exception {
-		LOG.debug("TODO: validate the token "+ token);
+
 		try {
 			String session = manager.validateAndExtractSession(token);
 			

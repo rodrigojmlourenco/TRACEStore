@@ -6,7 +6,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.slf4j.Logger;
@@ -17,6 +16,7 @@ import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
+import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
@@ -132,9 +132,25 @@ public class AuthenticationEndpoint {
 	@POST
 	@Secured
 	@Path("/logout")
-	public Response logout(@Context SecurityContext securityContext){
-		LOG.debug("TODO: close the session :"+extractSessionFromSecurityContext(securityContext));
-		return Response.ok().build();
+	@Produces(MediaType.APPLICATION_JSON)
+	public String logout(@Context SecurityContext securityContext){
+		
+		String session = extractSessionFromSecurityContext(securityContext);
+		
+		try {
+			
+			if(sessionDriver.isTrackingSessionClosed(session))
+				return generateError(1, "Session had already been closed.");
+			else
+				sessionDriver.closeTrackingSession(session);
+			
+			return generateSuccess();
+			
+		} catch (UnableToPerformOperation e) {
+			return generateError(2, e.getMessage());
+		} catch (SessionNotFoundException e) {
+			return generateError(3, e.getMessage());
+		}
 	}
 	
 	@POST
