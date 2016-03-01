@@ -4,8 +4,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,11 @@ public class AuthenticationEndpoint {
 	private SessionDriver sessionDriver = SessionDriverImpl.getDriver();
 	
 	private Gson gson = new Gson();
+	
+	private String extractSessionFromSecurityContext(SecurityContext context){
+		return context.getUserPrincipal().getName();
+	}
+	
 	private String generateError(int code, String message){
 		JsonObject error = new JsonObject();
 		error.addProperty("success", false);
@@ -125,8 +132,8 @@ public class AuthenticationEndpoint {
 	@POST
 	@Secured
 	@Path("/logout")
-	public Response logout(){
-		LOG.debug("TODO: close the session which is extracted from the auth token");
+	public Response logout(@Context SecurityContext securityContext){
+		LOG.debug("TODO: close the session :"+extractSessionFromSecurityContext(securityContext));
 		return Response.ok().build();
 	}
 	
