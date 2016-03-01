@@ -102,7 +102,7 @@ public class AuthenticationEndpoint {
 		try {
 			sessionDriver.openTrackingSession(userDriver.getUserID(username), session);
 			GraphDB graphDB = GraphDB.getConnection();
-			graphDB.getTrackingAPI().login(username, session);
+			graphDB.getTrackingAPI().login(username, session.substring(1, 16));
 		} catch (UnableToPerformOperation e) {
 			return generateError(4, e.getMessage());
 		} catch (Exception e) {
