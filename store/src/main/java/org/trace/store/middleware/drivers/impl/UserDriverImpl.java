@@ -246,8 +246,7 @@ public class UserDriverImpl implements UserDriver{
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		} catch (NoSuchTokenException e) {
-			e.printStackTrace();
-			throw new ExpiredTokenException();
+			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
 
