@@ -1,4 +1,4 @@
-package org.trace.store.services.security;
+package org.trace.store.filters;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

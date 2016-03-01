@@ -1,6 +1,6 @@
 package org.trace.store.middleware.drivers.exceptions;
 
-import org.trace.store.services.security.Role;
+import org.trace.store.filters.Role;
 
 public class UnknownSecurityRoleException extends Exception {
 

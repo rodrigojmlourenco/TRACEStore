@@ -4,6 +4,7 @@ package org.trace.store.middleware.drivers;
 import java.util.Date;
 import java.util.List;
 
+import org.trace.store.filters.Role;
 import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
 import org.trace.store.middleware.drivers.exceptions.InvalidIdentifierException;
 import org.trace.store.middleware.drivers.exceptions.NonMatchingPasswordsException;
@@ -15,7 +16,6 @@ import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
 import org.trace.store.middleware.drivers.exceptions.UnknownUserIdentifierException;
 import org.trace.store.middleware.drivers.exceptions.UserRegistryException;
 import org.trace.store.services.api.PrivacyPolicies;
-import org.trace.store.services.security.Role;
 
 public interface UserDriver {
 

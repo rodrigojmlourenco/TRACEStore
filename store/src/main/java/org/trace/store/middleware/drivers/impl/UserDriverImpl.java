@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.commons.codec.binary.Base64;
+import org.trace.store.filters.Role;
 import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.EmailAlreadyRegisteredException;
 import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
@@ -32,7 +33,6 @@ import org.trace.store.middleware.drivers.utils.FormFieldValidator;
 import org.trace.store.middleware.drivers.utils.SecurityRoleUtils;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
 import org.trace.store.services.api.PrivacyPolicies;
-import org.trace.store.services.security.Role;
 
 public class UserDriverImpl implements UserDriver{
 

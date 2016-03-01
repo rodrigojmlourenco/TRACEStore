@@ -14,6 +14,8 @@ import javax.ws.rs.core.Response;
 import org.apache.tinkerpop.shaded.minlog.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.trace.store.filters.Role;
+import org.trace.store.filters.Secured;
 import org.trace.store.middleware.TRACESecurityManager;
 import org.trace.store.middleware.TRACEStore;
 import org.trace.store.middleware.backend.GraphDB;
@@ -30,8 +32,6 @@ import org.trace.store.services.api.PrivacyPolicies;
 import org.trace.store.services.api.TRACEQuery;
 import org.trace.store.services.api.TraceTrack;
 import org.trace.store.services.api.UserRegistryRequest;
-import org.trace.store.services.security.Role;
-import org.trace.store.services.security.Secured;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

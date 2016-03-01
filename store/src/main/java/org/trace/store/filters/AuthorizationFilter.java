@@ -1,4 +1,4 @@
-package org.trace.store.services.security;
+package org.trace.store.filters;
 
 import java.io.IOException;
 import java.lang.reflect.AnnotatedElement;

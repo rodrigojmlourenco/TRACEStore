@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.trace.store.filters.Secured;
 import org.trace.store.middleware.TRACESecurityManager;
 import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.drivers.SessionDriver;
@@ -18,7 +19,6 @@ import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
-import org.trace.store.services.security.Secured;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -65,8 +65,6 @@ public class AuthenticationEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String login(@QueryParam("username") String username, @QueryParam("password") String password){
 		
-		LOG.debug("Authenticating <"+username+","+password+">"); //TODO: remover
-		
 		//Step 1 - Check if the user's account is activated
 		if(!manager.isActiveUser(username))
 			return generateError(1, username+" has not activated his account yet");
@@ -75,8 +73,6 @@ public class AuthenticationEndpoint {
 		if(!manager.validateUser(username, password))
 			return generateError(2, "Invalid password or username");
 		
-		LOG.debug("<"+username+"> presented the correct password.");
-
 		//Step 3 - Issue a new token and provide it to the user
 		String session;
 		int tries = 0;
@@ -94,7 +90,6 @@ public class AuthenticationEndpoint {
 			return generateError(3, e.getMessage());
 		}
 		
-		LOG.debug("Session {"+session+"} generated for "+username);
 		
 		try {
 			sessionDriver.openTrackingSession(userDriver.getUserID(username), session);
@@ -108,18 +103,12 @@ public class AuthenticationEndpoint {
 			return generateError(5, e.getMessage());
 		}
 		
-		LOG.debug("Session store in TitanDb and MariaDB");
-		
 		String authToken;
 		try{
 			authToken = manager.issueToken(username,session);
-		LOG.debug("Session { "+authToken+" } attributted to user "+username+", the token contains the session.");
 		}catch(Exception e){
 			return generateError(6, e.getMessage());
 		}
-		
-		
-		
 		
 		JsonObject token = new JsonObject();
 		token.addProperty("success", true);
@@ -137,7 +126,8 @@ public class AuthenticationEndpoint {
 	@Secured
 	@Path("/logout")
 	public Response logout(){
-		throw new UnsupportedOperationException();
+		LOG.debug("TODO: close the session which is extracted from the auth token");
+		return Response.ok().build();
 	}
 	
 	@POST

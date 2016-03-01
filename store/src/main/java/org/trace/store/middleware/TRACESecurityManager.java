@@ -166,6 +166,14 @@ public class TRACESecurityManager{
 		return claims.getSubject();
 	}
 	
+	public String validateAndExtractSession(String token) throws Exception{
+		Claims claims = Jwts.parser()         
+				.setSigningKey(DatatypeConverter.parseBase64Binary(SECRET))
+				.parseClaimsJws(token).getBody();
+
+		return claims.get("session", String.class);
+	}
+	
 	private Date validateAndExtractDate(String token) throws Exception{
 		Claims claims = Jwts.parser()         
 				.setSigningKey(DatatypeConverter.parseBase64Binary(SECRET))

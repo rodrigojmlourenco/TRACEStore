@@ -1,4 +1,4 @@
-package org.trace.store.services.security;
+package org.trace.store.filters;
 
 import java.io.IOException;
 
@@ -11,6 +11,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.trace.store.middleware.TRACESecurityManager;
 
 @Secured
@@ -18,6 +20,8 @@ import org.trace.store.middleware.TRACESecurityManager;
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter{
 
+	private final Logger LOG = LoggerFactory.getLogger(AuthenticationFilter.class); 
+	
 	private TRACESecurityManager manager = TRACESecurityManager.getManager();
 
 	@Override
@@ -49,6 +53,14 @@ public class AuthenticationFilter implements ContainerRequestFilter{
 
 
 	private boolean validateToken(String token) throws Exception {
+		LOG.debug("TODO: validate the token "+ token);
+		try {
+			String session = manager.validateAndExtractSession(token);
+			if(session!=null && !session.isEmpty())
+				LOG.debug("Validated token with session: "+session);
+		}catch(Exception e){
+			LOG.error(e.getMessage());
+		}
 		return true;
 	}
 }
