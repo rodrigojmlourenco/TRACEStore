@@ -110,9 +110,15 @@ public class AuthenticationEndpoint {
 		
 		LOG.debug("Session store in TitanDb and MariaDB");
 		
-		String authToken = manager.issueToken(username, session);
-		
+		String authToken;
+		try{
+			authToken = manager.issueToken(username, session);
 		LOG.debug("Session { "+authToken+" } attributted to user "+username+", the token contains the session.");
+		}catch(Exception e){
+			return generateError(6, e.getMessage());
+		}
+		
+		
 		
 		
 		JsonObject token = new JsonObject();
