@@ -104,11 +104,13 @@ public class AuthenticationEndpoint {
 			LOG.debug("<<<>>>");
 			int i=0, limit =10;
 			for(String s : graphDB.getTrackingAPI().getAllSessions()){
+				if(!s.startsWith("0.")){
 				LOG.debug(s);
 				if(i >= limit)
 					break;
 				else
 					i++;
+				}
 			}
 			graphDB.getTrackingAPI().login(username, session.substring(1, 16));
 			
