@@ -8,10 +8,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
-import org.apache.tinkerpop.shaded.minlog.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trace.store.filters.Role;
@@ -34,7 +35,6 @@ import org.trace.store.services.api.TraceTrack;
 import org.trace.store.services.api.UserRegistryRequest;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 
 /**
  * In order for higher-level information to be acquired, the data acquired by 
@@ -52,7 +52,7 @@ public class TRACEStoreService {
 	
 	private UserDriver uDriver = UserDriverImpl.getDriver();
 	private TRACETrackingDriver mDriver = TRACEStore.getTRACEStore();
-	private TRACESecurityManager secMan = TRACESecurityManager.getManager();
+	
 
 	@Path("/test")
 	@GET
@@ -123,13 +123,6 @@ public class TRACEStoreService {
 		}
 	}
 
-	@POST
-	@Secured(Role.user)
-	@Path("/session")
-	public Response generateSessionId(){
-		return Response.ok(secMan.generateSessionPseudonym()).build();
-	}
-
 	/**
 	 * Allows users to set security and privacy policies about their data. 
 	 *   
@@ -161,12 +154,12 @@ public class TRACEStoreService {
 	 * @see GeoLocation
 	 */
 	@POST
-	//@Secured(Role.user) TODO: descomentar
-	@Path("/put/geo/{sessionId}")
+	@Secured
+	@Path("/put/geo")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response put(@PathParam("sessionId") String sessionId, GeoLocation location){
+	public Response put(GeoLocation location, @Context SecurityContext context){
 		
-		LOG.debug(sessionId);
+		String sessionId = context.getUserPrincipal().getName();
 
 		
 		boolean success;
@@ -196,10 +189,10 @@ public class TRACEStoreService {
 	 * @see BeaconLocation
 	 */
 	@POST
-	@Secured(Role.user)
-	@Path("/put/beacon/{sessionId}")
+	@Secured
+	@Path("/put/beacon")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response put(@PathParam("sessionId") String sessionId, BeaconLocation location){
+	public Response put(BeaconLocation location, @Context SecurityContext context){
 		throw new UnsupportedOperationException();
 	}
 
@@ -214,9 +207,9 @@ public class TRACEStoreService {
 	 * @see TraceTrack
 	 */
 	@POST
-	@Secured(Role.user)
-	@Path("/put/track/{sessionId}")
-	public Response put(@PathParam("sessionId") String sessionId, TraceTrack track){
+	@Secured
+	@Path("/put/track")
+	public Response put(TraceTrack track, @Context SecurityContext context){
 		throw new UnsupportedOperationException();
 	}
 
