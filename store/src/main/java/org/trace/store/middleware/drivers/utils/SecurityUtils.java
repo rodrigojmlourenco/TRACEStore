@@ -40,7 +40,7 @@ public class SecurityUtils {
 		return dtPlusOne.toDate();
 	}
 	
-	public static String generateSecureActivationToken(int size) throws UnsupportedEncodingException{
+	public static String generateSecureActivationToken(int size){
 		byte[] token = new byte[size];
 		r.nextBytes(token);
 		return Hex.encodeHexString(token);
