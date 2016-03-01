@@ -94,6 +94,7 @@ user_sessions	 = "CREATE TABLE IF NOT EXISTS sessions ("
 user_sessions	+= "Session VARCHAR(255) NOT NULL UNIQUE PRIMARY KEY, "
 user_sessions	+= "UserId	INT(11) UNSIGNED NOT NULL, "
 user_sessions	+= "FOREIGN KEY(UserId) REFERENCES users(Id) ON DELETE CASCADE, "
+user_sessions	+= "IsClosed BOOLEAN DEFAULT false, "
 user_sessions	+= "CreatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)"
 
 

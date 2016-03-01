@@ -22,12 +22,11 @@ public interface TRACETrackingDriver {
 	/**
 	 * 
 	 * @param username
-	 * @param password
 	 * @param name
 	 * @param address
 	 * @return
 	 */
-	public boolean registerUser(String username, String password, String name, String address);
+	public boolean registerUser(String username, String name, String address);
 	
 	/**
 	 * Enables a tracking application to report its geographical location,

@@ -140,8 +140,8 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 	
 		
 	@Override
-	public boolean registerUser(String username, String password, String name, String address){
-		return graph.getTrackingAPI().register(username, password, name, address);
+	public boolean registerUser(String username, String name, String address){
+		return graph.getTrackingAPI().register(username, name, address);
 	}
 
 

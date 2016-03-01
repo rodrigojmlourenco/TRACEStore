@@ -1,6 +1,9 @@
 package org.trace.store.middleware.drivers;
 
 
+import java.util.Date;
+import java.util.List;
+
 import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
 import org.trace.store.middleware.drivers.exceptions.InvalidIdentifierException;
 import org.trace.store.middleware.drivers.exceptions.NonMatchingPasswordsException;
@@ -112,4 +115,5 @@ public interface UserDriver {
 	 * @return True if the privacy policies were successfully added, false otherwise.
 	 */
 	public boolean setPrivacyPolicies(String identifier, PrivacyPolicies policies);
+	
 }

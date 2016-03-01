@@ -106,7 +106,6 @@ public class TRACEStoreService {
 							Role.user);
 
 			mDriver.registerUser(request.getUsername(),
-									request.getPassword(),
 									request.getName(),
 									request.getAddress());
 			
@@ -168,7 +167,8 @@ public class TRACEStoreService {
 	public Response put(@PathParam("sessionId") String sessionId, GeoLocation location){
 		
 		LOG.debug(sessionId);
-		Log.debug(location.toString());
+
+		
 		boolean success;
 		GraphDB conn = GraphDB.getConnection();
 		success = conn.getTrackingAPI().put(

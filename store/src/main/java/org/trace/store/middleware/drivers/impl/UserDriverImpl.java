@@ -1,18 +1,12 @@
 package org.trace.store.middleware.drivers.impl;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.trace.store.middleware.drivers.UserDriver;
@@ -38,11 +32,6 @@ import org.trace.store.middleware.drivers.utils.SecurityRoleUtils;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
 import org.trace.store.services.api.PrivacyPolicies;
 import org.trace.store.services.security.Role;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class UserDriverImpl implements UserDriver{
 
@@ -53,56 +42,7 @@ public class UserDriverImpl implements UserDriver{
 	private Connection conn;
 
 	private UserDriverImpl(){
-
-		String user="error", password="error", database="error";
-
-		String configFile = System.getenv("HOME")+"/trace/config.xml";
-
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder;
-		try {
-			dBuilder = dbFactory.newDocumentBuilder();
-			Document config = dBuilder.parse(configFile);
-
-			config.getDocumentElement().normalize();
-
-			NodeList configParams = config.getElementsByTagName("repository").item(0).getChildNodes();
-
-			Node aux;
-			for(int i=0; i<configParams.getLength(); i++){
-				aux = configParams.item(i);
-
-				if(aux.getNodeType() == Node.ELEMENT_NODE){
-					switch (aux.getNodeName()) {
-					case "user":
-						user = ((Element)aux).getAttribute("val");
-						break;
-					case "password":
-						password = ((Element)aux).getAttribute("val");
-					case "database":
-						database = ((Element)aux).getAttribute("val");
-					default:
-						break;
-					}
-				}
-			}
-
-
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+database, user, password);
-
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage());
-		} catch (SAXException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage());
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e.getMessage());
-		}
+		conn = MariaDBDriver.getMariaConnection();
 	}
 
 	private static UserDriverImpl DRIVER = new UserDriverImpl();

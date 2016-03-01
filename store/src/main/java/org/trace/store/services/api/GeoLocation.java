@@ -74,7 +74,7 @@ public class GeoLocation {
 	
 	@Override
 	public String toString() {
-		return "{ latitude: "+getLatitude()+", longitude: "+longitude+", timestamp: "+timestamp+"}";
+		return "{ latitude: "+latitude+", longitude: "+longitude+", timestamp: "+timestamp+"}";
 	}
 	
 	
