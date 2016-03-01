@@ -183,7 +183,7 @@ public class TRACESecurityManager{
 	}
 	
 	
-	private String createJWT(String id, String issuer, String subject, Date expiration, String payload){
+	private String createJWT(String id, String issuer, String subject, Date expiration){
 		//The JWT signature algorithm we will be using to sign the token
 		SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
@@ -200,7 +200,6 @@ public class TRACESecurityManager{
 				.setSubject(subject)
 				.setIssuer(issuer)
 				.setExpiration(expiration)
-				.setPayload(payload)
 				.signWith(signatureAlgorithm, signingKey);
 
 		//Builds the JWT and serializes it to a compact, URL-safe string
@@ -208,7 +207,7 @@ public class TRACESecurityManager{
 	}
 
 	
-	public String issueToken(String username, String session){
+	public String issueToken(String username){
 		
 		int tries = 0;
 		Date expiration;
@@ -231,7 +230,7 @@ public class TRACESecurityManager{
 		//Step 2 - Generate the token
 		expiration = new Date(System.currentTimeMillis()+TOKEN_TTL);
 		
-		jwt = createJWT(jti, TOKEN_ISSUER, username, expiration, session);
+		jwt = createJWT(jti, TOKEN_ISSUER, username, expiration);
 		authenticationTokens.put(jti, jwt);
 		expirationDates.put(jti, expiration);
 		userTokens.put(username, jti);

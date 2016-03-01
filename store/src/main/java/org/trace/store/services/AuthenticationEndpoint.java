@@ -112,7 +112,7 @@ public class AuthenticationEndpoint {
 		
 		String authToken;
 		try{
-			authToken = manager.issueToken(username, session);
+			authToken = manager.issueToken(username);
 		LOG.debug("Session { "+authToken+" } attributted to user "+username+", the token contains the session.");
 		}catch(Exception e){
 			return generateError(6, e.getMessage());
