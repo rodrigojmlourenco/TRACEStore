@@ -23,6 +23,8 @@ import org.trace.store.services.security.Secured;
 
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 @Path("/auth")
 public class AuthenticationEndpoint {
@@ -37,30 +39,20 @@ public class AuthenticationEndpoint {
 	private UserDriver userDriver		= UserDriverImpl.getDriver();
 	private SessionDriver sessionDriver = SessionDriverImpl.getDriver();
 	
-	private JSONObject generateError(int code, String message){
-		JSONObject error = new JSONObject();
+	private Gson gson = new Gson();
+	private String generateError(int code, String message){
+		JsonObject error = new JsonObject();
+		error.addProperty("success", false);
+		error.addProperty("code", code);
+		error.addProperty("error", message);
+		return gson.toJson(error);
 		
-		try {
-			error.append("success", false);
-			error.append("code", code);
-			error.append("error", message);
-			return error;
-		} catch (JSONException e) {			
-			e.printStackTrace();
-			return null;
-		}
 	}
 	
-	private JSONObject generateSuccess(){
-		JSONObject error = new JSONObject();
-		
-		try {
-			error.append("success", true);
-			return error;
-		} catch (JSONException e) {			
-			LOG.error(e.getMessage());
-			return null;
-		}
+	private String generateSuccess(){
+		JsonObject success = new JsonObject();
+		success.addProperty("success", true);
+		return gson.toJson(success);
 	}
 	
 	
@@ -74,7 +66,9 @@ public class AuthenticationEndpoint {
 	@POST
 	@Path("/login")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JSONObject login(@QueryParam("username") String username, @QueryParam("password") String password){
+	public String login(@QueryParam("username") String username, @QueryParam("password") String password){
+		
+		LOG.debug("Authenticating <"+username+","+password+">"); //TODO: remover
 		
 		//Step 1 - Check if the user's account is activated
 		if(!manager.isActiveUser(username))
@@ -125,7 +119,7 @@ public class AuthenticationEndpoint {
 			e.printStackTrace();
 		}
 		
-		return token;
+		return gson.toJson(token);
 	}
 	
 	/**
@@ -142,8 +136,8 @@ public class AuthenticationEndpoint {
 	
 	@POST
 	@Path("/activate")
-	@Produces(MediaType.APPLICATION_JSON)
-	public JSONObject activate(@QueryParam("token") String token){
+	@Produces({MediaType.APPLICATION_JSON})
+	public String activate(@QueryParam("token") String token){
 		
 		LOG.debug("Activating the account with activation token "+token);
 		
