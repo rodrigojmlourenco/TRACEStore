@@ -102,6 +102,14 @@ public class AuthenticationEndpoint {
 			
 			GraphDB graphDB = GraphDB.getConnection();
 			LOG.debug("<<<>>>");
+			int i=0, limit =10;
+			for(String s : graphDB.getTrackingAPI().getAllSessions()){
+				LOG.debug(s);
+				if(i >= limit)
+					break;
+				else
+					i++;
+			}
 			graphDB.getTrackingAPI().login(username, session.substring(1, 16));
 			
 		} catch (UnableToPerformOperation e) {
