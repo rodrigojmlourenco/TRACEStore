@@ -101,6 +101,7 @@ public class AuthenticationEndpoint {
 			sessionDriver.openTrackingSession(userDriver.getUserID(username), session);
 			
 			GraphDB graphDB = GraphDB.getConnection();
+			Log.debug("<<<>>>");
 			graphDB.getTrackingAPI().login(username, session.substring(1, 16));
 			
 		} catch (UnableToPerformOperation e) {
