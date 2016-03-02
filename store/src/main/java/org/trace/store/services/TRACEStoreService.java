@@ -35,6 +35,7 @@ import org.trace.store.services.api.TraceTrack;
 import org.trace.store.services.api.UserRegistryRequest;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * In order for higher-level information to be acquired, the data acquired by 
@@ -144,6 +145,20 @@ public class TRACEStoreService {
 	 ************************************************************************
 	 */
 
+	private Gson gson = new Gson();
+	private String generateSuccessResponse(){
+		JsonObject response = new JsonObject();
+		response.addProperty("success", true);
+		return gson.toJson(response);
+	}
+	
+	private String generateFailedResponse(String msg){
+		JsonObject response = new JsonObject();
+		response.addProperty("success", false);
+		response.addProperty("error", msg);
+		return gson.toJson(response);
+	}
+	
 	/**
 	 * Enables a tracking application to report its location, at a specific moment in time.
 	 * @param sessionId The user's session identifier, which operates as a pseudonym.
@@ -157,7 +172,7 @@ public class TRACEStoreService {
 	@Secured
 	@Path("/put/geo/{session}")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response put(@PathParam("session") String session, GeoLocation location, @Context SecurityContext context){
+	public String put(@PathParam("session") String session, GeoLocation location, @Context SecurityContext context){
 		
 		boolean success;
 		GraphDB conn = GraphDB.getConnection();
@@ -168,9 +183,9 @@ public class TRACEStoreService {
 						location.getLongitude());
 		
 		if(success)
-			return Response.ok("Location successfully inserted.").build();
+			return generateSuccessResponse();
 		else
-			return Response.ok("Location insertion failed.").build();
+			return generateFailedResponse("Location insertion failed.");
 		
 	}
 	
