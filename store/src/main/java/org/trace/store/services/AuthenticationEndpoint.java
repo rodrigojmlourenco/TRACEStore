@@ -81,39 +81,10 @@ public class AuthenticationEndpoint {
 		if(!manager.validateUser(username, password))
 			return generateError(2, "Invalid password or username");
 		
-		//Step 3 - Issue a new token and provide it to the user
-		String session;
-		int tries = 0;
-		try {
-			do{
-				session = SecurityUtils.generateSecureActivationToken(32);
-				tries++;
-				
-				if (tries > MAX_TRIES) {
-					return generateError(5, "Can no longer generate unique session code");
-				}
-				
-			}while(sessionDriver.trackingSessionExists(session));
-		}catch (UnableToPerformOperation e) {
-			return generateError(3, e.getMessage());
-		}
-		
-		
-		try {
-			sessionDriver.openTrackingSession(userDriver.getUserID(username), session);
-			
-			GraphDB graphDB = GraphDB.getConnection();
-			graphDB.getTrackingAPI().login(username, session);
-			
-		} catch (UnableToPerformOperation e) {
-			return generateError(4, e.getMessage());
-		} catch (Exception e) {
-			return generateError(5, e.getMessage());
-		}
-		
+		//Step 3 - Issue a new JWT token and provide it to the user
 		String authToken;
 		try{
-			authToken = manager.issueToken(username,session);
+			authToken = manager.issueToken(username);
 		}catch(Exception e){
 			return generateError(6, e.getMessage());
 		}
@@ -135,23 +106,8 @@ public class AuthenticationEndpoint {
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String logout(@Context SecurityContext securityContext){
-		
-		String session = extractSessionFromSecurityContext(securityContext);
-		
-		try {
-			
-			if(sessionDriver.isTrackingSessionClosed(session))
-				return generateError(1, "Session had already been closed.");
-			else
-				sessionDriver.closeTrackingSession(session);
-			
-			return generateSuccess();
-			
-		} catch (UnableToPerformOperation e) {
-			return generateError(2, e.getMessage());
-		} catch (SessionNotFoundException e) {
-			return generateError(3, e.getMessage());
-		}
+		//TODO: invalidate session
+		return generateError(1, "Method not implemented yet!");
 	}
 	
 	@POST
@@ -174,4 +130,72 @@ public class AuthenticationEndpoint {
 			return generateError(2, e.getMessage());
 		}
 	}
+	
+	@POST
+	@Secured
+	@Path("/session/open")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String openTrackingSession(@Context SecurityContext context){
+		
+		String session;
+		String username = context.getUserPrincipal().getName();
+		
+		int tries = 0;
+		try {
+			do{
+				session = SecurityUtils.generateSecureActivationToken(32);
+				tries++;
+				
+				if (tries > MAX_TRIES) {
+					return generateError(1, "Can no longer generate unique session code");
+				}
+				
+			}while(sessionDriver.trackingSessionExists(session));
+		}catch (UnableToPerformOperation e) {
+			return generateError(3, e.getMessage());
+		}
+		
+		
+		try {
+			sessionDriver.openTrackingSession(userDriver.getUserID(username), session);
+			
+			GraphDB graphDB = GraphDB.getConnection();
+			graphDB.getTrackingAPI().login(username, session);
+			
+			JsonObject response = new JsonObject();
+			response.addProperty("sucess", true);
+			response.addProperty("session", session);
+			
+			return gson.toJson(response);
+			
+		} catch (UnableToPerformOperation e) {
+			return generateError(2, e.getMessage());
+		} catch (Exception e) {
+			return generateError(3, e.getMessage());
+		}
+	}
+	
+	@POST
+	@Secured
+	@Path("/close")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String closeTrackingSession(@FormParam("session") String session){
+		
+		try {
+			
+			if(sessionDriver.isTrackingSessionClosed(session))
+				return generateError(1, "Session had already been closed.");
+			else
+				sessionDriver.closeTrackingSession(session);
+			
+			return generateSuccess();
+			
+		} catch (UnableToPerformOperation e) {
+			return generateError(2, e.getMessage());
+		} catch (SessionNotFoundException e) {
+			return generateError(3, e.getMessage());
+		}
+		
+	}
 }
+

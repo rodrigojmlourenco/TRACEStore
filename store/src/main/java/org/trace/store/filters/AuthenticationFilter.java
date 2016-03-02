@@ -29,7 +29,7 @@ public class AuthenticationFilter implements ContainerRequestFilter{
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
 
-		final String session;
+		final String username;
 		
 		
 		// Get the HTTP Authorization header from the request
@@ -47,9 +47,9 @@ public class AuthenticationFilter implements ContainerRequestFilter{
 		try {
 
 			// Validate the token
-			session = validateToken(token);
+			username = validateToken(token);
 			
-			if(session == null || session.isEmpty())
+			if(username == null || username.isEmpty())
 				throw new Exception();
 			
 			requestContext.setSecurityContext(new SecurityContext() {
@@ -70,7 +70,7 @@ public class AuthenticationFilter implements ContainerRequestFilter{
 						
 						@Override
 						public String getName() {
-							return session;
+							return username;
 						}
 					};
 				}
@@ -92,10 +92,10 @@ public class AuthenticationFilter implements ContainerRequestFilter{
 	private String validateToken(String token) throws Exception {
 
 		try {
-			String session = manager.validateAndExtractSession(token);
+			String username = manager.validateAndExtractSubject(token);
 			
-			if(session!=null && !session.isEmpty())
-				return session;
+			if(username!=null && !username.isEmpty())
+				return username;
 			else
 				return null;
 			

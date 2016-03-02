@@ -3,6 +3,7 @@ package org.trace.store.services;
 import java.util.Date;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -17,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.trace.store.filters.Role;
 import org.trace.store.filters.Secured;
-import org.trace.store.middleware.TRACESecurityManager;
 import org.trace.store.middleware.TRACEStore;
 import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.drivers.TRACETrackingDriver;
@@ -157,15 +157,12 @@ public class TRACEStoreService {
 	@Secured
 	@Path("/put/geo")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response put(GeoLocation location, @Context SecurityContext context){
-		
-		String sessionId = context.getUserPrincipal().getName();
-
+	public Response put(@FormParam("session") String session, GeoLocation location, @Context SecurityContext context){
 		
 		boolean success;
 		GraphDB conn = GraphDB.getConnection();
 		success = conn.getTrackingAPI().put(
-						sessionId,
+						session,
 						new Date(location.getTimestamp()),
 						location.getLatitude(),
 						location.getLongitude());
