@@ -107,6 +107,7 @@ public class AuthenticationEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String logout(@Context SecurityContext securityContext){
 		//TODO: invalidate session
+		LOG.debug("Logging out "+securityContext.getUserPrincipal().getName());
 		return generateError(1, "Method not implemented yet!");
 	}
 	
