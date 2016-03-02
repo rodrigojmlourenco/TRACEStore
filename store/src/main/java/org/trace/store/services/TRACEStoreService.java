@@ -155,9 +155,9 @@ public class TRACEStoreService {
 	 */
 	@POST
 	@Secured
-	@Path("/put/geo")
+	@Path("/put/geo/{session}")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response put(@FormParam("session") String session, GeoLocation location, @Context SecurityContext context){
+	public Response put(@PathParam("session") String session, GeoLocation location, @Context SecurityContext context){
 		
 		boolean success;
 		GraphDB conn = GraphDB.getConnection();
