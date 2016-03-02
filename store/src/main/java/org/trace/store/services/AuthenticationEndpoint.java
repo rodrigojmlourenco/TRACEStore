@@ -163,7 +163,7 @@ public class AuthenticationEndpoint {
 			graphDB.getTrackingAPI().login(username, session);
 			
 			JsonObject response = new JsonObject();
-			response.addProperty("sucess", true);
+			response.addProperty("success", true);
 			response.addProperty("session", session);
 			
 			return gson.toJson(response);
@@ -195,7 +195,6 @@ public class AuthenticationEndpoint {
 		} catch (SessionNotFoundException e) {
 			return generateError(3, e.getMessage());
 		}
-		
 	}
 }
 
