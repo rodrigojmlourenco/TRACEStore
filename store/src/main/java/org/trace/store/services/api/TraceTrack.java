@@ -36,8 +36,17 @@ public class TraceTrack {
 		return Arrays.asList(getTrack());
 	}
 	
-	public JsonObject getLocation(int index){
+	public JsonObject getJsonLocation(int index){
+		
+		if(index > track.length) return null;
+		
 		return track[index].getLocationAsJsonObject();
+	}
+	
+	public Location getLocation(int index){
+		if(index > track.length) return null;
+		
+		return track[index];
 	}
 	
 	public int getTrackSize(){

@@ -18,15 +18,19 @@ import org.trace.store.filters.Role;
 import org.trace.store.filters.Secured;
 import org.trace.store.middleware.TRACEStore;
 import org.trace.store.middleware.backend.GraphDB;
+import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.TRACETrackingDriver;
 import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.NonMatchingPasswordsException;
+import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.middleware.drivers.exceptions.UnableToRegisterUserException;
 import org.trace.store.middleware.drivers.exceptions.UserRegistryException;
+import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.services.api.BeaconLocation;
 import org.trace.store.services.api.GeoLocation;
+import org.trace.store.services.api.Location;
 import org.trace.store.services.api.PrivacyPolicies;
 import org.trace.store.services.api.TRACEQuery;
 import org.trace.store.services.api.TraceTrack;
@@ -50,6 +54,7 @@ public class TRACEStoreService {
 	private final Logger LOG = Logger.getLogger(TRACEStoreService.class); 
 	
 	private UserDriver uDriver = UserDriverImpl.getDriver();
+	private SessionDriver sDriver = SessionDriverImpl.getDriver();
 	private TRACETrackingDriver mDriver = TRACEStore.getTRACEStore();
 	
 
@@ -61,6 +66,23 @@ public class TRACEStoreService {
 		LOG.info("Welcome to the "+LOG_TAG);
 		
 		return "Welcome to the "+LOG_TAG;
+	}
+	
+	
+	@Path("/sample")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public TraceTrack samoleTrack(){
+		
+		
+		Location l1 = new Location(1, 1, 1);
+		Location l2 = new Location(2, 2, 2);
+		Location l3 = new Location(3, 3, 3);
+		Location[] locations =  {l1, l2, l3};
+		TraceTrack t = new TraceTrack(locations);
+	
+		return t;
+		
 	}
 	
 
@@ -192,6 +214,66 @@ public class TRACEStoreService {
 		
 	}
 	
+	
+	/**
+	 * Enables a tracking application to report a traced tracked, as a whole.
+	 *  
+	 * @param sessionId The user's session identifier, which operates as a pseudonym.
+	 * @param location The user's location
+	 * 
+	 * @return
+	 * 
+	 * @see TraceTrack
+	 */
+	@POST
+	@Secured
+	@Path("/put/track/{session}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String put(@PathParam("session") String session, TraceTrack track, @Context SecurityContext context){
+		
+		try {
+			if(!sDriver.trackingSessionExists(session))
+				return generateFailedResponse("Unknown session '"+session+"'.");
+		} catch (UnableToPerformOperation e) {
+			LOG.error("Failed to upload track with session '"+session+"' because : "+e.getMessage());
+			return generateFailedResponse("Failed to upload track because :"+e.getMessage());
+		}
+		
+		try {
+			if(sDriver.isTrackingSessionClosed(session))
+				return generateFailedResponse("Session '"+session+"' is already closed.");
+		} catch (UnableToPerformOperation | SessionNotFoundException e) {
+			LOG.error("Failed to upload track with session '"+session+"' because : "+e.getMessage());
+			return generateFailedResponse("Failed to upload track because :"+e.getMessage());
+		}
+		
+		boolean success;
+		Location location;
+		int failedInserts = 0;
+		
+		for(int i = 0; i < track.getTrackSize(); i++){
+			GraphDB conn = GraphDB.getConnection();
+			location = track.getLocation(i);
+			
+			if(location != null){
+				success = conn.getTrackingAPI().put(
+								session,
+								new Date(location.getTimestamp()),
+								location.getLatitude(),
+								location.getLongitude());
+				
+				if(!success)
+					failedInserts++;
+					
+			}
+		}
+		
+		if(failedInserts == 0)
+			return generateSuccessResponse();
+		else
+			return generateFailedResponse("Failed to insert "+failedInserts+" out of "+track.getTrackSize()+" locations");
+	}
 
 	/**
 	 * Enables a tracking application to report its location, at a specific moment in time.
@@ -211,22 +293,7 @@ public class TRACEStoreService {
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * Enables a tracking application to report a traced tracked, as a whole.
-	 *  
-	 * @param sessionId The user's session identifier, which operates as a pseudonym.
-	 * @param location The user's location
-	 * 
-	 * @return
-	 * 
-	 * @see TraceTrack
-	 */
-	@POST
-	@Secured
-	@Path("/put/track")
-	public Response put(TraceTrack track, @Context SecurityContext context){
-		throw new UnsupportedOperationException();
-	}
+	
 
 	/*
 	 ************************************************************************
