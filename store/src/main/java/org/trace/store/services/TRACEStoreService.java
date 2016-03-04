@@ -65,8 +65,11 @@ public class TRACEStoreService {
 		if (!appenders.hasMoreElements()) {
 		    System.out.println("LOG4J config file is missing");
 		} else {
-		    System.out.println("appender found "
-		    + ((Appender) appenders.nextElement()).getName());
+			
+			while(appenders.hasMoreElements()){
+			    System.out.println("appender found "
+			    + ((Appender) appenders.nextElement()).getName());
+			}
 		}
 		
 		
