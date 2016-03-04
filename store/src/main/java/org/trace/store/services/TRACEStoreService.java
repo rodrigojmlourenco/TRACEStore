@@ -15,9 +15,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.log4j.Appender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.trace.store.filters.Role;
 import org.trace.store.filters.Secured;
 import org.trace.store.middleware.TRACEStore;
@@ -66,7 +64,7 @@ public class TRACEStoreService {
 		if (!appenders.hasMoreElements()) {
 		    System.out.println("LOG4J config file is missing");
 		    
-		    PropertyConfigurator.configure("/usr/local/log4j/configurations/log4j.properties");
+		    
 		    
 		} else {
 			

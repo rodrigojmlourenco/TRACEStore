@@ -1,5 +1,6 @@
 package org.trace.store;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.trace.store.filters.AuthenticationFilter;
@@ -32,6 +33,8 @@ public class TraceStoreApp extends ResourceConfig{
         
         // Enable Tracing support.
         property(ServerProperties.TRACING, "ALL");
+        
+        PropertyConfigurator.configure(System.getenv("LOG4J_CONFIG"));
 	}
 	
 }
