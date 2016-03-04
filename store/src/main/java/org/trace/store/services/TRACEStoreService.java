@@ -1,7 +1,7 @@
 package org.trace.store.services;
 
 import java.util.Date;
-
+import java.util.Enumeration;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.trace.store.filters.Role;
@@ -59,7 +60,17 @@ public class TRACEStoreService {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String test(){
-		LOG.debug("Hello world");
+	
+		Enumeration appenders = LOG.getAllAppenders();
+		if (!appenders.hasMoreElements()) {
+		    System.out.println("LOG4J config file is missing");
+		} else {
+		    System.out.println("appender found "
+		    + ((Appender) appenders.nextElement()).getName());
+		}
+		
+		
+		
 		return "Welcome to the "+LOG_TAG;
 	}
 	
