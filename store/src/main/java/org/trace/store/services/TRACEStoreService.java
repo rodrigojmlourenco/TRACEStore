@@ -49,7 +49,7 @@ public class TRACEStoreService {
 
 	private final String LOG_TAG = "TRACEStoreService"; 
 
-	private final Logger LOG = Logger.getLogger(TRACEStoreService.class);//LoggerFactory.getLogger(); 
+	private final Logger LOG = Logger.getRootLogger();//Logger.getLogger(TRACEStoreService.class);//LoggerFactory.getLogger(); 
 	
 	private UserDriver uDriver = UserDriverImpl.getDriver();
 	private TRACETrackingDriver mDriver = TRACEStore.getTRACEStore();
@@ -59,7 +59,7 @@ public class TRACEStoreService {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String test(){
-		LOG.log(Level.DEBUG, "Welcome to the "+LOG_TAG);
+		LOG.debug("Hello world");
 		return "Welcome to the "+LOG_TAG;
 	}
 	
