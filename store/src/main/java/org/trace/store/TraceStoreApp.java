@@ -1,5 +1,9 @@
 package org.trace.store;
 
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.trace.store.filters.AuthenticationFilter;
@@ -32,6 +36,18 @@ public class TraceStoreApp extends ResourceConfig{
         
         // Enable Tracing support.
         property(ServerProperties.TRACING, "ALL");
+        
+        
+        //Logging Configuration
+        FileAppender fa = new FileAppender();
+        fa.setName("FileLogger");
+        fa.setFile("/var/trace/log/store.log");
+        fa.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
+        fa.setThreshold(Level.DEBUG);
+        fa.setAppend(true);
+        fa.activateOptions();
+        
+        Logger.getRootLogger().addAppender(fa);
 	}
 	
 }

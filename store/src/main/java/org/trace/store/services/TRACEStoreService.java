@@ -2,8 +2,8 @@ package org.trace.store.services;
 
 import java.util.Date;
 
+
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,8 +14,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.trace.store.filters.Role;
 import org.trace.store.filters.Secured;
 import org.trace.store.middleware.TRACEStore;
@@ -49,7 +49,7 @@ public class TRACEStoreService {
 
 	private final String LOG_TAG = "TRACEStoreService"; 
 
-	private final Logger LOG = LoggerFactory.getLogger(TRACEStoreService.class); 
+	private final Logger LOG = Logger.getLogger(TRACEStoreService.class);//LoggerFactory.getLogger(); 
 	
 	private UserDriver uDriver = UserDriverImpl.getDriver();
 	private TRACETrackingDriver mDriver = TRACEStore.getTRACEStore();
@@ -59,6 +59,7 @@ public class TRACEStoreService {
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String test(){
+		LOG.log(Level.DEBUG, "Welcome to the "+LOG_TAG);
 		return "Welcome to the "+LOG_TAG;
 	}
 	

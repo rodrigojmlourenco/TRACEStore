@@ -21,6 +21,7 @@ import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.InvalidIdentifierException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
 import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.exceptions.SecretKeyNotFoundException;
@@ -97,9 +98,10 @@ public class TRACESecurityManager{
 	}
 
 	
-	public boolean isActiveUser(String identifier){
+	public boolean isActiveUser(String identifier) throws UnknownUserException{
 		
 		int userID;
+		
 		try {
 			userID = uDriver.getUserID(identifier);
 		} catch (UnableToPerformOperation e) {
@@ -114,7 +116,7 @@ public class TRACESecurityManager{
 		
 		try {
 			return uDriver.isValidPassword(username, password);
-		} catch (InvalidIdentifierException | UnableToPerformOperation e) {
+		} catch (InvalidIdentifierException | UnableToPerformOperation | UnknownUserException e) {
 			e.printStackTrace();
 			LOG.error("Failed to validate "+username+" because, "+e.getMessage());
 		}

@@ -19,6 +19,7 @@ import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
 import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
@@ -74,12 +75,16 @@ public class AuthenticationEndpoint {
 	public String login(@FormParam("username") String username, @FormParam("password") String password){
 		
 		//Step 1 - Check if the user's account is activated
-		if(!manager.isActiveUser(username))
-			return generateError(1, username+" has not activated his account yet");
+		try {
+			if(!manager.isActiveUser(username))
+				return generateError(1, username+" has not activated his account yet");
+		} catch (UnknownUserException e1) {
+			return generateError(2, e1.getMessage());
+		}
 		
 		//Step 2 - Validate the provided password against the one stored in the database
 		if(!manager.validateUser(username, password))
-			return generateError(2, "Invalid password or username");
+			return generateError(3, "Invalid password or username");
 		
 		//Step 3 - Issue a new JWT token and provide it to the user
 		String authToken;

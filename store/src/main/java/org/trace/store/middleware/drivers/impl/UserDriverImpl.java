@@ -151,7 +151,7 @@ public class UserDriverImpl implements UserDriver{
 
 	@Override
 	public boolean unregisterUser(String identifier, String password)
-			throws UnableToUnregisterUserException, NonMatchingPasswordsException {
+			throws UnableToUnregisterUserException, NonMatchingPasswordsException, UnknownUserException {
 
 		try{
 
@@ -173,7 +173,7 @@ public class UserDriverImpl implements UserDriver{
 	}
 
 	@Override
-	public int getUserID(String identifier) throws UnableToPerformOperation {
+	public int getUserID(String identifier) throws UnableToPerformOperation, UnknownUserException {
 		int UID;
 		try{
 			if(FormFieldValidator.isValidEmail(identifier))
@@ -292,7 +292,7 @@ public class UserDriverImpl implements UserDriver{
 	
 	@Override
 	public boolean isValidPassword(String identifier, String password)
-			throws InvalidIdentifierException, UnableToPerformOperation {
+			throws InvalidIdentifierException, UnableToPerformOperation, UnknownUserException {
 
 		int userID;
 		byte[] salt;
@@ -333,7 +333,7 @@ public class UserDriverImpl implements UserDriver{
 	}
 	
 	@Override
-	public boolean isValidRole(String identifier, Role role) throws UnableToPerformOperation {
+	public boolean isValidRole(String identifier, Role role) throws UnableToPerformOperation, UnknownUserException {
 		int userId;
 		String dbRole;
 		
@@ -662,6 +662,9 @@ public class UserDriverImpl implements UserDriver{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidIdentifierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnknownUserException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

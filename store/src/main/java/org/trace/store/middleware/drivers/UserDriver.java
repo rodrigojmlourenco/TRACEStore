@@ -1,9 +1,6 @@
 package org.trace.store.middleware.drivers;
 
 
-import java.util.Date;
-import java.util.List;
-
 import org.trace.store.filters.Role;
 import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
 import org.trace.store.middleware.drivers.exceptions.InvalidIdentifierException;
@@ -51,8 +48,9 @@ public interface UserDriver {
 	 * @return True if the operation was successful. 
 	 * @throws UnableToUnregisterUserException 
 	 * @throws NonMatchingPasswordsException 
+	 * @throws UnknownUserException 
 	 */
-	public boolean unregisterUser(String identifier, String password) throws UnableToUnregisterUserException, NonMatchingPasswordsException;
+	public boolean unregisterUser(String identifier, String password) throws UnableToUnregisterUserException, NonMatchingPasswordsException, UnknownUserException;
 	
 	/**
 	 * Fetches a given user's UID.
@@ -102,9 +100,9 @@ public interface UserDriver {
 			throws ExpiredTokenException, UnknownUserIdentifierException;
 	
 	
-	public boolean isValidPassword(String identifier, String password) throws InvalidIdentifierException, UnableToPerformOperation;
+	public boolean isValidPassword(String identifier, String password) throws InvalidIdentifierException, UnableToPerformOperation, UnknownUserException;
 	
-	public boolean isValidRole(String identifier, Role role) throws UnableToPerformOperation;
+	public boolean isValidRole(String identifier, Role role) throws UnableToPerformOperation, UnknownUserException;
 	
 	/**
 	 * Allows users to set security and privacy policies about their data.
