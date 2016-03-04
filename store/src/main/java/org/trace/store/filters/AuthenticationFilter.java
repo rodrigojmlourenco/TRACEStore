@@ -13,8 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.trace.store.middleware.TRACESecurityManager;
 
 @Secured
@@ -22,7 +21,7 @@ import org.trace.store.middleware.TRACESecurityManager;
 @Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter implements ContainerRequestFilter{
 
-	private final Logger LOG = LoggerFactory.getLogger(AuthenticationFilter.class); 
+	private final Logger LOG = Logger.getLogger(AuthenticationFilter.class); 
 	
 	private TRACESecurityManager manager = TRACESecurityManager.getManager();
 

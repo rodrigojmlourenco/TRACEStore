@@ -1,7 +1,6 @@
 package org.trace.store.services;
 
 import java.util.Date;
-import java.util.Enumeration;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -14,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.trace.store.filters.Role;
 import org.trace.store.filters.Secured;
@@ -49,7 +47,7 @@ public class TRACEStoreService {
 
 	private final String LOG_TAG = "TRACEStoreService"; 
 
-	private final Logger LOG = Logger.getRootLogger();//Logger.getLogger(TRACEStoreService.class);//LoggerFactory.getLogger(); 
+	private final Logger LOG = Logger.getLogger(TRACEStoreService.class); 
 	
 	private UserDriver uDriver = UserDriverImpl.getDriver();
 	private TRACETrackingDriver mDriver = TRACEStore.getTRACEStore();
@@ -60,32 +58,11 @@ public class TRACEStoreService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String test(){
 	
-		Enumeration appenders = LOG.getAllAppenders();
-		if (!appenders.hasMoreElements()) {
-		    System.out.println("LOG4J config file is missing");
-		    
-		    
-		    
-		} else {
-			
-			while(appenders.hasMoreElements()){
-			    System.out.println("appender found "
-			    + ((Appender) appenders.nextElement()).getName());
-			}
-		}
-		
-		
+		LOG.info("Welcome to the "+LOG_TAG);
 		
 		return "Welcome to the "+LOG_TAG;
 	}
 	
-	//TODO: remover
-	@GET
-	@Path("/sample")
-	@Produces(MediaType.APPLICATION_JSON)
-	public GeoLocation getGeoLocationSample(){
-		return new GeoLocation(38.7368192, -9.138705, System.currentTimeMillis());
-	}
 
 	/*
 	 ************************************************************************
@@ -108,6 +85,8 @@ public class TRACEStoreService {
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response registerUser(UserRegistryRequest request){
 
+		
+		
 		String activationToken;
 
 		try {
@@ -127,16 +106,21 @@ public class TRACEStoreService {
 									request.getName(),
 									request.getAddress());
 			
-
+			LOG.info("User '"+request.getUsername()+"' successfully registered.");
+			
 			return Response.ok(activationToken).build();
 
 		} catch (UserRegistryException e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
 			return Response.ok(e.getMessage()).build();
 		} catch (NonMatchingPasswordsException e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
 			return Response.ok(e.getMessage()).build();
 		} catch (UnableToRegisterUserException e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
 			return Response.ok(e.getMessage()).build();
 		} catch (UnableToPerformOperation e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
 			return Response.ok(e.getMessage()).build();
 		}
 	}
@@ -201,8 +185,10 @@ public class TRACEStoreService {
 		
 		if(success)
 			return generateSuccessResponse();
-		else
+		else{
+			LOG.error("Provided location was not accepted. TODO: provide verbose error");
 			return generateFailedResponse("Location insertion failed.");
+		}
 		
 	}
 	

@@ -1,11 +1,11 @@
 package org.trace.store.middleware;
 
 import java.io.File;
+
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.drivers.TRACEPlannerDriver;
 import org.trace.store.middleware.drivers.TRACERewardDriver;
@@ -28,7 +28,7 @@ import trace.TraceVertex;
 
 public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACEPlannerDriver{
 
-	private static final Logger LOG = LoggerFactory.getLogger(TRACEStore.class);
+	private static final Logger LOG = Logger.getLogger(TRACEStore.class);
 	
 	private static TRACEStore MANAGER = new TRACEStore();
 	

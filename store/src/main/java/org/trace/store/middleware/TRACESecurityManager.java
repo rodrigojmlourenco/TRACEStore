@@ -2,6 +2,7 @@ package org.trace.store.middleware;
 
 
 import java.io.File;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.security.Key;
@@ -15,8 +16,7 @@ import java.util.concurrent.TimeUnit;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.InvalidIdentifierException;
@@ -38,7 +38,7 @@ public class TRACESecurityManager{
 	public final static int TOKEN_TTL		= 3600000; //1hour
 	public final static String TOKEN_ISSUER = "org.trace";
 	
-	private Logger LOG = LoggerFactory.getLogger("TRACESecurityManager"); 
+	private Logger LOG = Logger.getLogger(TRACESecurityManager.class); 
 	
 	private static TRACESecurityManager MANAGER = new TRACESecurityManager();
 	

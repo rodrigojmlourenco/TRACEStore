@@ -1,16 +1,17 @@
 package org.trace.store.middleware.backend;
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.standalone.CommandLineParameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.trace.store.middleware.backend.exceptions.UnableToGenerateGraphException;
 
 import trace.DBMapAPI;
@@ -21,7 +22,7 @@ import trace.TraceVertex;
 
 public class GraphDB {
 
-	private static final Logger LOG = LoggerFactory.getLogger(GraphDB.class); 
+	private static final Logger LOG = Logger.getLogger(GraphDB.class); 
 	
 	private static GraphDB CONN = new GraphDB();
 	private final DBMapAPI map;

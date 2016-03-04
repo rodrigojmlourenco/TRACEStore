@@ -9,8 +9,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.trace.store.filters.Secured;
 import org.trace.store.middleware.TRACESecurityManager;
 import org.trace.store.middleware.backend.GraphDB;
@@ -30,7 +29,7 @@ import com.google.gson.JsonObject;
 @Path("/auth")
 public class AuthenticationEndpoint {
 
-	private final Logger LOG = LoggerFactory.getLogger(AuthenticationEndpoint.class); 
+	private final Logger LOG = Logger.getLogger(AuthenticationEndpoint.class); 
 	
 	
 	private final int MAX_TRIES = 30;
@@ -41,10 +40,6 @@ public class AuthenticationEndpoint {
 	private SessionDriver sessionDriver = SessionDriverImpl.getDriver();
 	
 	private Gson gson = new Gson();
-	
-	private String extractSessionFromSecurityContext(SecurityContext context){
-		return context.getUserPrincipal().getName();
-	}
 	
 	private String generateError(int code, String message){
 		JsonObject error = new JsonObject();
@@ -76,21 +71,27 @@ public class AuthenticationEndpoint {
 		
 		//Step 1 - Check if the user's account is activated
 		try {
-			if(!manager.isActiveUser(username))
+			if(!manager.isActiveUser(username)){
+				LOG.error("User '"+username+"' attempted to loggin without an active account");
 				return generateError(1, username+" has not activated his account yet");
+			}
 		} catch (UnknownUserException e1) {
+			LOG.error("Unknown user '"+username+"' attempted to loggin.");
 			return generateError(2, e1.getMessage());
 		}
 		
 		//Step 2 - Validate the provided password against the one stored in the database
-		if(!manager.validateUser(username, password))
+		if(!manager.validateUser(username, password)){
+			LOG.error("User '"+username+"' attempted to loggin with invalid credentials");
 			return generateError(3, "Invalid password or username");
+		}
 		
 		//Step 3 - Issue a new JWT token and provide it to the user
 		String authToken;
 		try{
 			authToken = manager.issueToken(username);
 		}catch(Exception e){
+			LOG.error("User '"+username+"' attempted to loggin, however he was unable because: "+e.getMessage());
 			return generateError(6, e.getMessage());
 		}
 		
@@ -127,12 +128,16 @@ public class AuthenticationEndpoint {
 			if(userDriver.activateAccount(token)){
 				LOG.info("User account activated.");
 				return generateSuccess();
-			}else
+			}else{
+				LOG.error("User was not successfully activated");
 				return generateError(3, "User was not successfully activated");
+			}
 						
 		} catch (ExpiredTokenException e) {
+			LOG.error("User attempted to activate his account, however failed to do so because: "+e.getMessage());
 			return generateError(1, e.getMessage());
 		} catch (UnableToPerformOperation e) {
+			LOG.error("User attempted to activate his account, however failed to do so because: "+e.getMessage());
 			return generateError(2, e.getMessage());
 		}
 	}
@@ -203,4 +208,3 @@ public class AuthenticationEndpoint {
 		}
 	}
 }
-

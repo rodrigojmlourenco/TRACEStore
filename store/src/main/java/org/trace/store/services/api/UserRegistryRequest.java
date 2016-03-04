@@ -2,6 +2,8 @@ package org.trace.store.services.api;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.google.gson.JsonObject;
+
 @XmlRootElement
 public class UserRegistryRequest {
 
@@ -86,5 +88,18 @@ public class UserRegistryRequest {
 		this.name = name;
 	}
 	
+	public JsonObject toJson(){
+		JsonObject request = new JsonObject();
+		request.addProperty("name", name);
+		request.addProperty("username", username);
+		request.addProperty("email", email);
+		request.addProperty("phone", phone);
+		request.addProperty("address", address);
+		return request;
+	}
 	
+	@Override
+	public String toString() {
+		return toJson().toString();
+	}
 }
