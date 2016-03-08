@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,6 +21,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class MariaDBDriver {
+	
+	private final int WAIT_TIMEOUT = 600;
+	private final int INTERACTIVE_TIMEOUT = 300; //28800;
 	
 	//Logging
 	private Logger log = Logger.getLogger(MariaDBDriver.class);
@@ -67,6 +74,8 @@ public class MariaDBDriver {
 			mUser = user;
 			mPassword = password;
 			mDatabase = database;
+			
+			scheduleCleanerTask();
 
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -133,4 +142,49 @@ public class MariaDBDriver {
 	protected static Connection getMariaConnection(){
 		return DRIVER.getConnection();
 	}
+	
+	/* Async Work
+	 * Async Work
+	 * Async Work 
+	 **************************************************************************
+	 * The connection with the MySQL/MariaDB driver is susceptible to two
+	 * timeouts ( wait and interactive ). If no requests are performed during
+	 * these periods, the connection is terminated.
+	 * 
+	 * To assure that this does not happen, a KeepAliveTask is scheduled to
+	 * to keep this connection alive.
+	 *
+	 **************************************************************************
+	 **************************************************************************
+	 **************************************************************************
+	 */
+	private final ScheduledExecutorService scheduledService = Executors.newScheduledThreadPool(1);
+	
+	private void scheduleCleanerTask(){
+		scheduledService.scheduleAtFixedRate(new KeepAliveTask(), INTERACTIVE_TIMEOUT/2, INTERACTIVE_TIMEOUT/2, TimeUnit.SECONDS);
+	}
+
+	/**
+	 * Performs a simple request to the existing MariaDBDriver Connection.
+	 */
+	private class KeepAliveTask implements Runnable {
+
+		@Override
+		public void run() {
+			
+			log.info("Keeping the connection alive...");
+			
+			Connection conn = MariaDBDriver.getMariaConnection();
+			
+			try{
+				Statement stmt = conn.createStatement();
+				stmt.execute("SELECT 1");
+				stmt.close();
+			}catch(SQLException e){
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
 }

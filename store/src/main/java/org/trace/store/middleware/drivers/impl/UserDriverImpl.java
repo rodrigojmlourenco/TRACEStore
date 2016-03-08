@@ -199,7 +199,6 @@ public class UserDriverImpl implements UserDriver{
 
 		}catch(SQLException e){
 			e.printStackTrace();
-			MariaDBDriver.forceReconnectIfNecessary(); //TODO: isto não está feito de forma nada inteligente, para testes apenas
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
