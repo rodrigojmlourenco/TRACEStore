@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,9 +18,14 @@ import org.xml.sax.SAXException;
 
 public class MariaDBDriver {
 	
+	//Logging
+	private Logger log = Logger.getLogger(MariaDBDriver.class);
+	
 	private Connection conn;
 
 	private static MariaDBDriver DRIVER = new MariaDBDriver();
+	
+	private String mUser, mPassword, mDatabase;
 	
 	private MariaDBDriver(){
 		String user="error", password="error", database="error";
@@ -57,6 +63,10 @@ public class MariaDBDriver {
 
 
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+database, user, password);
+			
+			mUser = user;
+			mPassword = password;
+			mDatabase = database;
 
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -75,6 +85,50 @@ public class MariaDBDriver {
 	
 	private Connection getConnection(){ return conn; }
 	
+	/**
+	 * Checks whether the connection to the JDBC is still open and valid.
+	 * 
+	 * @return True if the connection is valid, false otherwise.
+	 */
+	private boolean stillValidConnection(){
+		try {
+			return conn.isValid(0);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * Closes the current connection, if possible, and initiates a new one.
+	 */
+	private void attemptReconnect(){
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/"+mDatabase, mUser, mPassword);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	protected void reconnectForInvalidConnection(){
+		
+		log.debug("[1] Checking if the connection is valid...");
+		
+		if(!stillValidConnection()){
+			log.debug("[2] The connection is invalid, attempting reconnect...");
+			attemptReconnect();
+		}
+	}
+	
+	protected static void forceReconnectIfNecessary(){
+		DRIVER.reconnectForInvalidConnection();
+	}
 	
 	protected static Connection getMariaConnection(){
 		return DRIVER.getConnection();

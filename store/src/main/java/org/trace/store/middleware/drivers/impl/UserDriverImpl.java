@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 import org.trace.store.filters.Role;
 import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.EmailAlreadyRegisteredException;
@@ -36,6 +37,8 @@ import org.trace.store.services.api.PrivacyPolicies;
 
 public class UserDriverImpl implements UserDriver{
 
+	private Logger log = Logger.getLogger(UserDriverImpl.class);
+	
 	protected final int HASHING_ITERATIONS = 0;
 	protected final int SALT_SIZE = 64;
 	protected final int TOKEN_SIZE = 25;
@@ -175,12 +178,18 @@ public class UserDriverImpl implements UserDriver{
 	@Override
 	public int getUserID(String identifier) throws UnableToPerformOperation, UnknownUserException {
 		int UID;
+		
+		
+		
+		
 		try{
-			if(FormFieldValidator.isValidEmail(identifier))
+			if(FormFieldValidator.isValidEmail(identifier)){
+				log.debug(identifier+" is an email.");
 				UID =  getUserIDfromEmail(identifier);
-			else if(FormFieldValidator.isValidUsername(identifier))
+			}else if(FormFieldValidator.isValidUsername(identifier)){
+				log.debug(identifier+" is an username.");
 				UID = getUserIDfromUsername(identifier);
-			else
+			}else
 				throw new UnableToPerformOperation("Invalid identifier.");
 
 			if(UID <= -1)
@@ -189,6 +198,8 @@ public class UserDriverImpl implements UserDriver{
 				return UID;
 
 		}catch(SQLException e){
+			e.printStackTrace();
+			MariaDBDriver.forceReconnectIfNecessary(); //TODO: isto não está feito de forma nada inteligente, para testes apenas
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
@@ -550,6 +561,8 @@ public class UserDriverImpl implements UserDriver{
 
 	private int getUserIDfromEmail(String email) throws SQLException{
 
+		
+		
 		int result;
 		PreparedStatement statement =
 				conn.prepareStatement("SELECT Id FROM users WHERE email = ?");
