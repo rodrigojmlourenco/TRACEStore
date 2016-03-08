@@ -22,8 +22,8 @@ import org.xml.sax.SAXException;
 
 public class MariaDBDriver {
 	
-	private final int WAIT_TIMEOUT = 600;
-	private final int INTERACTIVE_TIMEOUT = 300; //28800;
+	
+	
 	
 	//Logging
 	private Logger log = Logger.getLogger(MariaDBDriver.class);
@@ -153,7 +153,6 @@ public class MariaDBDriver {
 	 * 
 	 * To assure that this does not happen, a KeepAliveTask is scheduled to
 	 * to keep this connection alive.
-	 *
 	 **************************************************************************
 	 **************************************************************************
 	 **************************************************************************
@@ -161,13 +160,18 @@ public class MariaDBDriver {
 	private final ScheduledExecutorService scheduledService = Executors.newScheduledThreadPool(1);
 	
 	private void scheduleCleanerTask(){
-		scheduledService.scheduleAtFixedRate(new KeepAliveTask(), INTERACTIVE_TIMEOUT/2, INTERACTIVE_TIMEOUT/2, TimeUnit.SECONDS);
+		scheduledService.scheduleAtFixedRate(
+				new KeepAliveTask(),
+				KeepAliveTask.TIMEOUT,
+				KeepAliveTask.TIMEOUT, TimeUnit.SECONDS);
 	}
 
 	/**
 	 * Performs a simple request to the existing MariaDBDriver Connection.
 	 */
 	private class KeepAliveTask implements Runnable {
+		
+		protected final static int TIMEOUT = 28800 - (2*60*60); // 8h - 2h, where 8h is the default mysql timeout.
 
 		@Override
 		public void run() {
