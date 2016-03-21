@@ -1,4 +1,4 @@
-package org.trace.DBAPI;
+package org.trace.DBAPI.data;
 
 public class TraceBeaconID {
 

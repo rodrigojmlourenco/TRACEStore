@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Result;
+import org.trace.DBAPI.data.TraceVertex;
 
 import io.netty.util.internal.SystemPropertyUtil;
 

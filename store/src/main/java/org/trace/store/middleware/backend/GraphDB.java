@@ -15,6 +15,8 @@ import org.opentripplanner.standalone.CommandLineParameters;
 import org.trace.store.middleware.backend.exceptions.UnableToGenerateGraphException;
 
 import org.trace.DBAPI.*;
+import org.trace.DBAPI.data.TraceEdge;
+import org.trace.DBAPI.data.TraceVertex;
 
 public class GraphDB {
 

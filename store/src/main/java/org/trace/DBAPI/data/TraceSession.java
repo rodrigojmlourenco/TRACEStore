@@ -1,4 +1,4 @@
-package org.trace.DBAPI;
+package org.trace.DBAPI.data;
 
 import java.util.Date;
 

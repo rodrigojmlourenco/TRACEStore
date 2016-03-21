@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Result;
+import org.trace.DBAPI.data.TraceEdge;
+import org.trace.DBAPI.data.TraceVertex;
 
 //This Class is responsible for setting up new locations, streets, roads and so on.
 public class DBMapAPI extends DBAPI{
