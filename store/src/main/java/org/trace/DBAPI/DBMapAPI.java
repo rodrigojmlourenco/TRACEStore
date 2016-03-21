@@ -59,7 +59,7 @@ public class DBMapAPI extends DBAPI{
 		//return values list
 		List<Result> results = null; 
 
-		System.out.println("DEBUG: addRoad(" + name + "," + p1 + "," + p2 + ")");
+//		System.out.println("DEBUG: addRoad(" + name + "," + p1 + "," + p2 + ")");
 
 		//params
 		Map<String,Object> params = new HashMap<>();
@@ -190,7 +190,9 @@ public class DBMapAPI extends DBAPI{
 			double distance = TraceLocationMethods.distance(p1Latitude, p1Longitude, p2Latitude, p2Longitude, "K");
 
 			//if the distance is too big we do not want to 
-			if(distance > 0.008 && distance < 0.500){
+//			if(distance > 0.008 && distance < 0.500){
+			if(false){
+
 				double p3Latitude = TraceLocationMethods.midPoint(p1Latitude, p2Latitude);
 				double p3Longitude = TraceLocationMethods.midPoint(p1Longitude, p2Longitude);
 				String p3 = "" + p3Latitude + "_" + p3Longitude;
