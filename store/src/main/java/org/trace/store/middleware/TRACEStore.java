@@ -21,8 +21,7 @@ import org.trace.store.services.api.data.Beacon;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import trace.TraceVertex;
-
+import org.trace.DBAPI.*;
 
 public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACEPlannerDriver{
 
