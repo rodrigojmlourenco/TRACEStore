@@ -177,21 +177,24 @@ public class DBMapAPI extends DBAPI{
 		if(results.size() < 4){
 			return false;
 		}else{
-			double p1Latitude = results.get(0).getDouble();
-			double p1Longitude = results.get(1).getDouble();
-			double p2Latitude = results.get(2).getDouble();
-			double p2Longitude = results.get(3).getDouble();
+			
+			addRoadAux(name, p1, p2, properties);
+			
+//			double p1Latitude = results.get(0).getDouble();
+//			double p1Longitude = results.get(1).getDouble();
+//			double p2Latitude = results.get(2).getDouble();
+//			double p2Longitude = results.get(3).getDouble();
 
-			List<TraceVertex> roadVertices = TraceLocationMethods.splitRoad(p1, p1Latitude, p1Longitude, p2, p2Latitude, p2Longitude, 0.016);			
+//			List<TraceVertex> roadVertices = TraceLocationMethods.splitRoad(p1, p1Latitude, p1Longitude, p2, p2Latitude, p2Longitude, 0.016);			
 
-			int size = roadVertices.size();
-			for(int i = 1; i < size-1; i++){
-				addLocation(roadVertices.get(i).getName(), roadVertices.get(i).getLatitude(), roadVertices.get(i).getLongitude());
-//				System.out.println("addLocation:" + roadVertices.get(i).getName());
-				addRoadAux(name+"_"+(i-1), roadVertices.get(i-1).getName(), roadVertices.get(i).getName(), properties);
-//				System.out.println("addRoad: " + name+"_"+i);
-			}
-			addRoadAux(name+"_"+size, roadVertices.get(size-2).getName(), roadVertices.get(size-1).getName(), properties);
+//			int size = roadVertices.size();
+//			for(int i = 1; i < size-1; i++){
+//				addLocation(roadVertices.get(i).getName(), roadVertices.get(i).getLatitude(), roadVertices.get(i).getLongitude());
+////				System.out.println("addLocation:" + roadVertices.get(i).getName());
+//				addRoadAux(name+"_"+(i-1), roadVertices.get(i-1).getName(), roadVertices.get(i).getName(), properties);
+////				System.out.println("addRoad: " + name+"_"+i);
+//			}
+//			addRoadAux(name+"_"+size, roadVertices.get(size-2).getName(), roadVertices.get(size-1).getName(), properties);
 //			System.out.println("addRoad: " + name+"_"+size);
 
 			//if the distance is too big we do not want to 
@@ -226,6 +229,11 @@ public class DBMapAPI extends DBAPI{
 
 			//				return results != null;
 			//			}
+			
+			
+			
+			
+			
 			return true;
 		}	
 
