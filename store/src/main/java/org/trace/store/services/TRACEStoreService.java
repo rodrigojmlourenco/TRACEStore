@@ -365,7 +365,7 @@ public class TRACEStoreService {
 	 * @return List of sessions and dates as a Json array.
 	 */
 	@GET
-	@Path("/sessionsDate/{username}")
+	@Path("/sessionsAndDates/{username}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getUserSessionsAndDates(@PathParam("username") String username){
 		Gson gson = new Gson();
