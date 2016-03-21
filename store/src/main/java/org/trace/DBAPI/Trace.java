@@ -171,6 +171,13 @@ public class Trace {
 //			List<String> userSessions = apiTracking.getUserSessions("miguel","passWord123#");
 
 			String tSession = apiTracking.login("miguel",new TraceSession().getSessionID());
+			List<String> sessions = apiTracking.getUserSessionsAndDates("miguel");
+			
+			for(String s : sessions){
+				System.out.println(s);
+			}
+			
+			
 //			System.out.println("tSession: " + tSession);
 //
 //			Map<String,Object> attributes = new HashMap<>();
@@ -526,8 +533,6 @@ public class Trace {
 //			for(String s : list){
 //				System.out.println(s);
 //			}
-			
-			System.out.println("test6!");
 			
 		} catch (Exception e) {
 			e.printStackTrace();

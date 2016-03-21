@@ -357,6 +357,22 @@ public class TRACEStoreService {
 	}
 	
 	/**
+	 * Fetches the list of tracking sessions and corresponding dates that are associated with the
+	 * specified user.
+	 * 
+	 * @param username The user's username.
+	 * 
+	 * @return List of sessions and dates as a Json array.
+	 */
+	@GET
+	@Path("/sessionsDate/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getUserSessionsAndDates(@PathParam("username") String username){
+		Gson gson = new Gson();
+		return gson.toJson(mDriver.getUserSessions(username));
+	}
+	
+	/**
 	 * Fetches the list of all tracking sessions.
 	 * 
 	 * @return List of sessions as a Json array.

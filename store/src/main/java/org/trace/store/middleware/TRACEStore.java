@@ -184,6 +184,20 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 		
 		return results;
 	}
+	
+	//TODO: passa a questionar a mariaDB
+	@Override
+	public JsonArray getUserSessionsAndDates(String username) {
+		
+		JsonArray results = new JsonArray();
+		
+		List<String> sessions = graph.getTrackingAPI().getUserSessionsAndDates(username);
+		
+		for(String session : sessions)
+			results.add(session);
+		
+		return results;
+	}
 
 	//TODO: passa a questionar a mariaDB
 	@Override

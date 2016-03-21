@@ -595,30 +595,8 @@ public class DBTrackingAPI extends DBAPI{
 
 	public List<String> getUserSessions(String username){
 
-//		List<String> userSessions = new ArrayList<>();
-//
-//		//return values list
-//		List<Result> results = null;
-//
-//		//params
-//		Map<String,Object> params = new HashMap<>();
-//		params.put("username", username);
-//
-//		//ArrayList to save the trajectory 
-////		A = g.V().has('username', username).outE().hasLabel('login').inV().values('sessionID').toList();
-////		g.V().has('username', username).outE().hasLabel('login').inV().hasLabel('session').order().by('date',decr);
-////		"A.values('sessionID');"
-//		results = query("A = g.V().has('username',username).id().next();"
-//				+ "B = g.V(A).outE('login').inV().order().by('date',decr).range(0,50).values('sessionID');"
-//				+ "",params);
-//
-//		for(Result r : results){
-//			userSessions.add(r.getString());
-//		}
-
 		return getUserSessions(username,0);
 		
-//		return getUserSessions(username,0);
 	}
 	
 	public List<String> getUserSessions(String username, int index){
@@ -639,6 +617,35 @@ public class DBTrackingAPI extends DBAPI{
 				+ "B = g.V(A).outE('login').inV().order().by('date',decr).range(index0,index1).values('sessionID');"
 				+ "",params);
 
+		for(Result r : results){
+			userSessions.add(r.getString());
+		}
+
+		return userSessions;
+	}
+	
+	public List<String> getUserSessionsAndDates(String username){
+		return getUserSessionsAndDates(username,0);
+	}
+	
+	public List<String> getUserSessionsAndDates(String username, int index){
+
+		List<String> userSessions = new ArrayList<>();
+
+		//return values list
+		List<Result> results = null;
+
+		//params
+		Map<String,Object> params = new HashMap<>();
+		params.put("username", username);
+		params.put("index0", index);
+		params.put("index1", index+50);
+
+		//ArrayList to save the trajectory 
+		results = query("A = g.V().has('username',username).id().next();"
+				+ "B = g.V(A).outE('login').inV().order().by('date',decr).range(index0,index1).values('sessionID','date');"
+				+ "",params);
+		
 		for(Result r : results){
 			userSessions.add(r.getString());
 		}
