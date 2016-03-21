@@ -52,39 +52,39 @@ public class TRACEStoreService {
 	private final String LOG_TAG = "TRACEStoreService"; 
 
 	private final Logger LOG = Logger.getLogger(TRACEStoreService.class); 
-	
+
 	private UserDriver uDriver = UserDriverImpl.getDriver();
 	private SessionDriver sDriver = SessionDriverImpl.getDriver();
 	private TRACETrackingDriver mDriver = TRACEStore.getTRACEStore();
-	
+
 
 	@Path("/test")
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String test(){
-	
+
 		LOG.info("Welcome to the "+LOG_TAG);
-		
+
 		return "Welcome to the "+LOG_TAG;
 	}
-	
-	
+
+
 	@Path("/sample")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public TraceTrack samoleTrack(){
-		
-		
+
+
 		Location l1 = new Location(1, 1, 1);
 		Location l2 = new Location(2, 2, 2);
 		Location l3 = new Location(3, 3, 3);
 		Location[] locations =  {l1, l2, l3};
 		TraceTrack t = new TraceTrack(locations);
-	
+
 		return t;
-		
+
 	}
-	
+
 
 	/*
 	 ************************************************************************
@@ -107,8 +107,8 @@ public class TRACEStoreService {
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response registerUser(UserRegistryRequest request){
 
-		
-		
+
+
 		String activationToken;
 
 		try {
@@ -125,11 +125,11 @@ public class TRACEStoreService {
 							Role.user);
 
 			mDriver.registerUser(request.getUsername(),
-									request.getName(),
-									request.getAddress());
-			
+					request.getName(),
+					request.getAddress());
+
 			LOG.info("User '"+request.getUsername()+"' successfully registered.");
-			
+
 			return Response.ok(activationToken).build();
 
 		} catch (UserRegistryException e) {
@@ -174,14 +174,14 @@ public class TRACEStoreService {
 		response.addProperty("success", true);
 		return gson.toJson(response);
 	}
-	
+
 	private String generateFailedResponse(String msg){
 		JsonObject response = new JsonObject();
 		response.addProperty("success", false);
 		response.addProperty("error", msg);
 		return gson.toJson(response);
 	}
-	
+
 	/**
 	 * Enables a tracking application to report its location, at a specific moment in time.
 	 * @param sessionId The user's session identifier, which operates as a pseudonym.
@@ -196,25 +196,25 @@ public class TRACEStoreService {
 	@Path("/put/geo/{session}")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public String put(@PathParam("session") String session, GeoLocation location, @Context SecurityContext context){
-		
+
 		boolean success;
 		GraphDB conn = GraphDB.getConnection();
 		success = conn.getTrackingAPI().put(
-						session,
-						new Date(location.getTimestamp()),
-						location.getLatitude(),
-						location.getLongitude());
-		
+				session,
+				new Date(location.getTimestamp()),
+				location.getLatitude(),
+				location.getLongitude());
+
 		if(success)
 			return generateSuccessResponse();
 		else{
 			LOG.error("Provided location was not accepted. TODO: provide verbose error");
 			return generateFailedResponse("Location insertion failed.");
 		}
-		
+
 	}
-	
-	
+
+
 	/**
 	 * Enables a tracking application to report a traced tracked, as a whole.
 	 *  
@@ -231,7 +231,7 @@ public class TRACEStoreService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String put(@PathParam("session") String session, TraceTrack track, @Context SecurityContext context){
-		
+
 		try {
 			if(!sDriver.trackingSessionExists(session))
 				return generateFailedResponse("Unknown session '"+session+"'.");
@@ -239,7 +239,7 @@ public class TRACEStoreService {
 			LOG.error("Failed to upload track with session '"+session+"' because : "+e.getMessage());
 			return generateFailedResponse("Failed to upload track because :"+e.getMessage());
 		}
-		
+
 		try {
 			if(sDriver.isTrackingSessionClosed(session))
 				return generateFailedResponse("Session '"+session+"' is already closed.");
@@ -247,32 +247,42 @@ public class TRACEStoreService {
 			LOG.error("Failed to upload track with session '"+session+"' because : "+e.getMessage());
 			return generateFailedResponse("Failed to upload track because :"+e.getMessage());
 		}
-		
-		boolean success;
-		Location location;
-		int failedInserts = 0;
-		
-		for(int i = 0; i < track.getTrackSize(); i++){
-			GraphDB conn = GraphDB.getConnection();
-			location = track.getLocation(i);
-			
-			if(location != null){
-				success = conn.getTrackingAPI().put(
+
+		Thread thread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				boolean success;
+				Location location;
+				int failedInserts = 0;
+
+				for(int i = 0; i < track.getTrackSize(); i++){
+					GraphDB conn = GraphDB.getConnection();
+					location = track.getLocation(i);
+
+					if(location != null){
+						success = conn.getTrackingAPI().put(
 								session,
 								new Date(location.getTimestamp()),
 								location.getLatitude(),
 								location.getLongitude());
-				
-				if(!success)
-					failedInserts++;
-					
+
+						if(!success)
+							failedInserts++;
+
+					}
+				}
 			}
-		}
-		
-		if(failedInserts == 0)
-			return generateSuccessResponse();
-		else
-			return generateFailedResponse("Failed to insert "+failedInserts+" out of "+track.getTrackSize()+" locations");
+		});
+
+		thread.start();
+
+		//TODO: Correct this so that we can get a better response, i.e., know if the insertion really got done.
+		//Right now it always says it has been done correctly.
+		//		if(failedInserts == 0)
+		return generateSuccessResponse();
+		//		else
+		//			return generateFailedResponse("Failed to insert "+failedInserts+" out of "+track.getTrackSize()+" locations");
 	}
 
 	/**
@@ -293,7 +303,7 @@ public class TRACEStoreService {
 		throw new UnsupportedOperationException();
 	}
 
-	
+
 
 	/*
 	 ************************************************************************
@@ -302,7 +312,7 @@ public class TRACEStoreService {
 	 ************************************************************************
 	 ************************************************************************
 	 */
-	
+
 	/**
 	 * Enables users to query aspects such as previously taken routes 
 	 * 
@@ -317,8 +327,8 @@ public class TRACEStoreService {
 	public Response query(TRACEQuery query){
 		throw new UnsupportedOperationException();
 	}	
-	
-	
+
+
 	/*
 	 ************************************************************************
 	 ************************************************************************
@@ -326,7 +336,7 @@ public class TRACEStoreService {
 	 ************************************************************************
 	 ************************************************************************
 	 */
-	
+
 	/**
 	 * Fetches the coordinates sequence that makes up the route associated
 	 * with the provided session identifyer
@@ -338,7 +348,7 @@ public class TRACEStoreService {
 		Gson gson = new Gson();
 		return gson.toJson(mDriver.getRouteBySession(sessionId));
 	}
-	
+
 	/**
 	 * Fetches the list of tracking sessions that are associated with the
 	 * specified user.
@@ -353,9 +363,9 @@ public class TRACEStoreService {
 	public String getUserSessions(@PathParam("username") String username){
 		Gson gson = new Gson();
 		return gson.toJson(mDriver.getUserSessions(username));
-		
+
 	}
-	
+
 	/**
 	 * Fetches the list of tracking sessions and corresponding dates that are associated with the
 	 * specified user.
@@ -371,7 +381,7 @@ public class TRACEStoreService {
 		Gson gson = new Gson();
 		return gson.toJson(mDriver.getUserSessionsAndDates(username));
 	}
-	
+
 	/**
 	 * Fetches the list of all tracking sessions.
 	 * 
