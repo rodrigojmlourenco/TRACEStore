@@ -61,7 +61,9 @@ class TraceLocationMethods {
 		return (dist);
 	}
 	
-	
+	public static double midPoint(double p1, double p2){
+		return ((p1 + p2) / 2);
+	}
 
 	/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 	/*::	This function converts decimal degrees to radians						 :*/

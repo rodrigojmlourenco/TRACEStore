@@ -172,13 +172,16 @@ public class Trace {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++			
 //			List<String> userSessions = apiTracking.getUserSessions("miguel","passWord123#");
 
-			String tSession = apiTracking.login("miguel",new TraceSession().getSessionID());
-			List<String> sessions = apiTracking.getUserSessionsAndDates("miguel");
+//			String tSession = apiTracking.login("miguel",new TraceSession().getSessionID());
+//			List<String> sessions = apiTracking.getUserSessionsAndDates("miguel");
+//			
+//			for(String s : sessions){
+//				System.out.println(s);
+//			}
 			
-			for(String s : sessions){
-				System.out.println(s);
-			}
-			
+//			api.addLocation("t3", 39.735374450684, -9.1406631469727);
+//			api.addLocation("t4", 39.733535766602, -9.1371507644653);
+//			api.addRoad("t3Tot4", "t3", "t4");
 			
 //			System.out.println("tSession: " + tSession);
 //
