@@ -59,7 +59,7 @@ public class DBMapAPI extends DBAPI{
 		//return values list
 		List<Result> results = null; 
 
-//		System.out.println("DEBUG: addRoad(" + name + "," + p1 + "," + p2 + ")");
+		//		System.out.println("DEBUG: addRoad(" + name + "," + p1 + "," + p2 + ")");
 
 		//params
 		Map<String,Object> params = new HashMap<>();
@@ -155,17 +155,12 @@ public class DBMapAPI extends DBAPI{
 		//return values list
 		List<Result> results = null; 
 
+		System.out.println("DEBUG: addRoad(" + name + "," + p1 + "," + p2 + ")");
+
 		//params
 		Map<String,Object> params = new HashMap<>();
 		params.put("idA",p1);
 		params.put("idB",p2);
-		params.put("streetName",name);
-
-		String propertiesString = "";
-
-		for(String key : properties.keySet()){
-			propertiesString += ",'" + key + "','" + properties.get(key) + "'";
-		}
 
 		//query
 		results = query("A = g.V().hasLabel('location').has('vertexID',idA).next();"
@@ -187,34 +182,51 @@ public class DBMapAPI extends DBAPI{
 			double p2Latitude = results.get(2).getDouble();
 			double p2Longitude = results.get(3).getDouble();
 
-			double distance = TraceLocationMethods.distance(p1Latitude, p1Longitude, p2Latitude, p2Longitude, "K");
+			List<TraceVertex> roadVertices = TraceLocationMethods.splitRoad(p1, p1Latitude, p1Longitude, p2, p2Latitude, p2Longitude, 0.016);			
+
+			int size = roadVertices.size();
+			for(int i = 1; i < size-1; i++){
+				addLocation(roadVertices.get(i).getName(), roadVertices.get(i).getLatitude(), roadVertices.get(i).getLongitude());
+//				System.out.println("addLocation:" + roadVertices.get(i).getName());
+				addRoadAux(name+"_"+(i-1), roadVertices.get(i-1).getName(), roadVertices.get(i).getName(), properties);
+//				System.out.println("addRoad: " + name+"_"+i);
+			}
+			addRoadAux(name+"_"+size, roadVertices.get(size-2).getName(), roadVertices.get(size-1).getName(), properties);
+//			System.out.println("addRoad: " + name+"_"+size);
 
 			//if the distance is too big we do not want to 
-//			if(distance > 0.008 && distance < 0.500){
-			if(false){
+			//			if(distance > 0.008 && distance < 0.500){
+			//			if(false){
+			//
+			//				double p3Latitude = TraceLocationMethods.midPoint(p1Latitude, p2Latitude);
+			//				double p3Longitude = TraceLocationMethods.midPoint(p1Longitude, p2Longitude);
+			//				String p3 = "" + p3Latitude + "_" + p3Longitude;
+			//				
+			//				System.out.println("p1: " + p1Latitude + ", " + p1Longitude);
+			//				System.out.println("p2: " + p2Latitude + ", " + p2Longitude);
+			//				System.out.println("p3: " + p3);
+			//
+			//				boolean success = true;
+			//
+			//				success = addLocation(p3, p3Latitude, p3Longitude) && success;
+			////
+			//				success = addRoad(name+"L", p1, p3, properties) && success;
+			//				success = addRoad(name+"R", p3, p2, properties) && success;
+			//
+			//				return success;
+			//
+			//			}else{
 
-				double p3Latitude = TraceLocationMethods.midPoint(p1Latitude, p2Latitude);
-				double p3Longitude = TraceLocationMethods.midPoint(p1Longitude, p2Longitude);
-				String p3 = "" + p3Latitude + "_" + p3Longitude;
+			//				System.out.println("else");
+			//				results = null;
+			//				results = query("a = g.V().hasLabel('location').has('vertexID',idA).next(); "
+			//						+ "b = g.V().hasLabel('location').has('vertexID',idB).next(); "
+			//						+ "a.addEdge('road', b, 'name', streetName" + propertiesString + "); "
+			//						+ "", params);
 
-				boolean success = true;
-
-				success = addLocation(p3, p3Latitude, p3Longitude) && success;
-
-				success = addRoad(name+"L", p1, p3, properties) && success;
-				success = addRoad(name+"R", p3, p2, properties) && success;
-
-				return success;
-
-			}else{
-				results = null;
-				results = query("a = g.V().hasLabel('location').has('vertexID',idA).next(); "
-						+ "b = g.V().hasLabel('location').has('vertexID',idB).next(); "
-						+ "a.addEdge('road', b, 'name', streetName" + propertiesString + "); "
-						+ "", params);
-
-				return results != null;
-			}
+			//				return results != null;
+			//			}
+			return true;
 		}	
 
 		//query
@@ -225,6 +237,31 @@ public class DBMapAPI extends DBAPI{
 		//
 		//		return results != null;
 	}
+
+	private boolean addRoadAux(String name, String p1, String p2, Map<String, Object> properties){
+		//return values list
+		List<Result> results = null;
+
+		//params
+		Map<String,Object> params = new HashMap<>();
+		params.put("idA",p1);
+		params.put("idB",p2);
+		params.put("streetName",name);
+
+		String propertiesString = "";
+
+		for(String key : properties.keySet()){
+			propertiesString += ",'" + key + "','" + properties.get(key) + "'";
+		}
+
+		results = query("a = g.V().hasLabel('location').has('vertexID',idA).next(); "
+				+ "b = g.V().hasLabel('location').has('vertexID',idB).next(); "
+				+ "a.addEdge('road', b, 'name', streetName" + propertiesString + "); "
+				+ "", params);
+
+		return results != null;
+	}
+
 
 	public List<Result> locationLookUpRadius(double latitude, double longitude, double radius){
 

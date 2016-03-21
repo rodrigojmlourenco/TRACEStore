@@ -31,21 +31,23 @@ package org.trace.DBAPI;
 
 import java.util.*;
 
+import org.apache.tinkerpop.gremlin.process.traversal.step.util.HasContainer;
 import org.codehaus.groovy.transform.LazyASTTransformation;
+import org.trace.DBAPI.data.TraceVertex;
 
 import java.lang.*;
 import java.io.*;
 
 class TraceLocationMethods {
-	
-	protected static final double DISTANCE = 0.0001; //Tolerance in kilometers
 
-//	public static void main (String[] args) throws java.lang.Exception
-//	{
-//		System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, "M") + " Miles\n");
-//		System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, "K") + " Kilometers\n");
-//		System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, "N") + " Nautical Miles\n");
-//	}
+	//	protected static final double MAX_DISTANCE = 0.016; 
+
+	//	public static void main (String[] args) throws java.lang.Exception
+	//	{
+	//		System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, "M") + " Miles\n");
+	//		System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, "K") + " Kilometers\n");
+	//		System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, "N") + " Nautical Miles\n");
+	//	}
 
 	public static double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
 		double theta = lon1 - lon2;
@@ -60,7 +62,7 @@ class TraceLocationMethods {
 		}
 		return (dist);
 	}
-	
+
 	public static double midPoint(double p1, double p2){
 		return ((p1 + p2) / 2);
 	}
@@ -78,26 +80,80 @@ class TraceLocationMethods {
 	private static double rad2deg(double rad) {
 		return (rad * 180 / Math.PI);
 	}
-	
-	
+
+
 	public static String getGridID(double coord){
 		int intCoord = (int) (coord * 10000);
 		double gridID = intCoord / 10000.0;
-		
+
 		return "" + gridID;
 	}
-	
+
 	public static List<String> getAdjacentGridIDs(double coord){
 		List<String> adjacentGridIDs = new ArrayList<>();
-		
+
 		int intCoord = (int) (coord * 10000);
 		int intCoord1 = intCoord - 1;
 		int intCoord2 = intCoord + 1;
-		
+
 		adjacentGridIDs.add("" + (intCoord1 / 10000.0));
 		adjacentGridIDs.add("" + (intCoord / 10000.0));
 		adjacentGridIDs.add("" + (intCoord2 / 10000.0));
 
 		return adjacentGridIDs;
+	}
+
+	public static List<TraceVertex> splitRoad(String p1, double lat1, double lon1, String p2, double lat2, double lon2, double distance){
+		List<TraceVertex> roadVertices = new ArrayList<>();
+
+		if(distance(lat1, lon1, lat2, lon2, "K") > distance){
+			double lat3 = TraceLocationMethods.midPoint(lat1, lat2);
+			double lon3 = TraceLocationMethods.midPoint(lon1, lon2);
+			String p3 = "" + lat3 + "_" + lon3;
+
+			List<TraceVertex> newRoadVerticesLeft = splitRoadAux(p1, lat1, lon1, p3, lat3, lon3, distance);
+			List<TraceVertex> newRoadVerticesRight = splitRoadAux(p3, lat3, lon3, p2, lat2, lon2, distance);
+
+			for(TraceVertex v : newRoadVerticesLeft){
+				if(!roadVertices.contains(v)){
+					roadVertices.add(v);
+				}
+			}
+			for(TraceVertex v : newRoadVerticesRight){
+				if(!roadVertices.contains(v)){
+					roadVertices.add(v);
+				}
+			}
+		}else{
+			roadVertices.add(new TraceVertex(p2,lat2,lon2));
+		}
+		return roadVertices;
+	}
+
+	private static List<TraceVertex> splitRoadAux(String p1, double lat1, double lon1, String p2, double lat2, double lon2, double distance){
+		List<TraceVertex> roadVertices = new ArrayList<>();
+
+		roadVertices.add(new TraceVertex(p1, lat1, lon1));
+		
+		if(distance(lat1, lon1, lat2, lon2, "K") > distance){
+			double lat3 = TraceLocationMethods.midPoint(lat1, lat2);
+			double lon3 = TraceLocationMethods.midPoint(lon1, lon2);
+			String p3 = "" + lat3 + "_" + lon3;
+
+			List<TraceVertex> newRoadVerticesLeft = splitRoadAux(p1, lat1, lon1, p3, lat3, lon3, distance);
+			List<TraceVertex> newRoadVerticesRight = splitRoadAux(p3, lat3, lon3, p2, lat2, lon2, distance);
+
+			for(TraceVertex v : newRoadVerticesLeft){
+				roadVertices.add(v);
+			}
+
+			for(TraceVertex v : newRoadVerticesRight){
+				roadVertices.add(v);
+			}
+		}else{
+			roadVertices.add(new TraceVertex(p2,lat2,lon2));
+		}
+
+		return roadVertices;
 	}
 }

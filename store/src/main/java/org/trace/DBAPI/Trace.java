@@ -179,9 +179,9 @@ public class Trace {
 //				System.out.println(s);
 //			}
 			
-//			api.addLocation("t3", 39.735374450684, -9.1406631469727);
-//			api.addLocation("t4", 39.733535766602, -9.1371507644653);
-//			api.addRoad("t3Tot4", "t3", "t4");
+			api.addLocation("t100", 34.735374450684, -9.1406631469727);
+			api.addLocation("t200", 34.730535766602, -9.1371507644653);
+			api.addRoad("t100Tot200", "t100", "t200", new HashMap<>());
 			
 //			System.out.println("tSession: " + tSession);
 //
