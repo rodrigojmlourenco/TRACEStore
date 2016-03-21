@@ -369,7 +369,7 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getUserSessionsAndDates(@PathParam("username") String username){
 		Gson gson = new Gson();
-		return gson.toJson(mDriver.getUserSessions(username));
+		return gson.toJson(mDriver.getUserSessionsAndDates(username));
 	}
 	
 	/**
