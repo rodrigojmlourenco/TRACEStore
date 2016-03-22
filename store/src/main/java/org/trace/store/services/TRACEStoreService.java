@@ -217,11 +217,18 @@ public class TRACEStoreService {
 
 	private Map<String, Object> extractLocationAttributes(Location location){
 		
+		LOG.debug(location.getAttributes()); //TODO: remover
+		
 		HashMap<String, Object> map = new HashMap<>();
+		try{
+		
 		JsonObject attributes = (JsonObject) location.getLocationAsJsonObject().get("attributes");
 		
 		for(Entry<String, JsonElement> attribute : attributes.entrySet())
 			map.put(attribute.getKey(), attribute.getValue());
+		}catch(ClassCastException e){
+			LOG.error("Unable to extract the attributes because, "+e.getMessage());
+		}
 		
 		return map;
 	}

@@ -80,6 +80,6 @@ public class Location {
 	
 	@Override
 	public String toString() {
-		return getLocationJSON();
+		return getLocationJSON().toString();
 	}
 }
