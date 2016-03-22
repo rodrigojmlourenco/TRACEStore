@@ -3,6 +3,7 @@ package org.trace.store.middleware.drivers;
 import java.util.Date;
 import java.util.List;
 
+import org.trace.DBAPI.data.SimpleSession;
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 
@@ -52,14 +53,14 @@ public interface SessionDriver {
 	 * @return List of all tracking sessions.
 	 * @throws UnableToPerformOperation
 	 */
-	public List<String> getAllTrackingSessions() throws UnableToPerformOperation;
+	public List<SimpleSession> getAllTrackingSessions() throws UnableToPerformOperation;
 	
 	/**
 	 * Fetches all closed tracking sessions' tokens.
 	 * @return List of all tracking sessions.
 	 * @throws UnableToPerformOperation
 	 */
-	public List<String> getAllClosedTrackingSessions() throws UnableToPerformOperation;
+	public List<SimpleSession> getAllClosedTrackingSessions() throws UnableToPerformOperation;
 	
 	/**
 	 * Fetches all closed tracking sessions' tokens associeted with a specific user.
@@ -67,7 +68,7 @@ public interface SessionDriver {
 	 * @return List of tracking session tokens.
 	 * @throws UnableToPerformOperation
 	 */
-	public List<String> getAllUserTrackingSessions(int userId) throws UnableToPerformOperation;
+	public List<SimpleSession> getAllUserTrackingSessions(int userId) throws UnableToPerformOperation;
 	
 	/**
 	 * Fetches all closed tracking sessions created after the specified date.
@@ -75,7 +76,7 @@ public interface SessionDriver {
 	 * @return List of tracking session tokens.
 	 * @throws UnableToPerformOperation
 	 */
-	public List<String> getAllTrackingSessionsCreatedAfter(Date date) throws UnableToPerformOperation;
+	public List<SimpleSession> getAllTrackingSessionsCreatedAfter(Date date) throws UnableToPerformOperation;
 	
 	/**
 	 * Fetches all closed tracking sessions created before the specified date.
@@ -83,6 +84,6 @@ public interface SessionDriver {
 	 * @return List of tracking session tokens.
 	 * @throws UnableToPerformOperation
 	 */
-	public List<String> getAllTrackingSessionsCreatedBefore(Date date) throws UnableToPerformOperation;
+	public List<SimpleSession> getAllTrackingSessionsCreatedBefore(Date date) throws UnableToPerformOperation;
 
 }

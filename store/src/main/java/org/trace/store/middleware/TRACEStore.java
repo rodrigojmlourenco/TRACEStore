@@ -6,9 +6,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.trace.store.middleware.backend.GraphDB;
+import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.TRACEPlannerDriver;
 import org.trace.store.middleware.drivers.TRACERewardDriver;
 import org.trace.store.middleware.drivers.TRACETrackingDriver;
+import org.trace.store.middleware.drivers.UserDriver;
+import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
+import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
+import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.TRACEPlannerQuery;
 import org.trace.store.services.api.TRACEPlannerResultSet;
@@ -22,6 +28,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.trace.DBAPI.*;
+import org.trace.DBAPI.data.SimpleSession;
 import org.trace.DBAPI.data.TraceVertex;
 
 public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACEPlannerDriver{
@@ -31,6 +38,9 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 	private static TRACEStore MANAGER = new TRACEStore();
 	
 	private final GraphDB graph = GraphDB.getConnection();
+	private final SessionDriver sessionDriver = SessionDriverImpl.getDriver();
+	private final UserDriver userDriver = UserDriverImpl.getDriver();
+	
 	
 	private TRACEStore(){
 		if(graph.isEmptyGraph()){
@@ -172,16 +182,24 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 		return results;
 	}
 
-	//TODO: passa a questionar a mariaDB
+
 	@Override
 	public JsonArray getUserSessions(String username) {
 		
 		JsonArray results = new JsonArray();
 		
-		List<String> sessions = graph.getTrackingAPI().getUserSessions(username);
-		
-		for(String session : sessions)
-			results.add(session);
+		//List<String> sessions = graph.getTrackingAPI().getUserSessions(username);
+		int userId;
+		try {
+			userId = userDriver.getUserID(username);
+			List<SimpleSession> sessions = sessionDriver.getAllUserTrackingSessions(userId);
+			
+			for(SimpleSession session : sessions)
+				results.add(session.toString());
+			
+		} catch (UnknownUserException | UnableToPerformOperation e) {
+			LOG.error(e);
+		}
 		
 		return results;
 	}
@@ -200,15 +218,22 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 		return results;
 	}
 
-	//TODO: passa a questionar a mariaDB
+	
 	@Override
 	public JsonArray getAllSessions() {
 		JsonArray results = new JsonArray();
 		
-		List<String> sessions = graph.getTrackingAPI().getAllSessions();
+		//List<String> sessions = graph.getTrackingAPI().getAllSessions();
+		List<SimpleSession> sessions;
+		try {
+			sessions = sessionDriver.getAllTrackingSessions();
+			for(SimpleSession session : sessions)
+				results.add(session.toString());
+		} catch (UnableToPerformOperation e) {
+			LOG.error(e);
+		}
 		
-		for(String session : sessions)
-			results.add(session);
+		
 		
 		return results;
 	}

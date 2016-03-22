@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.trace.DBAPI.data.SimpleSession;
 import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
@@ -103,17 +104,21 @@ public class SessionDriverImpl implements SessionDriver{
 	}
 
 	@Override
-	public List<String> getAllTrackingSessions() throws UnableToPerformOperation {
+	public List<SimpleSession> getAllTrackingSessions() throws UnableToPerformOperation {
 		
 		Statement stmt;
-		List<String> sessions = new ArrayList<>();
+		List<SimpleSession> sessions = new ArrayList<>();
 		
 		try {
 			stmt = conn.createStatement();
-			ResultSet result = stmt.executeQuery("SELECT Session FROM sessions");
+			ResultSet result = stmt.executeQuery("SELECT Session, CreatedAt FROM sessions");
 			
+			String session;
+			Long timestamp;
 			while(result.next()){
-				sessions.add(result.getString(1));
+				session = result.getString(1);
+				timestamp = result.getDate(2).getTime();
+				sessions.add(new SimpleSession(session, timestamp));
 			}
 			
 			stmt.close();
@@ -128,17 +133,21 @@ public class SessionDriverImpl implements SessionDriver{
 	}
 
 	@Override
-	public List<String> getAllUserTrackingSessions(int userId) throws UnableToPerformOperation {
+	public List<SimpleSession> getAllUserTrackingSessions(int userId) throws UnableToPerformOperation {
 		PreparedStatement stmt;
-		List<String> sessions = new ArrayList<>();
+		List<SimpleSession> sessions = new ArrayList<>();
 		
 		try {
-			stmt = conn.prepareStatement("SELECT Session FROM sessions WHERE UserId=? AND IsClosed=1");
+			stmt = conn.prepareStatement("SELECT Session, CreatedAt FROM sessions WHERE UserId=? AND IsClosed=1");
 			stmt.setInt(1, userId);
 			ResultSet result = stmt.executeQuery();
 			
+			String session;
+			Long timestamp;
 			while(result.next()){
-				sessions.add(result.getString(1));
+				session = result.getString(1);
+				timestamp = result.getDate(2).getTime();
+				sessions.add(new SimpleSession(session, timestamp));
 			}
 			
 			stmt.close();
@@ -152,17 +161,21 @@ public class SessionDriverImpl implements SessionDriver{
 	}
 
 	@Override
-	public List<String> getAllTrackingSessionsCreatedAfter(Date date) throws UnableToPerformOperation {
+	public List<SimpleSession> getAllTrackingSessionsCreatedAfter(Date date) throws UnableToPerformOperation {
 		PreparedStatement stmt;
-		List<String> sessions = new ArrayList<>();
+		List<SimpleSession> sessions = new ArrayList<>();
 		
 		try {
-			stmt = conn.prepareStatement("SELECT Session FROM sessions WHERE CreatedAt > ? AND IsClosed=1");
+			stmt = conn.prepareStatement("SELECT Session, CreatedAt FROM sessions WHERE CreatedAt > ? AND IsClosed=1");
 			stmt.setDate(1, new java.sql.Date(date.getTime()));
 			ResultSet result = stmt.executeQuery();
 			
+			String session;
+			Long timestamp;
 			while(result.next()){
-				sessions.add(result.getString(1));
+				session = result.getString(1);
+				timestamp = result.getDate(2).getTime();
+				sessions.add(new SimpleSession(session, timestamp));
 			}
 			
 			stmt.close();
@@ -176,17 +189,21 @@ public class SessionDriverImpl implements SessionDriver{
 	}
 
 	@Override
-	public List<String> getAllTrackingSessionsCreatedBefore(Date date) throws UnableToPerformOperation {
+	public List<SimpleSession> getAllTrackingSessionsCreatedBefore(Date date) throws UnableToPerformOperation {
 		PreparedStatement stmt;
-		List<String> sessions = new ArrayList<>();
+		List<SimpleSession> sessions = new ArrayList<>();
 		
 		try {
-			stmt = conn.prepareStatement("SELECT Session FROM sessions WHERE CreatedAt <= ? AND IsClosed=1");
+			stmt = conn.prepareStatement("SELECT Session, CreatedAt FROM sessions WHERE CreatedAt <= ? AND IsClosed=1");
 			stmt.setDate(1, new java.sql.Date(date.getTime()));
 			ResultSet result = stmt.executeQuery();
 			
+			String session;
+			Long timestamp;
 			while(result.next()){
-				sessions.add(result.getString(1));
+				session = result.getString(1);
+				timestamp = result.getDate(2).getTime();
+				sessions.add(new SimpleSession(session, timestamp));
 			}
 			
 			stmt.close();
@@ -201,16 +218,20 @@ public class SessionDriverImpl implements SessionDriver{
 	
 	
 	@Override
-	public List<String> getAllClosedTrackingSessions() throws UnableToPerformOperation{
+	public List<SimpleSession> getAllClosedTrackingSessions() throws UnableToPerformOperation{
 		Statement stmt;
-		List<String> sessions = new ArrayList<>();
+		List<SimpleSession> sessions = new ArrayList<>();
 		
 		try {
 			stmt = conn.createStatement();
-			ResultSet result = stmt.executeQuery("SELECT Session FROM sessions WHERE IsClosed=1");
+			ResultSet result = stmt.executeQuery("SELECT Session, CreatedAt FROM sessions WHERE IsClosed=1");
 			
+			String session;
+			Long timestamp;
 			while(result.next()){
-				sessions.add(result.getString(1));
+				session = result.getString(1);
+				timestamp = result.getDate(2).getTime();
+				sessions.add(new SimpleSession(session, timestamp));
 			}
 			
 			stmt.close();
@@ -244,8 +265,8 @@ public class SessionDriverImpl implements SessionDriver{
 			driver.closeTrackingSession("abcd4");
 			
 			System.out.println("Listing closed sessions...");
-			for(String s : driver.getAllUserTrackingSessions(10))
-				System.out.println(s);
+			for(SimpleSession s : driver.getAllUserTrackingSessions(10))
+				System.out.println(s.toString());
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
