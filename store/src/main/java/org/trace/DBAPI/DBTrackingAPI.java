@@ -274,7 +274,7 @@ public class DBTrackingAPI extends DBAPI{
 		Set<String> keys = attributes.keySet();
 		if(attributes != null){
 			for(String key : keys){
-				params.put(key,attributes.get(key));
+				params.put(key,attributes.get(key).toString());
 				attributesString += ", '" +  key + "', " + key;
 			}
 		}
