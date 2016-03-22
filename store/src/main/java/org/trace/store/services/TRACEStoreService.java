@@ -217,7 +217,7 @@ public class TRACEStoreService {
 
 	private Map<String, Object> extractLocationAttributes(Location location){
 		
-		LOG.debug(location.getAttributes()); //TODO: remover
+		LOG.debug("Attributes :"+location.getAttributes()); //TODO: remover
 		
 		HashMap<String, Object> map = new HashMap<>();
 		try{
@@ -278,6 +278,7 @@ public class TRACEStoreService {
 					GraphDB conn = GraphDB.getConnection();
 					location = track.getLocation(i);
 
+					/*
 					if(location != null){
 						success = conn.getTrackingAPI().put(
 								session,
@@ -290,6 +291,7 @@ public class TRACEStoreService {
 							LOG.error("Failed to inser location "+location);
 
 					}
+					*/
 				}
 			}
 		});
