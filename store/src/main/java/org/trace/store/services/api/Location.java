@@ -12,21 +12,14 @@ public class Location {
 	private String attributes;
 	
 	public Location(){}
-	
-	public Location(double latitude, double longitude, long timestamp){
-		this.latitude = latitude;
-		this.longitude = longitude;
-		this.timestamp = timestamp;
-		this.attributes = "";
-	}
-	
+
 	public Location(double latitude, double longitude, long timestamp, String attributes){
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.timestamp = timestamp;
 		this.attributes = attributes;
 	}
-
+	
 	public String getLocationJSON() {
 		return getLocationAsJsonObject().toString();
 	}

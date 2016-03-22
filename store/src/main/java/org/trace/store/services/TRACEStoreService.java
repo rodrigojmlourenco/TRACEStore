@@ -79,9 +79,9 @@ public class TRACEStoreService {
 	public TraceTrack samoleTrack(){
 
 
-		Location l1 = new Location(1, 1, 1);
-		Location l2 = new Location(2, 2, 2);
-		Location l3 = new Location(3, 3, 3);
+		Location l1 = new Location(1, 1, 1,"a");
+		Location l2 = new Location(2, 2, 2,"b");
+		Location l3 = new Location(3, 3, 3,"c");
 		Location[] locations =  {l1, l2, l3};
 		TraceTrack t = new TraceTrack(locations);
 
@@ -218,7 +218,6 @@ public class TRACEStoreService {
 	private Map<String, Object> extractLocationAttributes(Location location){
 		
 		LOG.debug("Attributes :"+location.getAttributes()); //TODO: remover
-		System.out.println("Attributes "+location.getAttributes()); //TODO: remover
 		
 		HashMap<String, Object> map = new HashMap<>();
 		try{
@@ -229,6 +228,7 @@ public class TRACEStoreService {
 			map.put(attribute.getKey(), attribute.getValue());
 		}catch(ClassCastException e){
 			LOG.error("Unable to extract the attributes because, "+e.getMessage());
+			return null;
 		}
 		
 		return map;
@@ -279,21 +279,30 @@ public class TRACEStoreService {
 					GraphDB conn = GraphDB.getConnection();
 					location = track.getLocation(i);
 
-					extractLocationAttributes(location);
-					/*
 					if(location != null){
-						success = conn.getTrackingAPI().put(
-								session,
-								new Date(location.getTimestamp()),
-								location.getLatitude(),
-								location.getLongitude(),
-								extractLocationAttributes(location));
+					
+						Map<String, Object> map = extractLocationAttributes(location);
+						
+						if(map != null){
+							success = conn.getTrackingAPI().put(
+									session,
+									new Date(location.getTimestamp()),
+									location.getLatitude(),
+									location.getLongitude(),
+									extractLocationAttributes(location));
+						}else{
+							success = conn.getTrackingAPI().put(
+									session,
+									new Date(location.getTimestamp()),
+									location.getLatitude(),
+									location.getLongitude(),
+									extractLocationAttributes(location));
+						}
 						
 						if(!success)
 							LOG.error("Failed to inser location "+location);
 
 					}
-					*/
 				}
 			}
 		});
