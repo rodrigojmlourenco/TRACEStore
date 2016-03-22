@@ -283,6 +283,7 @@ public class TRACEStoreService {
 					
 						Map<String, Object> map = extractLocationAttributes(location);
 						
+						/*
 						if(map != null){
 							success = conn.getTrackingAPI().put(
 									session,
@@ -301,7 +302,7 @@ public class TRACEStoreService {
 						
 						if(!success)
 							LOG.error("Failed to inser location "+location);
-
+						*/
 					}
 				}
 			}
