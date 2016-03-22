@@ -217,12 +217,13 @@ public class TRACEStoreService {
 
 	private Map<String, Object> extractLocationAttributes(Location location){
 		
-		LOG.debug("Attributes :"+location.getAttributes()); //TODO: remover
+		
 		
 		HashMap<String, Object> map = new HashMap<>();
 		try{
 		
 		JsonObject attributes = (JsonObject) location.getLocationAsJsonObject().get("attributes");
+		LOG.debug("Attributes :"+attributes); //TODO: remover
 		
 		for(Entry<String, JsonElement> attribute : attributes.entrySet())
 			map.put(attribute.getKey(), attribute.getValue());
