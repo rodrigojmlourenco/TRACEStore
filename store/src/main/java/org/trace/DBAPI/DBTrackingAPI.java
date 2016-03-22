@@ -199,9 +199,9 @@ public class DBTrackingAPI extends DBAPI{
 		List<String> adjacentLatitudeGridID = TraceLocationMethods.getAdjacentGridIDs(latitude);
 		List<String> adjacentLongitudeGridID = TraceLocationMethods.getAdjacentGridIDs(longitude);
 
-		String latitudeOR = "has('latitudeGridID','" + adjacentLatitudeGridID.get(0) + "),"
-				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(1) + "),"
-				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(2) + ")";
+		String latitudeOR = "has('latitudeGridID','" + adjacentLatitudeGridID.get(0) + "'),"
+				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(1) + "'),"
+				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(2) + "')";
 
 		String longitudeOR = "has('longitudeGridID','" + adjacentLongitudeGridID.get(0) + "'),"
 				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(1) + "'),"
