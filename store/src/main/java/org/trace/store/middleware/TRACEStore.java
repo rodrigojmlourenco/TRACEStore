@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.trace.DBAPI.data.SimpleSession;
+import org.trace.DBAPI.data.TraceVertex;
 import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.TRACEPlannerDriver;
@@ -26,10 +28,6 @@ import org.trace.store.services.api.data.Beacon;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
-import org.trace.DBAPI.*;
-import org.trace.DBAPI.data.SimpleSession;
-import org.trace.DBAPI.data.TraceVertex;
 
 public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACEPlannerDriver{
 
@@ -204,16 +202,22 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 		return results;
 	}
 	
-	//TODO: passa a questionar a mariaDB
 	@Override
 	public JsonArray getUserSessionsAndDates(String username) {
 		
 		JsonArray results = new JsonArray();
 		
-		List<String> sessions = graph.getTrackingAPI().getUserSessionsAndDates(username);
-		
-		for(String session : sessions)
-			results.add(session);
+		int userId;
+		try {
+			userId = userDriver.getUserID(username);
+			List<SimpleSession> sessions = sessionDriver.getAllUserTrackingSessions(userId);
+			
+			for(SimpleSession session : sessions)
+				results.add(session.toString());
+			
+		} catch (UnknownUserException | UnableToPerformOperation e) {
+			LOG.error(e);
+		}
 		
 		return results;
 	}
