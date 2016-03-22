@@ -184,37 +184,31 @@ public class DBMapAPI extends DBAPI{
 			return false;
 		}else{
 
-			//			addRoadAux(name, p1, p2, properties);
+						addRoadAux(name, p1, p2, properties);
 
-			double p1Latitude = results.get(0).getDouble();
-			double p1Longitude = results.get(1).getDouble();
-			double p2Latitude = results.get(2).getDouble();
-			double p2Longitude = results.get(3).getDouble();
-
-			List<TraceVertex> roadVertices = TraceLocationMethods.splitRoad(p1, p1Latitude, p1Longitude, p2, p2Latitude, p2Longitude, 0.016);			
-
-			int count = 1;
-			TraceVertex lastPoint = null;
-			for(TraceVertex v : roadVertices){
-				addLocation(v.getName(), v.getLatitude(), v.getLongitude());
-				if(lastPoint != null){
-					addRoadAux(name+"_"+count, lastPoint.getName(), v.getName(), properties);
-					count++;
-					System.out.println("DEBUG - addRoad: " + name+"_"+count + " " + lastPoint.getName() + "-->" + v.getName());
-				}
-				lastPoint = v;
-			}
-			
-//			int size = roadVertices.size();
-//			for(int i = 1; i < size-1; i++){
-//				addLocation(roadVertices.get(i).getName(), roadVertices.get(i).getLatitude(), roadVertices.get(i).getLongitude());
-//				//				System.out.println("addLocation:" + roadVertices.get(i).getName());
-//				addRoadAux(name+"_"+(i-1), roadVertices.get(i-1).getName(), roadVertices.get(i).getName(), properties);
-//				//				System.out.println("addRoad: " + name+"_"+i);
+			//TODO: Verify if is this is useful, it splits roads bigger than 16m into two. 
+			//Tested and working. Too much overhead on put() for now to be used.
+						
+//			double p1Latitude = results.get(0).getDouble();
+//			double p1Longitude = results.get(1).getDouble();
+//			double p2Latitude = results.get(2).getDouble();
+//			double p2Longitude = results.get(3).getDouble();
+//
+//			//Split with 0.016 as distance, i.e., 16m between each vertice.
+//			List<TraceVertex> roadVertices = TraceLocationMethods.splitRoad(p1, p1Latitude, p1Longitude, p2, p2Latitude, p2Longitude, 0.016);			
+//
+//			int count = 1;
+//			TraceVertex lastPoint = null;
+//			for(TraceVertex v : roadVertices){
+//				addLocation(v.getName(), v.getLatitude(), v.getLongitude());
+//				if(lastPoint != null){
+//					addRoadAux(name+"_"+count, lastPoint.getName(), v.getName(), properties);
+//					count++;
+////					System.out.println("DEBUG - addRoad: " + name+"_"+count + " " + lastPoint.getName() + "-->" + v.getName());
+//				}
+//				lastPoint = v;
 //			}
-//			addRoadAux(name+"_"+size, roadVertices.get(size-2).getName(), roadVertices.get(size-1).getName(), properties);
-//			//			System.out.println("addRoad: " + name+"_"+size);
-
+			
 			return true;
 		}	
 	}

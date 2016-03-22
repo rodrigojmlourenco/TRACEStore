@@ -179,9 +179,9 @@ public class Trace {
 //				System.out.println(s);
 //			}
 			
-			api.addLocation("t1", 33.735374450684, -9.1406631469727);
-			api.addLocation("t2", 33.730535766602, -9.1371507644653);
-			api.addRoad("t1Tot2", "t1", "t2", new HashMap<>());
+//			api.addLocation("t1", 33.735374450684, -9.1406631469727);
+//			api.addLocation("t2", 33.730535766602, -9.1371507644653);
+//			api.addRoad("t1Tot2", "t1", "t2", new HashMap<>());
 			
 //			System.out.println("tSession: " + tSession);
 //
@@ -191,7 +191,7 @@ public class Trace {
 			
 
 //			Date date1 = new Date();
-//			
+////			
 //			if(tSession != ""){
 //				apiTracking.put(tSession,new Date(), 38.735374450684,-9.1406631469727);
 //				apiTracking.put(tSession,new Date(), 38.735374450684,-9.1406631469727);
@@ -304,7 +304,7 @@ public class Trace {
 //
 //			Date date2 = new Date();
 //			Long time = date2.getTime() - date1.getTime();
-//			
+////			
 //			System.out.println("done: " + time + "ms.");
 			
 //			++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
