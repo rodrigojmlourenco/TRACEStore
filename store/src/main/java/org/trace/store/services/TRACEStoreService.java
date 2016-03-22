@@ -128,10 +128,6 @@ public class TRACEStoreService {
 							request.getPhone(),
 							Role.user);
 
-			mDriver.registerUser(request.getUsername(),
-					request.getName(),
-					request.getAddress());
-
 			LOG.info("User '"+request.getUsername()+"' successfully registered.");
 
 			return Response.ok(activationToken).build();
