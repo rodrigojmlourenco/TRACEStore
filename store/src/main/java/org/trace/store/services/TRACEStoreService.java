@@ -1,6 +1,9 @@
 package org.trace.store.services;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -37,6 +40,7 @@ import org.trace.store.services.api.TraceTrack;
 import org.trace.store.services.api.UserRegistryRequest;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
@@ -215,6 +219,17 @@ public class TRACEStoreService {
 	}
 
 
+	private Map<String, Object> extractLocationAttributes(Location location){
+		
+		HashMap<String, Object> map = new HashMap<>();
+		JsonObject attributes = (JsonObject) location.getLocationAsJsonObject().get("attributes");
+		
+		for(Entry<String, JsonElement> attribute : attributes.entrySet())
+			map.put(attribute.getKey(), attribute.getValue());
+		
+		return map;
+	}
+	
 	/**
 	 * Enables a tracking application to report a traced tracked, as a whole.
 	 *  
@@ -252,9 +267,9 @@ public class TRACEStoreService {
 
 			@Override
 			public void run() {
+				
 				boolean success;
 				Location location;
-				int failedInserts = 0;
 
 				for(int i = 0; i < track.getTrackSize(); i++){
 					GraphDB conn = GraphDB.getConnection();
@@ -265,10 +280,11 @@ public class TRACEStoreService {
 								session,
 								new Date(location.getTimestamp()),
 								location.getLatitude(),
-								location.getLongitude());
-
+								location.getLongitude(),
+								extractLocationAttributes(location));
+						
 						if(!success)
-							failedInserts++;
+							LOG.error("Failed to inser location "+location);
 
 					}
 				}
