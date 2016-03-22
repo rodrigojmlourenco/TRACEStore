@@ -217,13 +217,11 @@ public class TRACEStoreService {
 
 	private Map<String, Object> extractLocationAttributes(Location location){
 		
-		
-		
 		HashMap<String, Object> map = new HashMap<>();
 		try{
 		
 		JsonObject attributes = (JsonObject) location.getLocationAsJsonObject().get("attributes");
-		LOG.debug("Attributes :"+attributes); //TODO: remover
+		
 		
 		for(Entry<String, JsonElement> attribute : attributes.entrySet())
 			map.put(attribute.getKey(), attribute.getValue());
@@ -284,7 +282,6 @@ public class TRACEStoreService {
 					
 						Map<String, Object> map = extractLocationAttributes(location);
 						
-						/*
 						if(map != null){
 							success = conn.getTrackingAPI().put(
 									session,
@@ -303,7 +300,6 @@ public class TRACEStoreService {
 						
 						if(!success)
 							LOG.error("Failed to inser location "+location);
-						*/
 					}
 				}
 			}
