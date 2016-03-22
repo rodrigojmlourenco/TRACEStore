@@ -35,39 +35,35 @@ public class DBTrackingAPI extends DBAPI{
 		return results != null;
 	}
 
-	public String login(String username, String sessionID){
+	private boolean login(String sessionID){
 
 		//return values list
 		List<Result> results = null;
 
 		//params
 		Map<String,Object> params = new HashMap<>();
-		params.put("username",username);
+		params.put("sessionID",sessionID);
+		params.put("date",new Date());
 
-		//query 
-		//verify username + password match
-		results = query("g.V().hasLabel('user').has('username',username).hasNext()",params);
-		if(results.get(0).getBoolean()){
-			results=null;
-			while(results == null){
-				//create a new TraceSession
-				params.put("sessionID",sessionID);
-				params.put("date",new Date());
+		//begin a session
+		results = query("g.V().has('sessionID', sessionID).hasNext();"
+				+ "", params);
 
-				//begin a session
-				results = query("S = graph.addVertex(label,'session','sessionID', sessionID, 'date', date);"
-						+ "U = g.V().hasLabel('user').has('username',username).next();"
-						+ "U.addEdge('login', S)", params);
-			}
-			return sessionID;
+		if(!results.get(0).getBoolean()){
+			//begin a session
+			results = query("S = graph.addVertex(label,'session','sessionID', sessionID, 'date', date);"
+					+ "", params);
 		}
-		return "";
+
+		return results != null;
 	}
 
-	//Send an error in case the coords don't match any existing point
 	public boolean put(String sessionID, Date date, double latitude, double longitude){
 		//return values list
 		List<Result> results = null;
+
+		//Make sure the user has the appointed session registered in the DB.
+		login(sessionID);
 
 		//params
 		Map<String,Object> params = new HashMap<>();
@@ -77,20 +73,20 @@ public class DBTrackingAPI extends DBAPI{
 		params.put("date", date);
 		params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
 		params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
-		
+
 		List<String> adjacentLatitudeGridID = TraceLocationMethods.getAdjacentGridIDs(latitude);
 		List<String> adjacentLongitudeGridID = TraceLocationMethods.getAdjacentGridIDs(longitude);
-		
+
 		String latitudeOR = "has('latitudeGridID','" + adjacentLatitudeGridID.get(0) + "'),"
 				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(1) + "'),"
 				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(2) + "')";
-		
+
 		String longitudeOR = "has('longitudeGridID','" + adjacentLongitudeGridID.get(0) + "'),"
 				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(1) + "'),"
 				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(2) + "')";
-		
+
 		String orString = latitudeOR + "," + longitudeOR;
-		
+
 		//		params.put("vertexID",tSession.getVertexID());
 
 		//get id of the "finish" edge
@@ -104,7 +100,7 @@ public class DBTrackingAPI extends DBAPI{
 				+ 		"Lreturn.add('nothing')"//index(1) - nothing
 				+ "};"
 
-//				+ "preL = g.V().or(" + orString + ").dedup();" 	
+				//				+ "preL = g.V().or(" + orString + ").dedup();" 	
 				+ "L = g.V().or(" + orString + ").has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
 
 				+ "if(L.hasNext()){" //is there any location on map with these coords?
@@ -188,6 +184,9 @@ public class DBTrackingAPI extends DBAPI{
 		//return values list
 		List<Result> results = null;
 
+		//Make sure the user has the appointed session registered in the DB.
+		login(sessionID);
+
 		//params
 		Map<String,Object> params = new HashMap<>();
 		params.put("latitude",latitude);
@@ -196,21 +195,21 @@ public class DBTrackingAPI extends DBAPI{
 		params.put("date", date);
 		params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
 		params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
-		
+
 		List<String> adjacentLatitudeGridID = TraceLocationMethods.getAdjacentGridIDs(latitude);
 		List<String> adjacentLongitudeGridID = TraceLocationMethods.getAdjacentGridIDs(longitude);
-		
+
 		String latitudeOR = "has('latitudeGridID','" + adjacentLatitudeGridID.get(0) + "),"
 				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(1) + "),"
 				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(2) + ")";
-		
+
 		String longitudeOR = "has('longitudeGridID','" + adjacentLongitudeGridID.get(0) + "'),"
 				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(1) + "'),"
 				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(2) + "')";
-		
+
 		String orString = latitudeOR + "," + longitudeOR;
 
-		
+
 		//get id of the "finish" edge
 		results = query("Lreturn = new ArrayList<>(); " //return array
 				+ "E = g.V().has('sessionID',sessionID).inE().hasLabel('session').has('type','finish').id();" //ID of the "finish" edge
@@ -323,6 +322,9 @@ public class DBTrackingAPI extends DBAPI{
 		//return values list
 		List<Result> results = null;
 
+		//Make sure the user has the appointed session registered in the DB.
+		login(sessionID);
+
 		//params
 		Map<String,Object> params = new HashMap<>();
 		params.put("traceBeaconID",traceBeaconID);
@@ -410,6 +412,9 @@ public class DBTrackingAPI extends DBAPI{
 	public boolean put(String sessionID, Date date, String traceBeaconID, Map<String,Object> attributes){
 		//return values list
 		List<Result> results = null;
+
+		//Make sure the user has the appointed session registered in the DB.
+		login(sessionID);
 
 		//params
 		Map<String,Object> params = new HashMap<>();
@@ -504,9 +509,9 @@ public class DBTrackingAPI extends DBAPI{
 		}
 		return true;
 	}
-	
+
 	public boolean put(String sessionID, TraceVertex vertex){
-		
+
 		//location
 		if(vertex.getType().equals("location")){
 			if(vertex.hasAttributes()){
@@ -522,7 +527,7 @@ public class DBTrackingAPI extends DBAPI{
 			}
 		}
 	}
-	
+
 
 	public String getSessionDetails(String sessionID){
 		//return values list
@@ -580,7 +585,7 @@ public class DBTrackingAPI extends DBAPI{
 			String name = results.get(count).getString();
 			String type = results.get(count+1).getString();
 			TraceVertex v;
-			
+
 			if(type.equals("location")){
 				v = new TraceVertex(name, results.get(count+2).getFloat(), results.get(count+3).getFloat());
 				count+=4;
@@ -597,9 +602,9 @@ public class DBTrackingAPI extends DBAPI{
 	public List<String> getUserSessions(String username){
 
 		return getUserSessions(username,0);
-		
+
 	}
-	
+
 	public List<String> getUserSessions(String username, int index){
 
 		List<String> userSessions = new ArrayList<>();
@@ -624,11 +629,11 @@ public class DBTrackingAPI extends DBAPI{
 
 		return userSessions;
 	}
-	
+
 	public List<String> getUserSessionsAndDates(String username){
 		return getUserSessionsAndDates(username,0);
 	}
-	
+
 	public List<String> getUserSessionsAndDates(String username, int index){
 
 		List<String> userSessions = new ArrayList<>();
@@ -646,7 +651,7 @@ public class DBTrackingAPI extends DBAPI{
 		results = query("A = g.V().has('username',username).id().next();"
 				+ "B = g.V(A).outE('login').inV().order().by('date',decr).range(index0,index1).values('sessionID','date');"
 				+ "",params);
-		
+
 		for(Result r : results){
 			userSessions.add(r.getString());
 		}
@@ -674,23 +679,27 @@ public class DBTrackingAPI extends DBAPI{
 
 		return userSessions;
 	}
-	
+
 	//TODO: Insertion must be done in chronological order, is this assumed or should it be checked here?
 	//TODO: Note that ArrayList() keeps the order of insertion, that at least is assured.
 	public boolean submitRoute(String sessionID, List<TraceVertex> route){
 		boolean success = true;
-		
+
+		//First: identify the total amount of Km's that have been travelled (travelledDistance).
+		//Second: prepare a query that does a geowithin based on the first point of the trajectory and with a radius of "travelledDistanced". (geoPoints)
+		//Submit each point of the route and always use the geoPoints universe instead of the whole DB.
+
 		for(TraceVertex v : route){
 			success = put(sessionID, v) && success;
 		}
 
 		return success;
 	}
-	
+
 	//TODO: try to find a way to dele both edges and vertices in a single query
 	public boolean removeSession(String sessionID){
 		boolean success = true;
-		
+
 		//return values list
 		List<Result> results = null;
 
@@ -700,15 +709,15 @@ public class DBTrackingAPI extends DBAPI{
 
 		//ArrayList to save the trajectory
 		results = query(""
-//				+ "g.V().has('sessionID', sessionID).drop();"
+				//				+ "g.V().has('sessionID', sessionID).drop();"
 				+ "g.E().has('sessionID', sessionID).drop();"
 				+ "",params);
-		
+
 		results = query(""
 				+ "g.V().has('sessionID', sessionID).drop();"
-//				+ "g.E().has('sessionID', sessionID).drop();"
+				//				+ "g.E().has('sessionID', sessionID).drop();"
 				+ "",params);
-		
+
 		return success;
 	}
 }

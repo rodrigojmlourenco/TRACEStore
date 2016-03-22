@@ -171,7 +171,6 @@ public class AuthenticationEndpoint {
 			sessionDriver.openTrackingSession(userDriver.getUserID(username), session);
 			
 			GraphDB graphDB = GraphDB.getConnection();
-			graphDB.getTrackingAPI().login(username, session);
 			
 			JsonObject response = new JsonObject();
 			response.addProperty("success", true);
