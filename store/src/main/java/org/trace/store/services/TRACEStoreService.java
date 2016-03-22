@@ -218,6 +218,7 @@ public class TRACEStoreService {
 	private Map<String, Object> extractLocationAttributes(Location location){
 		
 		LOG.debug("Attributes :"+location.getAttributes()); //TODO: remover
+		System.out.println("Attributes "+location.getAttributes()); //TODO: remover
 		
 		HashMap<String, Object> map = new HashMap<>();
 		try{
@@ -278,6 +279,7 @@ public class TRACEStoreService {
 					GraphDB conn = GraphDB.getConnection();
 					location = track.getLocation(i);
 
+					extractLocationAttributes(location);
 					/*
 					if(location != null){
 						success = conn.getTrackingAPI().put(
