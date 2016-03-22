@@ -30,11 +30,17 @@ public class DBMapAPI extends DBAPI{
 		params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
 
 		//query
-		results = query("graph.addVertex(label,'location',"
-				+ "'vertexID', vertexID,"
-				+ "'location', Geoshape.point(latitude,longitude),"
-				+ "'latitudeGridID', latitudeGridID,"
-				+ "'longitudeGridID', longitudeGridID)", params);
+		results = query("g.V().has('vertexID', vertexID).hasNext()", params);
+
+		//If the point already exists, don't add it.
+		if(!results.get(0).getBoolean()){
+			//query
+			results = query("graph.addVertex(label,'location',"
+					+ "'vertexID', vertexID,"
+					+ "'location', Geoshape.point(latitude,longitude),"
+					+ "'latitudeGridID', latitudeGridID,"
+					+ "'longitudeGridID', longitudeGridID)", params);
+		}
 
 		return results != null;
 	}
@@ -177,73 +183,40 @@ public class DBMapAPI extends DBAPI{
 		if(results.size() < 4){
 			return false;
 		}else{
-			
-			addRoadAux(name, p1, p2, properties);
-			
-//			double p1Latitude = results.get(0).getDouble();
-//			double p1Longitude = results.get(1).getDouble();
-//			double p2Latitude = results.get(2).getDouble();
-//			double p2Longitude = results.get(3).getDouble();
 
-//			List<TraceVertex> roadVertices = TraceLocationMethods.splitRoad(p1, p1Latitude, p1Longitude, p2, p2Latitude, p2Longitude, 0.016);			
+			//			addRoadAux(name, p1, p2, properties);
 
+			double p1Latitude = results.get(0).getDouble();
+			double p1Longitude = results.get(1).getDouble();
+			double p2Latitude = results.get(2).getDouble();
+			double p2Longitude = results.get(3).getDouble();
+
+			List<TraceVertex> roadVertices = TraceLocationMethods.splitRoad(p1, p1Latitude, p1Longitude, p2, p2Latitude, p2Longitude, 0.016);			
+
+			int count = 1;
+			TraceVertex lastPoint = null;
+			for(TraceVertex v : roadVertices){
+				addLocation(v.getName(), v.getLatitude(), v.getLongitude());
+				if(lastPoint != null){
+					addRoadAux(name+"_"+count, lastPoint.getName(), v.getName(), properties);
+					count++;
+					System.out.println("DEBUG - addRoad: " + name+"_"+count + " " + lastPoint.getName() + "-->" + v.getName());
+				}
+				lastPoint = v;
+			}
+			
 //			int size = roadVertices.size();
 //			for(int i = 1; i < size-1; i++){
 //				addLocation(roadVertices.get(i).getName(), roadVertices.get(i).getLatitude(), roadVertices.get(i).getLongitude());
-////				System.out.println("addLocation:" + roadVertices.get(i).getName());
+//				//				System.out.println("addLocation:" + roadVertices.get(i).getName());
 //				addRoadAux(name+"_"+(i-1), roadVertices.get(i-1).getName(), roadVertices.get(i).getName(), properties);
-////				System.out.println("addRoad: " + name+"_"+i);
+//				//				System.out.println("addRoad: " + name+"_"+i);
 //			}
 //			addRoadAux(name+"_"+size, roadVertices.get(size-2).getName(), roadVertices.get(size-1).getName(), properties);
-//			System.out.println("addRoad: " + name+"_"+size);
+//			//			System.out.println("addRoad: " + name+"_"+size);
 
-			//if the distance is too big we do not want to 
-			//			if(distance > 0.008 && distance < 0.500){
-			//			if(false){
-			//
-			//				double p3Latitude = TraceLocationMethods.midPoint(p1Latitude, p2Latitude);
-			//				double p3Longitude = TraceLocationMethods.midPoint(p1Longitude, p2Longitude);
-			//				String p3 = "" + p3Latitude + "_" + p3Longitude;
-			//				
-			//				System.out.println("p1: " + p1Latitude + ", " + p1Longitude);
-			//				System.out.println("p2: " + p2Latitude + ", " + p2Longitude);
-			//				System.out.println("p3: " + p3);
-			//
-			//				boolean success = true;
-			//
-			//				success = addLocation(p3, p3Latitude, p3Longitude) && success;
-			////
-			//				success = addRoad(name+"L", p1, p3, properties) && success;
-			//				success = addRoad(name+"R", p3, p2, properties) && success;
-			//
-			//				return success;
-			//
-			//			}else{
-
-			//				System.out.println("else");
-			//				results = null;
-			//				results = query("a = g.V().hasLabel('location').has('vertexID',idA).next(); "
-			//						+ "b = g.V().hasLabel('location').has('vertexID',idB).next(); "
-			//						+ "a.addEdge('road', b, 'name', streetName" + propertiesString + "); "
-			//						+ "", params);
-
-			//				return results != null;
-			//			}
-			
-			
-			
-			
-			
 			return true;
 		}	
-
-		//query
-		//		results = query("a = g.V().hasLabel('location').has('vertexID',idA).next(); "
-		//				+ "b = g.V().hasLabel('location').has('vertexID',idB).next(); "
-		//				+ "a.addEdge('road', b, 'name', streetName" + propertiesString + "); "
-		//				+ "", params);
-		//
-		//		return results != null;
 	}
 
 	private boolean addRoadAux(String name, String p1, String p2, Map<String, Object> properties){
