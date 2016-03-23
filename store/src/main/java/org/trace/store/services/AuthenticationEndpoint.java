@@ -122,7 +122,7 @@ public class AuthenticationEndpoint {
 			//TODO: verify the audience
 			//TODO: verify that the email has been verified
 			
-			
+			LOG.debug(payload.getSubject());
 			
 			try {
 				userDriver.getUserID(payload.getSubject());
