@@ -183,6 +183,8 @@ public class UserDriverImpl implements UserDriver{
 				UID =  getUserIDfromEmail(identifier);
 			}else if(FormFieldValidator.isValidUsername(identifier)){
 				UID = getUserIDfromUsername(identifier);
+			}else if(FormFieldValidator.isValidSubject(identifier)){
+				UID = getUserIDfromUsername(identifier);
 			}else
 				throw new UnableToPerformOperation("Invalid identifier.");
 

@@ -32,6 +32,7 @@ public class FormFieldValidator {
 	private final static Pattern ADDRESS_VALIDATOR		= Pattern.compile("[a-zA-Z0-9,ºª]{5,254}");
 	private final static Pattern PHONE_VALIDATOR		= Pattern.compile("^([+]?[0-9]{1,3})?[0-9]{12,15}$");
 	
+	private final static Pattern SUBJECT_VALIDATOR  	= Pattern.compile("^[a-zA-Z0-9_]{5,25}$");
 	static {
 		// password must be between 8 and 16 chars long
 		LengthRule lengthRule = new LengthRule(8, 25);
@@ -62,6 +63,11 @@ public class FormFieldValidator {
 		ruleList.add(qwertySeqRule);
 
 		PASSWORD_VALIDATOR = new PasswordValidator(ruleList);
+	}
+	
+	public static boolean isValidSubject(String subject){
+		Matcher m = SUBJECT_VALIDATOR.matcher(subject);
+		return m.matches();
 	}
 		
 	public static boolean isValidEmail(String email){
