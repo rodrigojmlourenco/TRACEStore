@@ -38,6 +38,19 @@ public interface UserDriver {
 	public String registerUser(String username, String email, String pass1, String pass2, String name, String address, String phone, Role role)
 		throws UserRegistryException, NonMatchingPasswordsException, UnableToRegisterUserException, UnableToPerformOperation;
 	
+	/**
+	 * 
+	 * @param username
+	 * @param email
+	 * @param name
+	 * @param role
+	 * @return
+	 * @throws UserRegistryException
+	 * @throws UnableToRegisterUserException
+	 * @throws UnableToPerformOperation
+	 */
+	public String registerFederatedUser(String username, String email, String name)
+			throws UserRegistryException, UnableToRegisterUserException, UnableToPerformOperation;
 	
 	/**
 	 * Unregister a user, however, only if presents a correct password.

@@ -22,7 +22,9 @@ import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.middleware.drivers.exceptions.UnableToRegisterUserException;
 import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
+import org.trace.store.middleware.drivers.exceptions.UserRegistryException;
 import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
@@ -116,14 +118,26 @@ public class AuthenticationEndpoint {
 			}
 			
 			payload = token.getPayload();
+			
 			//TODO: verify the audience
+			//TODO: verify that the email has been verified
+			
+			
 			
 			try {
 				userDriver.getUserID(payload.getSubject());
 				return idToken;
 			} catch (UnknownUserException e){
-				LOG.info("TODO: register user with email address: "+payload.getEmail());
-				return payload.toPrettyString();
+				String name = payload.get("given_name").toString() + payload.get("family_name").toString();
+				try {
+					String activationToken = userDriver.registerFederatedUser(payload.getSubject(),payload.getEmail(),name);
+					userDriver.activateAccount(activationToken);
+					return idToken;
+				} catch (UserRegistryException | UnableToRegisterUserException | UnableToPerformOperation e1) {
+					return generateError(5, e.getMessage());
+				} catch (ExpiredTokenException e1) {
+					return generateError(6, e.getMessage());
+				}
 			} catch (UnableToPerformOperation  e) {
 				return generateError(4, e.getMessage());
 			}
