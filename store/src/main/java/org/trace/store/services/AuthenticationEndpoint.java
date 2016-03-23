@@ -40,33 +40,33 @@ import com.google.gson.JsonObject;
 public class AuthenticationEndpoint {
 
 	private final Logger LOG = Logger.getLogger(AuthenticationEndpoint.class); 
-	
-	
+
+
 	private final int MAX_TRIES = 30;
-	
+
 	private TRACESecurityManager manager = TRACESecurityManager.getManager();
-	
+
 	private UserDriver userDriver		= UserDriverImpl.getDriver();
 	private SessionDriver sessionDriver = SessionDriverImpl.getDriver();
-	
+
 	private Gson gson = new Gson();
-	
+
 	private String generateError(int code, String message){
 		JsonObject error = new JsonObject();
 		error.addProperty("success", false);
 		error.addProperty("code", code);
 		error.addProperty("error", message);
 		return gson.toJson(error);
-		
+
 	}
-	
+
 	private String generateSuccess(){
 		JsonObject success = new JsonObject();
 		success.addProperty("success", true);
 		return gson.toJson(success);
 	}
-	
-	
+
+
 	/**
 	 *   
 	 * @param username The user's unique username.
@@ -78,7 +78,7 @@ public class AuthenticationEndpoint {
 	@Path("/login")
 	@Produces(MediaType.APPLICATION_FORM_URLENCODED)
 	public String login(@FormParam("username") String username, @FormParam("password") String password){
-		
+
 		//Step 1 - Check if the user's account is activated
 		try {
 			if(!manager.isActiveUser(username)){
@@ -89,13 +89,13 @@ public class AuthenticationEndpoint {
 			LOG.error("Unknown user '"+username+"' attempted to loggin.");
 			return generateError(2, e1.getMessage());
 		}
-		
+
 		//Step 2 - Validate the provided password against the one stored in the database
 		if(!manager.validateUser(username, password)){
 			LOG.error("User '"+username+"' attempted to loggin with invalid credentials");
 			return generateError(3, "Invalid password or username");
 		}
-		
+
 		//Step 3 - Issue a new JWT token and provide it to the user
 		String authToken;
 		try{
@@ -104,14 +104,14 @@ public class AuthenticationEndpoint {
 			LOG.error("User '"+username+"' attempted to loggin, however he was unable because: "+e.getMessage());
 			return generateError(6, e.getMessage());
 		}
-		
+
 		JsonObject token = new JsonObject();
 		token.addProperty("success", true);
 		token.addProperty("token", authToken);
-		
+
 		return gson.toJson(token);
 	}
-	
+
 	/**
 	 * 
 	 * @param idToken
@@ -122,31 +122,38 @@ public class AuthenticationEndpoint {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String login(@FormParam("auth") String idToken){
-		
-		
-		JsonFactory jsonFactory = new GsonFactory();
-		NetHttpTransport transport = new NetHttpTransport();
-		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier(transport, jsonFactory);
-		
-		GoogleIdToken.Payload payload = null;
-		
-		try {
-			GoogleIdToken token = GoogleIdToken.parse(jsonFactory, idToken);
-			
-			if(verifier.verify(token)){
-				return payload.toPrettyString();
-			}else
-				return "Verification failed...";
-			
-		} catch (IOException e) {
-			LOG.error(e);
-		} catch (GeneralSecurityException e) {
-			LOG.error(e);
+
+		try{
+			JsonFactory jsonFactory = new GsonFactory();
+			NetHttpTransport transport = new NetHttpTransport();
+			GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier(transport, jsonFactory);
+
+
+			GoogleIdToken.Payload payload = null;
+
+			try {
+				GoogleIdToken token = GoogleIdToken.parse(jsonFactory, idToken);
+
+				if(verifier.verify(token)){
+					return payload.toPrettyString();
+				}else
+					return "Verification failed...";
+
+			} catch (IOException e) {
+				LOG.error(e);
+				e.printStackTrace();
+			} catch (GeneralSecurityException e) {
+				LOG.error(e);
+				e.printStackTrace();
+			}
+		}catch(Exception exp){
+			LOG.error(exp);
+			exp.printStackTrace();
 		}
-		
+
 		return "hello world";
 	}
-	
+
 	/**
 	 * Terminates a user's session.
 	 * 
@@ -161,14 +168,14 @@ public class AuthenticationEndpoint {
 		LOG.debug("Logging out "+securityContext.getUserPrincipal().getName());
 		return generateError(1, "Method not implemented yet!");
 	}
-	
+
 	@POST
 	@Path("/activate")
 	@Produces({MediaType.APPLICATION_JSON})
 	public String activate(@QueryParam("token") String token){
-		
+
 		LOG.debug("Activating the account with activation token "+token);
-		
+
 		try {
 			if(userDriver.activateAccount(token)){
 				LOG.info("User account activated.");
@@ -177,7 +184,7 @@ public class AuthenticationEndpoint {
 				LOG.error("User was not successfully activated");
 				return generateError(3, "User was not successfully activated");
 			}
-						
+
 		} catch (ExpiredTokenException e) {
 			LOG.error("User attempted to activate his account, however failed to do so because: "+e.getMessage());
 			return generateError(1, e.getMessage());
@@ -186,65 +193,65 @@ public class AuthenticationEndpoint {
 			return generateError(2, e.getMessage());
 		}
 	}
-	
+
 	@POST
 	@Secured
 	@Path("/session/open")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String openTrackingSession(@Context SecurityContext context){
-		
+
 		String session;
 		String username = context.getUserPrincipal().getName();
-		
+
 		int tries = 0;
 		try {
 			do{
 				session = SecurityUtils.generateSecureActivationToken(32);
 				tries++;
-				
+
 				if (tries > MAX_TRIES) {
 					return generateError(1, "Can no longer generate unique session code");
 				}
-				
+
 			}while(sessionDriver.trackingSessionExists(session));
 		}catch (UnableToPerformOperation e) {
 			return generateError(3, e.getMessage());
 		}
-		
-		
+
+
 		try {
 			sessionDriver.openTrackingSession(userDriver.getUserID(username), session);
-			
+
 			GraphDB graphDB = GraphDB.getConnection();
-			
+
 			JsonObject response = new JsonObject();
 			response.addProperty("success", true);
 			response.addProperty("session", session);
-			
+
 			return gson.toJson(response);
-			
+
 		} catch (UnableToPerformOperation e) {
 			return generateError(2, e.getMessage());
 		} catch (Exception e) {
 			return generateError(3, e.getMessage());
 		}
 	}
-	
+
 	@POST
 	@Secured
 	@Path("/close")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String closeTrackingSession(@FormParam("session") String session){
-		
+
 		try {
-			
+
 			if(sessionDriver.isTrackingSessionClosed(session))
 				return generateError(1, "Session had already been closed.");
 			else
 				sessionDriver.closeTrackingSession(session);
-			
+
 			return generateSuccess();
-			
+
 		} catch (UnableToPerformOperation e) {
 			return generateError(2, e.getMessage());
 		} catch (SessionNotFoundException e) {
