@@ -157,10 +157,13 @@ public class AuthenticationEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String login(@FormParam("username") String username, @FormParam("password") String password, @FormParam("token") String idToken){
 
-		if(idToken != null && !idToken.isEmpty())
+		if(idToken != null && !idToken.isEmpty()){
+			LOG.info("Native login...");
 			return performFederatedLogin(idToken);
-		else
+		}else{
+			LOG.info("Federated login...");
 			return performNativeLogin(username, password);
+		}
 
 
 	}
