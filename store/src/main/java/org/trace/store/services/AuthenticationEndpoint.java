@@ -171,7 +171,6 @@ public class AuthenticationEndpoint {
 			response = performNativeLogin(username, password);
 		}
 
-		LOG.info(response);
 		return response;
 
 	}
