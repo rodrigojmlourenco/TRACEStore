@@ -562,7 +562,7 @@ public class UserDriverImpl implements UserDriver{
 		PreparedStatement statement =
 				conn.prepareStatement("SELECT Id FROM users WHERE Email = ?");
 
-		statement.setString(0, email);
+		statement.setString(1, email);
 		ResultSet set = statement.executeQuery();
 
 
