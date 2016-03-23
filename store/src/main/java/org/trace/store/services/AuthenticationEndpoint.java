@@ -1,6 +1,10 @@
 package org.trace.store.services;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 
 import javax.ws.rs.Consumes;
@@ -17,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.trace.store.filters.Secured;
 import org.trace.store.middleware.TRACESecurityManager;
 import org.trace.store.middleware.backend.GraphDB;
+import org.trace.store.middleware.backend.exceptions.InvalidAuthTokenException;
 import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
@@ -30,12 +35,14 @@ import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @Path("/auth")
 public class AuthenticationEndpoint {
@@ -51,6 +58,8 @@ public class AuthenticationEndpoint {
 	private SessionDriver sessionDriver = SessionDriverImpl.getDriver();
 
 	private Gson gson = new Gson();
+	private JsonParser mJsonParser = new JsonParser();
+
 
 	private String generateError(int code, String message){
 		JsonObject error = new JsonObject();
@@ -103,53 +112,46 @@ public class AuthenticationEndpoint {
 
 	private String performFederatedLogin(String idToken){
 
-		JsonFactory jsonFactory = new GsonFactory();
-		NetHttpTransport transport = new NetHttpTransport();
-		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier(transport, jsonFactory);
-
-
-		GoogleIdToken.Payload payload = null;
-
+		Payload payload;
+		
+		//Step 1 - Validate the token
 		try {
-			GoogleIdToken token = GoogleIdToken.parse(jsonFactory, idToken);
 
-			if(!verifier.verify(token)){
-				return generateError(1, "Failed to validate the user");
-			}
+			payload = manager.validateGoogleAuthToken(idToken);
 			
-			payload = token.getPayload();
-			
-			//TODO: verify the audience
-			//TODO: verify that the email has been verified
-			
-			LOG.debug(payload.getSubject());
-			
-			try {
-				userDriver.getUserID(payload.getSubject());
-				return idToken;
-			} catch (UnknownUserException e){
-				String name = payload.get("given_name").toString() + " " +payload.get("family_name").toString();
-				try {
-					String activationToken = userDriver.registerFederatedUser(payload.getSubject(),payload.getEmail(),name);
-					userDriver.activateAccount(activationToken);
-					return idToken;
-				} catch (UserRegistryException | UnableToRegisterUserException | UnableToPerformOperation e1) {
-					return generateError(5, e.getMessage());
-				} catch (ExpiredTokenException e1) {
-					return generateError(6, e.getMessage());
-				}
-			} catch (UnableToPerformOperation  e) {
-				return generateError(4, e.getMessage());
-			}
-			
-		} catch (IOException e) {
-			LOG.error(e);
-			return generateError(2, e.getMessage());
-		} catch (GeneralSecurityException e) {
-			LOG.error(e);
-			return generateError(3, e.getMessage());
+		} catch (InvalidAuthTokenException e) {
+			return generateError(1, e.getMessage());
 		}
 
+		// Step 2 - Check if user exists, and if not register him
+		try {
+			
+			// Step 2a - The user exists -> return the token
+			userDriver.getUserID(payload.getSubject());
+			
+		} catch (UnknownUserException e){
+			
+			//Step 2b - The user doesnt exist -> create new user and return the token
+			String username = payload.getSubject();
+			String email = payload.getEmail();
+			String name = String.valueOf(payload.get("name"));
+			
+			try {
+			
+				String activationToken = userDriver.registerFederatedUser(username, email, name);
+				userDriver.activateAccount(activationToken);
+			
+			} catch (UserRegistryException | UnableToRegisterUserException | UnableToPerformOperation e1) {
+				return generateError(2, e.getMessage());
+			} catch (ExpiredTokenException e1) {
+				return generateError(3, e.getMessage());
+			}
+			
+		} catch (UnableToPerformOperation  e) {
+			return generateError(4, e.getMessage());
+		}
+		
+		return idToken;
 	}
 
 	/**
@@ -164,7 +166,7 @@ public class AuthenticationEndpoint {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String login(@FormParam("username") String username, @FormParam("password") String password, @FormParam("token") String idToken){
-		
+
 		if(idToken != null && !idToken.isEmpty())
 			return performFederatedLogin(idToken);
 		else
