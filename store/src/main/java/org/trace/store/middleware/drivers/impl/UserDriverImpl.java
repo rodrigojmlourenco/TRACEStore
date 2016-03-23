@@ -68,9 +68,25 @@ public class UserDriverImpl implements UserDriver{
 		boolean success = false;
 		Exception error = null; 
 
+		
+		
 		// 1 - Validate the security of the provided fields.
 		try {
 			validateFields(username, email, pass1, pass2);
+			
+			name 	= name == null ? "" : name;
+			phone 	= phone == null ? "" : phone;
+			address = address == null ? "" :address;
+			
+			if(!name.isEmpty() && !FormFieldValidator.isValidName(name))
+				throw new UnableToRegisterUserException("Invalid name.");
+				
+			if(!phone.isEmpty() && !FormFieldValidator.isValidPhoneNumber(phone))
+				throw new UnableToRegisterUserException("Invalid phone number.");
+			
+			if(!address.isEmpty() && !FormFieldValidator.isValidAddress(address))
+				throw new UnableToRegisterUserException("Invalid address");
+			
 		} catch (SQLException e1) {
 			throw new UnableToPerformOperation(e1.getMessage());
 		}
@@ -105,6 +121,9 @@ public class UserDriverImpl implements UserDriver{
 
 		// 4 - Update the user's detailed information
 		try {
+			
+			
+			
 			success = insertUserDetails(userId, name, address, phone);
 		} catch (SQLException e) {
 			error = e;

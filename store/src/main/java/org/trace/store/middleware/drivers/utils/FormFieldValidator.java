@@ -28,6 +28,7 @@ public class FormFieldValidator {
 	private final static PasswordValidator PASSWORD_VALIDATOR;
 	private final static EmailValidator EMAIL_VALIDATOR = EmailValidator.getInstance();
 	
+	private final static Pattern NAME_VALIDATOR  		= Pattern.compile("^[\\s\\p{L}]{3,64}+$/u");
 	private final static Pattern USERNAME_VALIDATOR  	= Pattern.compile("^[a-z0-9_]{5,15}$");
 	private final static Pattern ADDRESS_VALIDATOR		= Pattern.compile("[a-zA-Z0-9,ºª]{5,254}");
 	private final static Pattern PHONE_VALIDATOR		= Pattern.compile("^([+]?[0-9]{1,3})?[0-9]{12,15}$");
@@ -92,6 +93,11 @@ public class FormFieldValidator {
 	
 	public static boolean isValidAddress(String address){
 		Matcher m = ADDRESS_VALIDATOR.matcher(address);
+		return m.matches();
+	}
+
+	public static boolean isValidName(String name) {
+		Matcher m = NAME_VALIDATOR.matcher(name);
 		return m.matches();
 	}
 }
