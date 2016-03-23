@@ -71,21 +71,21 @@ public class DBTrackingAPI extends DBAPI{
 		params.put("latitude",latitude);
 		params.put("sessionID",sessionID);
 		params.put("date", date);
-//		params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
-//		params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
+		//		params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
+		//		params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
 
-//		List<String> adjacentLatitudeGridID = TraceLocationMethods.getAdjacentGridIDs(latitude);
-//		List<String> adjacentLongitudeGridID = TraceLocationMethods.getAdjacentGridIDs(longitude);
+		//		List<String> adjacentLatitudeGridID = TraceLocationMethods.getAdjacentGridIDs(latitude);
+		//		List<String> adjacentLongitudeGridID = TraceLocationMethods.getAdjacentGridIDs(longitude);
 
-//		String latitudeOR = "has('latitudeGridID','" + adjacentLatitudeGridID.get(0) + "'),"
-//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(1) + "'),"
-//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(2) + "')";
+		//		String latitudeOR = "has('latitudeGridID','" + adjacentLatitudeGridID.get(0) + "'),"
+		//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(1) + "'),"
+		//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(2) + "')";
 
-//		String longitudeOR = "has('longitudeGridID','" + adjacentLongitudeGridID.get(0) + "'),"
-//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(1) + "'),"
-//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(2) + "')";
+		//		String longitudeOR = "has('longitudeGridID','" + adjacentLongitudeGridID.get(0) + "'),"
+		//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(1) + "'),"
+		//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(2) + "')";
 
-//		String orString = latitudeOR + "," + longitudeOR;
+		//		String orString = latitudeOR + "," + longitudeOR;
 
 		//		params.put("vertexID",tSession.getVertexID());
 
@@ -101,7 +101,7 @@ public class DBTrackingAPI extends DBAPI{
 				+ "};"
 
 				//				+ "preL = g.V().or(" + orString + ").dedup();" 	
-//				+ "L = g.V().or(" + orString + ").has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
+				//				+ "L = g.V().or(" + orString + ").has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
 				+ "L = g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
 
 				+ "if(L.hasNext()){" //is there any location on map with these coords?
@@ -125,24 +125,24 @@ public class DBTrackingAPI extends DBAPI{
 			params.put("vertexID","" + latitude + "_" + longitude);
 			params.put("latitude",latitude);
 			params.put("longitude",longitude);
-//			params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
-//			params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
+			//			params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
+			//			params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
 
 			//query
 			List<Result> addPoint = null;
 			addPoint = super.query("graph.addVertex(label,'unmapped_location',"
 					+ "'vertexID', vertexID,"
 					+ "'location', Geoshape.point(latitude,longitude));"
-//					+ "'latitudeGridID', latitudeGridID,"
-//					+ "'longitudeGridID', longitudeGridID)"
+					//					+ "'latitudeGridID', latitudeGridID,"
+					//					+ "'longitudeGridID', longitudeGridID)"
 					+ "", params);
 
 			//failed to add new vertex
 			if(addPoint == null){
 				return false;
 			}
-//			params.remove("latitudeGridID");
-//			params.remove("longitudeGridID");
+			//			params.remove("latitudeGridID");
+			//			params.remove("longitudeGridID");
 			params.remove("latitude");
 			params.remove("longitude");
 		}else{
@@ -195,21 +195,21 @@ public class DBTrackingAPI extends DBAPI{
 		params.put("longitude",longitude);
 		params.put("sessionID",sessionID);
 		params.put("date", date);
-//		params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
-//		params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
+		//		params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
+		//		params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
 
-//		List<String> adjacentLatitudeGridID = TraceLocationMethods.getAdjacentGridIDs(latitude);
-//		List<String> adjacentLongitudeGridID = TraceLocationMethods.getAdjacentGridIDs(longitude);
+		//		List<String> adjacentLatitudeGridID = TraceLocationMethods.getAdjacentGridIDs(latitude);
+		//		List<String> adjacentLongitudeGridID = TraceLocationMethods.getAdjacentGridIDs(longitude);
 
-//		String latitudeOR = "has('latitudeGridID','" + adjacentLatitudeGridID.get(0) + "'),"
-//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(1) + "'),"
-//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(2) + "')";
+		//		String latitudeOR = "has('latitudeGridID','" + adjacentLatitudeGridID.get(0) + "'),"
+		//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(1) + "'),"
+		//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(2) + "')";
 
-//		String longitudeOR = "has('longitudeGridID','" + adjacentLongitudeGridID.get(0) + "'),"
-//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(1) + "'),"
-//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(2) + "')";
+		//		String longitudeOR = "has('longitudeGridID','" + adjacentLongitudeGridID.get(0) + "'),"
+		//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(1) + "'),"
+		//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(2) + "')";
 
-//		String orString = latitudeOR + "," + longitudeOR;
+		//		String orString = latitudeOR + "," + longitudeOR;
 
 
 		//get id of the "finish" edge
@@ -223,18 +223,18 @@ public class DBTrackingAPI extends DBAPI{
 				+ 		"Lreturn.add('nothing')"//index(1) - nothing
 				+ "};"
 
-//						+ "L = g.V().or(" + orString + ").has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
-						+ "L = g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
+				//						+ "L = g.V().or(" + orString + ").has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
+				+ "L = g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
 
-						
-						+ "if(L.hasNext()){" //is there any location on map with these coords?
-						+ 		"Lreturn.add(true);" //yes: index(2) - true
-						+ 		"Lreturn.add(L.next().value('vertexID'));" //location id: index(3) - vertexID
-						+ "}else{"
-						+ 		"Lreturn.add(false);" //no: index(2) - false
-						+ "};"
-						+ "Lreturn;"
-						+ "",params);
+
+				+ "if(L.hasNext()){" //is there any location on map with these coords?
+				+ 		"Lreturn.add(true);" //yes: index(2) - true
+				+ 		"Lreturn.add(L.next().value('vertexID'));" //location id: index(3) - vertexID
+				+ "}else{"
+				+ 		"Lreturn.add(false);" //no: index(2) - false
+				+ "};"
+				+ "Lreturn;"
+				+ "",params);
 
 		//				System.out.println("Size: " + results.size());
 
@@ -249,24 +249,24 @@ public class DBTrackingAPI extends DBAPI{
 		if(!results.get(2).getBoolean()){
 			//params
 			params.put("vertexID","" + longitude + "_" + latitude);
-//			params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
-//			params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
+			//			params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
+			//			params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
 
 			//query
 			List<Result> addPoint = null;
 			addPoint = super.query("graph.addVertex(label,'unmapped_location',"
 					+ "'vertexID', vertexID,"
 					+ "'location', Geoshape.point(latitude,longitude));"
-//					+ "'latitudeGridID',latitudeGridID,"
-//					+ "'longitudeGridID',longitudeGridID)"
+					//					+ "'latitudeGridID',latitudeGridID,"
+					//					+ "'longitudeGridID',longitudeGridID)"
 					+ "", params);
 
 			//failed to add new vertex
 			if(addPoint == null){
 				return false;
 			}
-//			params.remove("latitudeGridID");
-//			params.remove("longitudeGridID");
+			//			params.remove("latitudeGridID");
+			//			params.remove("longitudeGridID");
 			params.remove("latitude");
 			params.remove("longitude");
 		}else{
@@ -689,11 +689,11 @@ public class DBTrackingAPI extends DBAPI{
 	//TODO: Note that ArrayList() keeps the order of insertion, that at least is assured.
 	public boolean submitRoute(String sessionID, List<TraceVertex> route){
 		boolean success = true;
-		
+
 		//TODO: Do some kind of route parsing so that there are no two subsequent points being added with the same coords.
-		
+
 		System.out.println("route size: " + route.size());
-		
+
 		login(sessionID);
 		System.out.println("sessionID: " + sessionID);
 
@@ -715,63 +715,126 @@ public class DBTrackingAPI extends DBAPI{
 		params.put("longitude", route.get(0).getLongitude());
 		params.put("vertexID", ""+route.get(0).getLatitude()+"_"+route.get(0).getLongitude());
 		params.put("date", route.get(0).getDate());
-		
+		params.put("gpsTolerance", GPS_TOLERANCE);
+
 		System.out.println("lat:" + route.get(0).getLatitude());
 		System.out.println("lon:" + route.get(0).getLongitude());
 
 		//ArrayList to save the trajectory 
-		results = query("g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance))).values('vertexID');"
-				+ "",params);
-		
-		params.remove("totalDistance");
+		//		results = query("g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance))).values('vertexID');"
+		//				+ "",params);
 
-		List<String> IDs = new ArrayList<>();
-		String map = "g.V()";
+		//		params.remove("totalDistance");
+		//
+		//		List<String> IDs = new ArrayList<>();
+		//		String map = "g.V()";
+		//
+		//		System.out.println(results.size());
+		//		
+		//		if(!results.isEmpty()){
+		//			map+=".or( ";
+		//			//ArrayList to save the trajectory 
+		//			for(Result r : results){
+		//				IDs.add(r.getString());
+		//				map += "has('vertexID','" +r.getString()+ "'),";
+		//			}
+		//			map = map.substring(0, map.length()-1);
+		//			map += ")";
+		//		}
+		//		map+=";";
 
-		System.out.println(results.size());
-		
-		if(!results.isEmpty()){
-			map+=".or( ";
-			//ArrayList to save the trajectory 
-			for(Result r : results){
-				IDs.add(r.getString());
-				map += "has('vertexID','" +r.getString()+ "'),";
-			}
-			map = map.substring(0, map.length()-1);
-			map += ")";
-		}
-		map+=";";
-		
 
-		//Query: 1st) Put the mapping of the vertices.
-		//		 2nd) Check if vertices exist, if not add.
-		//       3rd) 
-		
 		//TODO: nao fazer clone e lookup, apenas usar uma ordenação e ver a distancia do primeiro
 		String queryString = "";
-		queryString += "S = g.V().hasLabel('session').has('sessionID', sessionID).next();";
-		queryString += "A = " + map;
-		queryString += "B0 = A.clone().has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a');";
-		queryString += "if(B0.hasNext()){C0 = B0.next();}else{CAux0 = graph.addVertex(label,'unmapped_location','vertexID', vertexID,'location', Geoshape.point(latitude,longitude));C0 = g.V(CAux0).next();};";
-		queryString += "S.addEdge('session', C0, 'type', 'start', 'sessionID', sessionID, 'date', date);";
-		
-		for(int i = 1; i < route.size(); i++){
-			params.put("lat"+i, route.get(i).getLatitude());
-			params.put("lon"+i, route.get(i).getLongitude());
-			params.put("vertexID"+i, "" + route.get(i).getLatitude() + "_" + route.get(i).getLongitude());
-			params.put("date"+i, route.get(i).getDate());
 
-			queryString += "B"+i+ " = A.clone().has('location', geoWithin(Geoshape.circle(lat"+i+", lon"+i+", " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(lat"+i+",lon"+i+").getPoint())}.order().by(incr).select('a');";
-			//TODO: if B hasNext ou "vertexID" exists... duplicate values...
-			queryString += "if(B"+i+".hasNext()){C"+i+" = B"+i+".next();}else{CAux"+i+" = graph.addVertex(label,'unmapped_location','vertexID', vertexID"+i+",'location', Geoshape.point(lat"+i+",lon"+i+"));C"+i+" = g.V(CAux"+i+").next();};";
-			queryString += "C"+(i-1)+".addEdge('session', C"+i+", 'type', 'trajectory', 'sessionID', sessionID, 'date', date"+i+");";
-		}
-//		
-		queryString += "C"+(route.size()-1)+".addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
+		//Get the session Vertex
+		queryString += "S = g.V().hasLabel('session').has('sessionID', sessionID).next();";
+
+		//Set A as the sub collection of vertices that we will need for this route
+		queryString += "A = g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance))).outE().filter{it.get().label() != 'session'};";
 		
+		queryString += "subGraph = A.subgraph('subGraph').cap('subGraph').next();";
+		
+		queryString += "sg = subGraph.traversal(standard());";
+		
+		//Set P0 as the route point we are considering now.
+		queryString += "P0 = Geoshape.point(latitude,longitude).getPoint();";
+		
+		queryString += "A = sg.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance)));";
+
+		//Clone A and order the vertices based on proximity to the vertex we are considering right now, i.e., closest as the first of the collection.
+		queryString += "B0 = A.as('a').map{it.get().value('location').getPoint().distance(P0)}.order().by(incr).select('a').clone();";
+		
+//		queryString += "B0 = A.has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance))).clone();";
+
+
+		//Check if the list is not empty. Check if the 1st entry is within the acceptable gps tolerance. 
+		//In case it's acceptable consider this point
+		//In case the point is not acceptable, add a new point to the DB and also to the initial "A" collection.
+		queryString += "if(B0.hasNext() && B0.clone().next().value('location').getPoint().distance(P0) <= gpsTolerance){C0 = B0.next();}else{CAux0 = graph.addVertex(label,'unmapped_location','vertexID', vertexID,'location', Geoshape.point(latitude,longitude));C0 = g.V(CAux0).next(); A.union(C0);};";
+
+		//Connect the session vertex to the first point of the route.
+		queryString += "S.addEdge('session', C0, 'type', 'start', 'sessionID', sessionID, 'date', date);";
+
+		//Now "kinda" repeat for every point of the route
+//		for(int i = 1; i < route.size(); i++){
+//
+//			//First get the latitude, longitude, possible vertexID and date for each point of the route
+//			params.put("lat"+i, route.get(i).getLatitude());
+//			params.put("lon"+i, route.get(i).getLongitude());
+//			params.put("vertexID"+i, "" + route.get(i).getLatitude() + "_" + route.get(i).getLongitude());
+//			params.put("date"+i, route.get(i).getDate());
+//
+//			//Set Pi as the route point we are considering now.
+//			queryString += "P"+i+" = Geoshape.point(lat"+i+",lon"+i+").getPoint();";
+//
+//			//Clone A and order the vertices based on the proximity to Pi
+//			queryString += "B"+i+ " = A.clone().as('a').map{it.get().value('location').getPoint().distance(P"+i+")}.order().by(incr).select('a');";
+//
+//			//Check if the list is not empty. Check if the 1st entry is within the acceptable gps tolerance. 
+//			//In case it's acceptable consider this point
+//			//In case the point is not acceptable, add a new point to the DB and also to the initial "A" collection.
+//			queryString += "if(B"+i+".hasNext() && B"+i+".clone().next().value('location').getPoint().distance(P"+i+") <= gpsTolerance){C"+i+" = B"+i+".next();}else{CAux"+i+" = graph.addVertex(label,'unmapped_location','vertexID', vertexID"+i+",'location', P"+i+");C"+i+" = g.V(CAux"+i+").next(); A.union(C"+i+");};";
+//
+//			//Connect the session vertex to the first point of the route.
+//			queryString += "C"+(i-1)+".addEdge('session', C"+i+", 'type', 'trajectory', 'sessionID', sessionID, 'date', date"+i+");";
+//		}
+//
+//		//Complete the cicle and close the route with the "finish" edge
+//		queryString += "C"+(route.size()-1)+".addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
+
 //		System.out.println(queryString);
-		
+
 		results = query(queryString,params);
+
+
+
+
+
+		//		queryString += "B0 = A.clone().has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a');";
+		//		queryString += "B0 = A.as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a').clone();";
+		//		queryString += "if(B0.hasNext()){C0 = B0.next();}else{CAux0 = graph.addVertex(label,'unmapped_location','vertexID', vertexID,'location', Geoshape.point(latitude,longitude));C0 = g.V(CAux0).next();};";
+		//		queryString += "S.addEdge('session', C0, 'type', 'start', 'sessionID', sessionID, 'date', date);";
+
+		//		for(int i = 1; i < route.size(); i++){
+		//			params.put("lat"+i, route.get(i).getLatitude());
+		//			params.put("lon"+i, route.get(i).getLongitude());
+		//			params.put("vertexID"+i, "" + route.get(i).getLatitude() + "_" + route.get(i).getLongitude());
+		//			params.put("date"+i, route.get(i).getDate());
+		//
+		////			queryString += "B"+i+ " = A.clone().has('location', geoWithin(Geoshape.circle(lat"+i+", lon"+i+", " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(lat"+i+",lon"+i+").getPoint())}.order().by(incr).select('a');";
+		//			queryString += "B"+i+ " = A.as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(lat"+i+",lon"+i+").getPoint())}.order().by(incr).select('a').clone();";
+		//			//TODO: if B hasNext ou "vertexID" exists... duplicate values...
+		////			queryString += "if(B"+i+".hasNext()){C"+i+" = B"+i+".next();}else{CAux"+i+" = graph.addVertex(label,'unmapped_location','vertexID', vertexID"+i+",'location', Geoshape.point(lat"+i+",lon"+i+"));C"+i+" = g.V(CAux"+i+").next();};";
+		//			queryString += "if(B"+i+".hasNext()){C"+i+" = B"+i+".next();}else{CAux"+i+" = graph.addVertex(label,'unmapped_location','vertexID', vertexID"+i+",'location', Geoshape.point(lat"+i+",lon"+i+"));C"+i+" = g.V().has('vertexID',vertexID"+i+").next();};";
+		//			queryString += "C"+(i-1)+".addEdge('session', C"+i+", 'type', 'trajectory', 'sessionID', sessionID, 'date', date"+i+");";
+		//		}
+		////		
+		//		queryString += "C"+(route.size()-1)+".addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
+
+		//		System.out.println(queryString);
+
+		//		results = query(queryString,params);
 
 		//Old code
 		//		for(TraceVertex v : route){

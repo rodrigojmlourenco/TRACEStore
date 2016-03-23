@@ -445,20 +445,20 @@ public class Trace {
 			routeForSubmission.add(new TraceVertex(39.735374450684,-9.1406631469727));
 			Thread.sleep(100);
 			routeForSubmission.add(new TraceVertex(39.735172271729,-9.140739440918));
-			Thread.sleep(100);
-			routeForSubmission.add(new TraceVertex(39.735172271729,-9.140739440918));
-			Thread.sleep(100);
-			routeForSubmission.add(new TraceVertex(39.735282897949,-9.1403131484985));
-			Thread.sleep(100);
-			routeForSubmission.add(new TraceVertex(39.735282897949,-9.1403131484985));
-			Thread.sleep(100);
-			routeForSubmission.add(new TraceVertex(39.735118865967,-9.1405467987061));
-			Thread.sleep(100);
-			routeForSubmission.add(new TraceVertex(39.735118865967,-9.1405467987061));
-			Thread.sleep(100);
-			routeForSubmission.add(new TraceVertex(39.735328674316,-9.1404991149902));
-			Thread.sleep(100);
-			routeForSubmission.add(new TraceVertex(39.735328674316,-9.1404991149902));
+//			Thread.sleep(100);
+//			routeForSubmission.add(new TraceVertex(39.735172271729,-9.140739440918));
+//			Thread.sleep(100);
+//			routeForSubmission.add(new TraceVertex(39.735282897949,-9.1403131484985));
+//			Thread.sleep(100);
+//			routeForSubmission.add(new TraceVertex(39.735282897949,-9.1403131484985));
+//			Thread.sleep(100);
+//			routeForSubmission.add(new TraceVertex(39.735118865967,-9.1405467987061));
+//			Thread.sleep(100);
+//			routeForSubmission.add(new TraceVertex(39.735118865967,-9.1405467987061));
+//			Thread.sleep(100);
+//			routeForSubmission.add(new TraceVertex(39.735328674316,-9.1404991149902));
+//			Thread.sleep(100);
+//			routeForSubmission.add(new TraceVertex(39.735328674316,-9.1404991149902));
 			
 			System.out.println("route created");
 //			
