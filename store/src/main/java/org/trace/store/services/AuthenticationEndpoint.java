@@ -79,6 +79,8 @@ public class AuthenticationEndpoint {
 	@Produces(MediaType.APPLICATION_FORM_URLENCODED)
 	public String login(@FormParam("username") String username, @FormParam("password") String password){
 
+		LOG.info("Regular login");
+		
 		//Step 1 - Check if the user's account is activated
 		try {
 			if(!manager.isActiveUser(username)){
@@ -123,6 +125,8 @@ public class AuthenticationEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String login(@FormParam("auth") String idToken){
 
+		LOG.info("3rd Party Login / Register");
+		
 		try{
 			JsonFactory jsonFactory = new GsonFactory();
 			NetHttpTransport transport = new NetHttpTransport();
