@@ -279,6 +279,6 @@ public class AuthenticationEndpoint {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String testAuthToken(@FormParam("auth") String auth){
-		return "FUCK OFF !!!";
+		return String.valueOf(manager.getTokenType(auth));
 	}
 }
