@@ -128,7 +128,7 @@ public class AuthenticationEndpoint {
 				userDriver.getUserID(payload.getSubject());
 				return idToken;
 			} catch (UnknownUserException e){
-				String name = payload.get("given_name").toString() + payload.get("family_name").toString();
+				String name = payload.get("given_name").toString() + " " +payload.get("family_name").toString();
 				try {
 					String activationToken = userDriver.registerFederatedUser(payload.getSubject(),payload.getEmail(),name);
 					userDriver.activateAccount(activationToken);
