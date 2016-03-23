@@ -1,5 +1,8 @@
 package org.trace.store.services;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -23,6 +26,12 @@ import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -100,6 +109,39 @@ public class AuthenticationEndpoint {
 		token.addProperty("token", authToken);
 		
 		return gson.toJson(token);
+	}
+	
+	/**
+	 * 
+	 * @param idToken
+	 * @return
+	 */
+	@POST
+	@Path("/login")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String login(@FormParam("auth") String idToken){
+		
+		JsonFactory jsonFactory = new GsonFactory();
+		NetHttpTransport transport = new NetHttpTransport();
+		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier(transport, jsonFactory);
+		
+		GoogleIdToken.Payload payload = null;
+		
+		try {
+			GoogleIdToken token = GoogleIdToken.parse(jsonFactory, idToken);
+			
+			if(verifier.verify(token)){
+				return payload.toPrettyString();
+			}else
+				return "Verification failed...";
+			
+		} catch (IOException e) {
+			LOG.error(e);
+		} catch (GeneralSecurityException e) {
+			LOG.error(e);
+		}
+		
+		return idToken;
 	}
 	
 	/**

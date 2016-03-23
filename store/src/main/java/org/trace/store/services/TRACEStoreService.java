@@ -78,7 +78,6 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public TraceTrack samoleTrack(){
 
-
 		Location l1 = new Location(1, 1, 1,"a");
 		Location l2 = new Location(2, 2, 2,"b");
 		Location l3 = new Location(3, 3, 3,"c");
@@ -86,7 +85,6 @@ public class TRACEStoreService {
 		TraceTrack t = new TraceTrack(locations);
 
 		return t;
-
 	}
 
 
