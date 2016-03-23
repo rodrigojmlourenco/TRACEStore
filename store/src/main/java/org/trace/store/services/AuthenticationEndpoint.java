@@ -141,7 +141,11 @@ public class AuthenticationEndpoint {
 			return generateError(4, e.getMessage());
 		}
 		
-		return idToken;
+		JsonObject jToken = new JsonObject();
+		jToken.addProperty("success", true);
+		jToken.addProperty("token", idToken);
+		
+		return gson.toJson(jToken);
 	}
 
 	/**
