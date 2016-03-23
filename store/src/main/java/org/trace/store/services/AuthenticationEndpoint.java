@@ -135,7 +135,7 @@ public class AuthenticationEndpoint {
 				GoogleIdToken token = GoogleIdToken.parse(jsonFactory, idToken);
 
 				if(verifier.verify(token)){
-					return payload.toPrettyString();
+					return token.getPayload().toPrettyString();
 				}else
 					return "Verification failed...";
 
