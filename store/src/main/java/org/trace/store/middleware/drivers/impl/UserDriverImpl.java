@@ -180,10 +180,8 @@ public class UserDriverImpl implements UserDriver{
 		int UID;
 		try{
 			if(FormFieldValidator.isValidEmail(identifier)){
-				log.debug(identifier+" is an email.");
 				UID =  getUserIDfromEmail(identifier);
 			}else if(FormFieldValidator.isValidUsername(identifier)){
-				log.debug(identifier+" is an username.");
 				UID = getUserIDfromUsername(identifier);
 			}else
 				throw new UnableToPerformOperation("Invalid identifier.");
