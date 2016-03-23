@@ -123,9 +123,7 @@ public class AuthenticationEndpoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String login(@FormParam("auth") String idToken){
 		
-		LOG.debug(idToken);
 		
-		/*
 		JsonFactory jsonFactory = new GsonFactory();
 		NetHttpTransport transport = new NetHttpTransport();
 		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier(transport, jsonFactory);
@@ -145,7 +143,6 @@ public class AuthenticationEndpoint {
 		} catch (GeneralSecurityException e) {
 			LOG.error(e);
 		}
-		*/
 		
 		return "hello world";
 	}
