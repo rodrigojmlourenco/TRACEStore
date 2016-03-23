@@ -66,7 +66,7 @@ public class AuthenticationEndpoint {
 	}
 
 	private String performNativeLogin(String username, String password){
-		//Step 1 - Check if the user's account is activated
+
 		try {
 			if(!manager.isActiveUser(username)){
 				LOG.error("User '"+username+"' attempted to loggin without an active account");
@@ -100,37 +100,41 @@ public class AuthenticationEndpoint {
 	}
 
 	private String performFederatedLogin(String idToken){
-		LOG.info("3rd Party Login / Register");
 
-		try{
-			JsonFactory jsonFactory = new GsonFactory();
-			NetHttpTransport transport = new NetHttpTransport();
-			GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier(transport, jsonFactory);
+		JsonFactory jsonFactory = new GsonFactory();
+		NetHttpTransport transport = new NetHttpTransport();
+		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier(transport, jsonFactory);
 
 
-			GoogleIdToken.Payload payload = null;
+		GoogleIdToken.Payload payload = null;
 
-			try {
-				GoogleIdToken token = GoogleIdToken.parse(jsonFactory, idToken);
+		try {
+			GoogleIdToken token = GoogleIdToken.parse(jsonFactory, idToken);
 
-				if(verifier.verify(token)){
-					return token.getPayload().toPrettyString();
-				}else
-					return "Verification failed...";
-
-			} catch (IOException e) {
-				LOG.error(e);
-				e.printStackTrace();
-			} catch (GeneralSecurityException e) {
-				LOG.error(e);
-				e.printStackTrace();
+			if(!verifier.verify(token)){
+				return generateError(1, "Failed to validate the user");
 			}
-		}catch(Exception exp){
-			LOG.error(exp);
-			exp.printStackTrace();
+			
+			payload = token.getPayload();
+			//TODO: verify the audience
+			
+			try {
+				userDriver.getUserID(payload.getSubject());
+				return idToken;
+			} catch (UnknownUserException e){
+				LOG.info("TODO: register user with email address: "+payload.getEmail());
+				return payload.toPrettyString();
+			} catch (UnableToPerformOperation  e) {
+				return generateError(4, e.getMessage());
+			}
+			
+		} catch (IOException e) {
+			LOG.error(e);
+			return generateError(2, e.getMessage());
+		} catch (GeneralSecurityException e) {
+			LOG.error(e);
+			return generateError(3, e.getMessage());
 		}
-
-		return "hello world";
 
 	}
 
