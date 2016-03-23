@@ -313,12 +313,10 @@ public class TRACESecurityManager{
 			String googleClientSecret = new String(Files.readAllBytes(new File("/var/trace/auth/client_secret.json").toPath()));
 			gAudience = ((JsonObject)mJsonParser.parse(googleClientSecret)).get("web").getAsJsonObject().get("client_id").getAsString();
 			
-			LOG.debug("Audience : "+gAudience);
-			
 			gTokenVerifier = 
 					new GoogleIdTokenVerifier.Builder(gTransport, gJsonFactory)
 					.setAudience(Arrays.asList(gAudience))
-					//.setIssuer("https://accounts.google.com")
+					.setIssuer("accounts.google.com")
 					.build();
 			
 			return true;
@@ -341,11 +339,6 @@ public class TRACESecurityManager{
 			GoogleIdToken token = gTokenVerifier.verify(idToken);
 			
 			if(token != null && token.getPayload().getEmailVerified()){
-				
-				LOG.debug(token.getPayload().getAudience());
-				LOG.debug(token.getPayload().getIssuer());
-				LOG.debug(token.getPayload().toPrettyString());
-				
 				return token.getPayload();
 			}else{
 				throw new InvalidAuthTokenException();
