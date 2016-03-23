@@ -65,22 +65,7 @@ public class AuthenticationEndpoint {
 		return gson.toJson(success);
 	}
 
-
-	/**
-	 *   
-	 * @param username The user's unique username.
-	 * @param password The user's corresponding password.
-	 * 
-	 * @return Reponse object, whose body contains the session identifier.
-	 */
-	@POST
-	@Path("/login")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	@Produces(MediaType.APPLICATION_JSON)
-	public String login(@FormParam("username") String username, @FormParam("password") String password){
-
-		LOG.info("Regular login");
-		
+	private String performNativeLogin(String username, String password){
 		//Step 1 - Check if the user's account is activated
 		try {
 			if(!manager.isActiveUser(username)){
@@ -114,19 +99,9 @@ public class AuthenticationEndpoint {
 		return gson.toJson(token);
 	}
 
-	/**
-	 * 
-	 * @param idToken
-	 * @return
-	 */
-	@POST
-	@Path("/login")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	@Produces(MediaType.APPLICATION_JSON)
-	public String login(@FormParam("auth") String idToken){
-
+	private String performFederatedLogin(String idToken){
 		LOG.info("3rd Party Login / Register");
-		
+
 		try{
 			JsonFactory jsonFactory = new GsonFactory();
 			NetHttpTransport transport = new NetHttpTransport();
@@ -156,7 +131,31 @@ public class AuthenticationEndpoint {
 		}
 
 		return "hello world";
+
 	}
+
+	/**
+	 *   
+	 * @param username The user's unique username.
+	 * @param password The user's corresponding password.
+	 * 
+	 * @return Reponse object, whose body contains the session identifier.
+	 */
+	@POST
+	@Path("/login")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String login(@FormParam("username") String username, @FormParam("password") String password, @FormParam("token") String idToken){
+		
+		if(idToken != null && !idToken.isEmpty())
+			return performFederatedLogin(idToken);
+		else
+			return performNativeLogin(username, password);
+
+
+	}
+
+
 
 	/**
 	 * Terminates a user's session.
