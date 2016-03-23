@@ -350,7 +350,7 @@ public class TRACESecurityManager{
 		mTokenTypes.put(token, type);
 	}
 	
-	private void unregisterToken(String token){
+	public void unregisterToken(String token){
 		mTokenTypes.remove(token);
 	}
 	

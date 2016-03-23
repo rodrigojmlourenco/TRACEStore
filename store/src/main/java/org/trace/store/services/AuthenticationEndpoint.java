@@ -173,13 +173,17 @@ public class AuthenticationEndpoint {
 	 * @return
 	 */
 	@POST
-	//@Secured
+	@Secured
 	@Path("/logout")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String logout(@Context SecurityContext securityContext){
-		//TODO: invalidate session
-		LOG.debug("Logging out "+securityContext.getUserPrincipal().getName());
-		return generateError(1, "Method not implemented yet!");
+	public String logout(@FormParam("token") String token, @Context SecurityContext securityContext){
+		
+		manager.unregisterToken(token);
+		
+		LOG.info(securityContext.getUserPrincipal().getName()+" has logged out.");
+		
+		return generateSuccess();
 	}
 	
 	
@@ -272,13 +276,5 @@ public class AuthenticationEndpoint {
 		} catch (SessionNotFoundException e) {
 			return generateError(3, e.getMessage());
 		}
-	}
-	
-	@POST
-	@Path("/test")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	@Produces(MediaType.APPLICATION_JSON)
-	public String testAuthToken(@FormParam("auth") String auth){
-		return String.valueOf(manager.getTokenType(auth));
 	}
 }
