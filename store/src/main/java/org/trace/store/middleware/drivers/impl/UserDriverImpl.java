@@ -178,10 +178,6 @@ public class UserDriverImpl implements UserDriver{
 	@Override
 	public int getUserID(String identifier) throws UnableToPerformOperation, UnknownUserException {
 		int UID;
-		
-		
-		
-		
 		try{
 			if(FormFieldValidator.isValidEmail(identifier)){
 				log.debug(identifier+" is an email.");
@@ -564,7 +560,7 @@ public class UserDriverImpl implements UserDriver{
 		
 		int result;
 		PreparedStatement statement =
-				conn.prepareStatement("SELECT Id FROM users WHERE email = ?");
+				conn.prepareStatement("SELECT Id FROM users WHERE Email = ?");
 
 		statement.setString(0, email);
 		ResultSet set = statement.executeQuery();
