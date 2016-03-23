@@ -1,12 +1,5 @@
 package org.trace.store.services;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.security.GeneralSecurityException;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -20,6 +13,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.apache.log4j.Logger;
 import org.trace.store.filters.Secured;
 import org.trace.store.middleware.TRACESecurityManager;
+import org.trace.store.middleware.TRACESecurityManager.TokenType;
 import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.backend.exceptions.InvalidAuthTokenException;
 import org.trace.store.middleware.drivers.SessionDriver;
@@ -34,15 +28,9 @@ import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.gson.GsonFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 @Path("/auth")
 public class AuthenticationEndpoint {
@@ -58,8 +46,6 @@ public class AuthenticationEndpoint {
 	private SessionDriver sessionDriver = SessionDriverImpl.getDriver();
 
 	private Gson gson = new Gson();
-	private JsonParser mJsonParser = new JsonParser();
-
 
 	private String generateError(int code, String message){
 		JsonObject error = new JsonObject();
@@ -106,6 +92,9 @@ public class AuthenticationEndpoint {
 		JsonObject token = new JsonObject();
 		token.addProperty("success", true);
 		token.addProperty("token", authToken);
+		
+		//Register the token for future references
+		manager.registerToken(authToken, TokenType.trace);
 
 		return gson.toJson(token);
 	}
@@ -118,6 +107,7 @@ public class AuthenticationEndpoint {
 		try {
 
 			payload = manager.validateGoogleAuthToken(idToken);
+			manager.registerToken(idToken, TokenType.google);
 			
 		} catch (InvalidAuthTokenException e) {
 			return generateError(1, e.getMessage());

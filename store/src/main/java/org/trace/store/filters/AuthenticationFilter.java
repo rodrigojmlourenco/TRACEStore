@@ -91,6 +91,9 @@ public class AuthenticationFilter implements ContainerRequestFilter{
 	private String validateToken(String token) throws Exception {
 
 		try {
+			
+			LOG.info(manager.getTokenType(token));
+			
 			String username = manager.validateAndExtractSubject(token);
 			
 			if(username!=null && !username.isEmpty())
