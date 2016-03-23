@@ -3,6 +3,7 @@ package org.trace.store.services;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -118,11 +119,13 @@ public class AuthenticationEndpoint {
 	 */
 	@POST
 	@Path("/login")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String login(@FormParam("auth") String idToken){
 		
 		LOG.debug(idToken);
 		
+		/*
 		JsonFactory jsonFactory = new GsonFactory();
 		NetHttpTransport transport = new NetHttpTransport();
 		GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier(transport, jsonFactory);
@@ -142,8 +145,9 @@ public class AuthenticationEndpoint {
 		} catch (GeneralSecurityException e) {
 			LOG.error(e);
 		}
+		*/
 		
-		return idToken;
+		return "hello world";
 	}
 	
 	/**
