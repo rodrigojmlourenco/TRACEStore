@@ -334,15 +334,18 @@ public class TRACESecurityManager{
 			LOG.info("Setting up the Google Token Verifier...");
 			setupGoogleTokenVerifier(GOOGLE_INFO_PATH);
 		}
-			
-		//TEsting
+
 		
-		//End Testing
 		
 		try {
 			GoogleIdToken token = gTokenVerifier.verify(idToken);
 			
 			if(token != null && token.getPayload().getEmailVerified()){
+				
+				LOG.debug(token.getPayload().getAudience());
+				LOG.debug(token.getPayload().getIssuer());
+				LOG.debug(token.getPayload().toPrettyString());
+				
 				return token.getPayload();
 			}else{
 				throw new InvalidAuthTokenException();
