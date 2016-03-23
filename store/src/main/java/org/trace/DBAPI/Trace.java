@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.trace.DBAPI.data.TraceSession;
+import org.trace.DBAPI.data.TraceVertex;
 
 public class Trace {
 
@@ -438,18 +439,28 @@ public class Trace {
 //			System.out.println("attributes created");
 ////			
 //			//route creation
-//			List<TraceVertex> routeForSubmission = new ArrayList<>();
-//			routeForSubmission.add(new TraceVertex(18, 10));
-//			Thread.sleep(100);
-//			routeForSubmission.add(new TraceVertex(18, 22));
-//			Thread.sleep(100);
-//			routeForSubmission.add(new TraceVertex("beaconID4"));
-//			Thread.sleep(100);
-//			routeForSubmission.add(new TraceVertex("beaconID4"));
-//			Thread.sleep(100);
-//			routeForSubmission.add(new TraceVertex(18,20));
-//
-//			System.out.println("route created");
+			List<TraceVertex> routeForSubmission = new ArrayList<>();
+			routeForSubmission.add(new TraceVertex(39.735374450684,-9.1406631469727));
+			Thread.sleep(100);
+			routeForSubmission.add(new TraceVertex(39.735374450684,-9.1406631469727));
+			Thread.sleep(100);
+			routeForSubmission.add(new TraceVertex(39.735172271729,-9.140739440918));
+			Thread.sleep(100);
+			routeForSubmission.add(new TraceVertex(39.735172271729,-9.140739440918));
+			Thread.sleep(100);
+			routeForSubmission.add(new TraceVertex(39.735282897949,-9.1403131484985));
+			Thread.sleep(100);
+			routeForSubmission.add(new TraceVertex(39.735282897949,-9.1403131484985));
+			Thread.sleep(100);
+			routeForSubmission.add(new TraceVertex(39.735118865967,-9.1405467987061));
+			Thread.sleep(100);
+			routeForSubmission.add(new TraceVertex(39.735118865967,-9.1405467987061));
+			Thread.sleep(100);
+			routeForSubmission.add(new TraceVertex(39.735328674316,-9.1404991149902));
+			Thread.sleep(100);
+			routeForSubmission.add(new TraceVertex(39.735328674316,-9.1404991149902));
+			
+			System.out.println("route created");
 //			
 			//route printing
 //			System.out.println("routeForSubmission:");
@@ -458,8 +469,17 @@ public class Trace {
 //			}
 //			System.out.println("#Points: " + routeForSubmission.size());
 			
+			
+			Date date1 = new Date();
+			
 			//route submission
-//			apiTracking.submitRoute(tSession, routeForSubmission);
+			apiTracking.submitRoute(new TraceSession().getSessionID(), routeForSubmission);
+			
+			Date date2 = new Date();
+			long time = date2.getTime() - date1.getTime();
+////			
+			System.out.println("done: " + time + "ms.");
+			System.out.println("Avg per point:" + time/routeForSubmission.size() + "ms.");
 			
 //			System.out.println("route submitted");
 			
