@@ -313,10 +313,12 @@ public class TRACESecurityManager{
 			String googleClientSecret = new String(Files.readAllBytes(new File("/var/trace/auth/client_secret.json").toPath()));
 			gAudience = ((JsonObject)mJsonParser.parse(googleClientSecret)).get("web").getAsJsonObject().get("client_id").getAsString();
 			
+			LOG.debug("Audience : "+gAudience);
+			
 			gTokenVerifier = 
 					new GoogleIdTokenVerifier.Builder(gTransport, gJsonFactory)
 					.setAudience(Arrays.asList(gAudience))
-					.setIssuer("https://accounts.google.com")
+					//.setIssuer("https://accounts.google.com")
 					.build();
 			
 			return true;
@@ -333,6 +335,9 @@ public class TRACESecurityManager{
 			setupGoogleTokenVerifier(GOOGLE_INFO_PATH);
 		}
 			
+		//TEsting
+		
+		//End Testing
 		
 		try {
 			GoogleIdToken token = gTokenVerifier.verify(idToken);
