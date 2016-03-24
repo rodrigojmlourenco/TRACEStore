@@ -790,7 +790,8 @@ public class DBTrackingAPI extends DBAPI{
 //		//Complete the cycle and close the route with the "finish" edge
 		queryString += "g.V(C"+(route.size()-1)+").next().addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
 
-		LOG.info("DBTrackingAPI.java - submitRoute: queryString has a length of:" + queryString.length());
+		LOG.info("submitRoute: route length:" + route.size());
+		LOG.info("submitRoute: queryString has a length of:" + queryString.length());
 		
 		results = query(queryString,params);
 
