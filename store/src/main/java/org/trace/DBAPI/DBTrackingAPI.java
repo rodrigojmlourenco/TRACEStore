@@ -958,13 +958,25 @@ public class DBTrackingAPI extends DBAPI{
 //		//Complete the cycle and close the route with the "finish" edge
 		queryString += "g.V(C"+(route.size()-1)+").next().addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
 		
+		queryString += "finishID;";
+		
+		
+		
 		//Drop the session "finish" edge
-		queryString += "g.V(finishID).drop();";
+//		queryString += "g.V(finishID).drop();";
 				
 		LOG.info("submitMoreRoutes: route length:" + route.size());
 		LOG.info("submitMoreRoutes: queryString has a length of:" + queryString.length());
 		
 		results = query(queryString,params);
+		
+		params.clear();
+		if(!results.isEmpty()){
+			params.put("finishID", results.get(0).getString());
+
+			queryString = "g.V(finishID).drop()";
+			results = query(queryString,params);
+		}
 
 		return results!=null;
 	}
