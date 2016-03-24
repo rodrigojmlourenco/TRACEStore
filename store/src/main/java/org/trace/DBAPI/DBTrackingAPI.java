@@ -58,7 +58,7 @@ public class DBTrackingAPI extends DBAPI{
 		results = query("g.V().has('sessionID', sessionID).hasNext();"
 				+ "", params);
 		
-		LOG.error("login: session exists? " + results.get(0).getBoolean());
+//		LOG.info("login: session exists? " + results.get(0).getBoolean());
 
 		if(!results.get(0).getBoolean()){
 			//begin a session
@@ -67,7 +67,7 @@ public class DBTrackingAPI extends DBAPI{
 					+ "", params);
 		}
 		
-		LOG.error("login: results != null:" + (results != null));
+//		LOG.info("login: results != null:" + (results != null));
 
 		return results != null;
 	}
@@ -705,7 +705,7 @@ public class DBTrackingAPI extends DBAPI{
 		//routeParsing()
 
 		//Verify there's actually a sessionID and that we can associate this route with it
-		if(login(sessionID)){
+		if(!login(sessionID)){
 			LOG.error("DBTrackingAPI.java - submitRoute: The login failed");
 			return false;
 		}
