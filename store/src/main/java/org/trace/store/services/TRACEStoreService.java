@@ -356,20 +356,12 @@ public class TRACEStoreService {
 		throw new UnsupportedOperationException();
 	}	
 
-
-	/*
-	 ************************************************************************
-	 ************************************************************************
-	 *** REUNIÃO 23/02/2016												  ***
-	 ************************************************************************
-	 ************************************************************************
-	 */
-
 	/**
 	 * Fetches the coordinates sequence that makes up the route associated
 	 * with the provided session identifyer
 	 */
 	@GET
+	@Secured
 	@Path("/route/{sessionId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getRouteBySession(@PathParam("sessionId") String sessionId){
@@ -386,10 +378,12 @@ public class TRACEStoreService {
 	 * @return List of sessions as a Json array.
 	 */
 	@GET
+	@Secured
 	@Path("/sessions/{username}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getUserSessions(@PathParam("username") String username){
+	public String getUserSessions(@Context SecurityContext context){
 		Gson gson = new Gson();
+		String username = context.getUserPrincipal().getName();
 		return gson.toJson(mDriver.getUserSessions(username));
 
 	}
@@ -403,10 +397,12 @@ public class TRACEStoreService {
 	 * @return List of sessions and dates as a Json array.
 	 */
 	@GET
-	@Path("/sessionsAndDates/{username}")
+	@Secured
+	@Path("/sessionsAndDates/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getUserSessionsAndDates(@PathParam("username") String username){
+	public String getUserSessionsAndDates(@Context SecurityContext context){
 		Gson gson = new Gson();
+		String username = context.getUserPrincipal().getName();
 		return gson.toJson(mDriver.getUserSessionsAndDates(username));
 	}
 
@@ -416,9 +412,79 @@ public class TRACEStoreService {
 	 * @return List of sessions as a Json array.
 	 */
 	@GET
+	@Secured
 	@Path("/sessions")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getAllSessions(){
+		Gson gson = new Gson();
+		return gson.toJson(mDriver.getAllSessions());
+	}
+
+	/*
+	 ************************************************************************
+	 ************************************************************************
+	 *** REUNIÃO 23/02/2016												  ***
+	 ************************************************************************
+	 ************************************************************************
+	 */
+
+	
+	
+	/**
+	 * Fetches the coordinates sequence that makes up the route associated
+	 * with the provided session identifyer
+	 */
+	@GET
+	@Path("/test/route/{sessionId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String unsecuredGetRouteBySession(@PathParam("sessionId") String sessionId){
+		Gson gson = new Gson();
+		return gson.toJson(mDriver.getRouteBySession(sessionId));
+	}
+	
+	
+	/**
+	 * Fetches the list of tracking sessions that are associated with the
+	 * specified user.
+	 * 
+	 * @param username The user's username.
+	 * 
+	 * @return List of sessions as a Json array.
+	 */
+	@GET
+	@Path("/test/sessions/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String unsecureGetUserSessions(@PathParam("username") String username){
+		Gson gson = new Gson();
+		return gson.toJson(mDriver.getUserSessions(username));
+
+	}
+	
+	/**
+	 * Fetches the list of tracking sessions and corresponding dates that are associated with the
+	 * specified user.
+	 * 
+	 * @param username The user's username.
+	 * 
+	 * @return List of sessions and dates as a Json array.
+	 */
+	@GET
+	@Path("/test/sessionsAndDates/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String unsecuredGetUserSessionsAndDates(@PathParam("username") String username){
+		Gson gson = new Gson();
+		return gson.toJson(mDriver.getUserSessionsAndDates(username));
+	}
+	
+	/**
+	 * Fetches the list of all tracking sessions.
+	 * 
+	 * @return List of sessions as a Json array.
+	 */
+	@GET
+	@Path("/test/sessions")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String unsecureGetAllSessions(){
 		Gson gson = new Gson();
 		return gson.toJson(mDriver.getAllSessions());
 	}

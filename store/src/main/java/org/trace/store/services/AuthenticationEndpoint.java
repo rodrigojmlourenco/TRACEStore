@@ -2,6 +2,7 @@ package org.trace.store.services;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -196,7 +197,14 @@ public class AuthenticationEndpoint {
 		return generateSuccess();
 	}
 	
-	
+	@GET
+	@Secured
+	@Path("/check")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String checkToken(){
+		//TODO: esta seria uma boa oportunidade para renover o token talvez...
+		return generateSuccess();
+	}
 
 	@POST
 	@Path("/activate")
