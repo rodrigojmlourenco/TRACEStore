@@ -7,13 +7,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Result;
 import org.trace.DBAPI.data.TraceVertex;
+import org.trace.store.services.TRACEStoreService;
 
 import io.netty.util.internal.SystemPropertyUtil;
 
 public class DBTrackingAPI extends DBAPI{
+	
+	private final Logger LOG = Logger.getLogger(TRACEStoreService.class); 
 
 	public DBTrackingAPI(Client client){
 		super(client);
@@ -36,6 +40,11 @@ public class DBTrackingAPI extends DBAPI{
 	}
 
 	private boolean login(String sessionID){
+		
+		if(sessionID == null){
+			LOG.error("DBTrackingAPI.java - login: sessionID is null!");
+			return false;
+		}
 
 		//return values list
 		List<Result> results = null;
@@ -226,7 +235,6 @@ public class DBTrackingAPI extends DBAPI{
 				//						+ "L = g.V().or(" + orString + ").has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
 				+ "L = g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
 
-
 				+ "if(L.hasNext()){" //is there any location on map with these coords?
 				+ 		"Lreturn.add(true);" //yes: index(2) - true
 				+ 		"Lreturn.add(L.next().value('vertexID'));" //location id: index(3) - vertexID
@@ -237,9 +245,7 @@ public class DBTrackingAPI extends DBAPI{
 				+ "",params);
 
 		//				System.out.println("Size: " + results.size());
-
 		//		g.V().has('location', geoWithin(Geoshape.circle(10,10,2000))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(10,10).getPoint())}.order().by(incr).select('a').valueMap()
-
 
 		if(results == null || results.size() == 0){
 			return false;
@@ -691,18 +697,16 @@ public class DBTrackingAPI extends DBAPI{
 		boolean success = true;
 
 		//TODO: Do some kind of route parsing so that there are no two subsequent points being added with the same coords.
+		//routeParsing()
 
-//		System.out.println("route size: " + route.size());
+		//Verify there's actually a sessionID and that we can associate this route with it
+		if(login(sessionID)){
+			LOG.error("DBTrackingAPI.java - submitRoute: The login failed");
+			return false;
+		}
 
-		login(sessionID);
-//		System.out.println("sessionID: " + sessionID);
-
-		//First: identify the total amount of Km's that have been travelled (travelledDistance).
+		//First: identify the total amount of Km's that have been traveled (travelledDistance).
 		double totalDistance = TraceLocationMethods.routeTotalDistance(route); 
-//		System.out.println("totalDistance = " + totalDistance);
-
-		//Second: prepare a query that does a geowithin based on the first point of the trajectory and with a radius of "travelledDistanced". (geoPoints)
-		//Submit each point of the route and always use the geoPoints universe instead of the whole DB.
 
 		//return values list
 		List<Result> results = null;
@@ -717,34 +721,7 @@ public class DBTrackingAPI extends DBAPI{
 		params.put("date", route.get(0).getDate());
 		params.put("gpsTolerance", GPS_TOLERANCE);
 
-//		System.out.println("lat:" + route.get(0).getLatitude());
-//		System.out.println("lon:" + route.get(0).getLongitude());
-
-		//ArrayList to save the trajectory 
-		//		results = query("g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance))).values('vertexID');"
-		//				+ "",params);
-
-		//		params.remove("totalDistance");
-		//
-		//		List<String> IDs = new ArrayList<>();
-		//		String map = "g.V()";
-		//
-		//		System.out.println(results.size());
-		//		
-		//		if(!results.isEmpty()){
-		//			map+=".or( ";
-		//			//ArrayList to save the trajectory 
-		//			for(Result r : results){
-		//				IDs.add(r.getString());
-		//				map += "has('vertexID','" +r.getString()+ "'),";
-		//			}
-		//			map = map.substring(0, map.length()-1);
-		//			map += ")";
-		//		}
-		//		map+=";";
-
-
-		//TODO: nao fazer clone e lookup, apenas usar uma ordenação e ver a distancia do primeiro
+		//String that will be submitted for the query
 		String queryString = "";
 
 		//Get the session Vertex
@@ -808,6 +785,8 @@ public class DBTrackingAPI extends DBAPI{
 //		//Complete the cycle and close the route with the "finish" edge
 		queryString += "g.V(C"+(route.size()-1)+").next().addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
 
+		LOG.info("DBTrackingAPI.java - submitRoute: queryString has a length of:" + queryString.length());
+		
 		results = query(queryString,params);
 
 		return results!=null;

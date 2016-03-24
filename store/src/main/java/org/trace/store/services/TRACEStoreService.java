@@ -290,26 +290,6 @@ public class TRACEStoreService {
 						v.setDate(new Date(location.getTimestamp()));
 						route.add(v);
 					
-//						Map<String, Object> map = extractLocationAttributes(location);
-//						
-//						if(map != null){
-//							success = conn.getTrackingAPI().put(
-//									session,
-//									new Date(location.getTimestamp()),
-//									location.getLatitude(),
-//									location.getLongitude(),
-//									extractLocationAttributes(location));
-//						}else{
-//							success = conn.getTrackingAPI().put(
-//									session,
-//									new Date(location.getTimestamp()),
-//									location.getLatitude(),
-//									location.getLongitude(),
-//									extractLocationAttributes(location));
-//						}
-						
-//						if(!success)
-//							LOG.error("Failed to inser location "+location);
 					}
 				}
 				success = conn.getTrackingAPI().submitRoute(session, route);
