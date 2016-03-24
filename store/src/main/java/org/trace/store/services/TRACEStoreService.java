@@ -1,7 +1,9 @@
 package org.trace.store.services;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -17,6 +19,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.log4j.Logger;
+import org.trace.DBAPI.data.TraceVertex;
 import org.trace.store.filters.Role;
 import org.trace.store.filters.Secured;
 import org.trace.store.middleware.TRACEStore;
@@ -273,34 +276,46 @@ public class TRACEStoreService {
 				
 				boolean success;
 				Location location;
-
+				TraceVertex v;
+				List<TraceVertex> route = new ArrayList<>();
+				GraphDB conn = GraphDB.getConnection();
+				
 				for(int i = 0; i < track.getTrackSize(); i++){
-					GraphDB conn = GraphDB.getConnection();
+//					GraphDB conn = GraphDB.getConnection();
 					location = track.getLocation(i);
 
 					if(location != null){
+						
+						v = new TraceVertex(location.getLatitude(),location.getLongitude(),extractLocationAttributes(location));
+						v.setDate(new Date(location.getTimestamp()));
+						route.add(v);
 					
-						Map<String, Object> map = extractLocationAttributes(location);
+//						Map<String, Object> map = extractLocationAttributes(location);
+//						
+//						if(map != null){
+//							success = conn.getTrackingAPI().put(
+//									session,
+//									new Date(location.getTimestamp()),
+//									location.getLatitude(),
+//									location.getLongitude(),
+//									extractLocationAttributes(location));
+//						}else{
+//							success = conn.getTrackingAPI().put(
+//									session,
+//									new Date(location.getTimestamp()),
+//									location.getLatitude(),
+//									location.getLongitude(),
+//									extractLocationAttributes(location));
+//						}
 						
-						if(map != null){
-							success = conn.getTrackingAPI().put(
-									session,
-									new Date(location.getTimestamp()),
-									location.getLatitude(),
-									location.getLongitude(),
-									extractLocationAttributes(location));
-						}else{
-							success = conn.getTrackingAPI().put(
-									session,
-									new Date(location.getTimestamp()),
-									location.getLatitude(),
-									location.getLongitude(),
-									extractLocationAttributes(location));
-						}
-						
-						if(!success)
-							LOG.error("Failed to inser location "+location);
+//						if(!success)
+//							LOG.error("Failed to inser location "+location);
 					}
+				}
+				success = conn.getTrackingAPI().submitRoute(session, route);
+				
+				if(!success){
+					LOG.error("Failed to insert route");
 				}
 			}
 		});

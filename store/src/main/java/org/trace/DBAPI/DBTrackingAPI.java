@@ -805,48 +805,12 @@ public class DBTrackingAPI extends DBAPI{
 			queryString += "g.V(C"+(i-1)+").next().addEdge('session', g.V(C"+i+").next(), 'type', 'trajectory', 'sessionID', sessionID, 'date', date"+i+");";
 		}
 //
-//		//Complete the cicle and close the route with the "finish" edge
+//		//Complete the cycle and close the route with the "finish" edge
 		queryString += "g.V(C"+(route.size()-1)+").next().addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
-
-//		System.out.println(queryString);
 
 		results = query(queryString,params);
 
-
-
-
-
-		//		queryString += "B0 = A.clone().has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a');";
-		//		queryString += "B0 = A.as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a').clone();";
-		//		queryString += "if(B0.hasNext()){C0 = B0.next();}else{CAux0 = graph.addVertex(label,'unmapped_location','vertexID', vertexID,'location', Geoshape.point(latitude,longitude));C0 = g.V(CAux0).next();};";
-		//		queryString += "S.addEdge('session', C0, 'type', 'start', 'sessionID', sessionID, 'date', date);";
-
-		//		for(int i = 1; i < route.size(); i++){
-		//			params.put("lat"+i, route.get(i).getLatitude());
-		//			params.put("lon"+i, route.get(i).getLongitude());
-		//			params.put("vertexID"+i, "" + route.get(i).getLatitude() + "_" + route.get(i).getLongitude());
-		//			params.put("date"+i, route.get(i).getDate());
-		//
-		////			queryString += "B"+i+ " = A.clone().has('location', geoWithin(Geoshape.circle(lat"+i+", lon"+i+", " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(lat"+i+",lon"+i+").getPoint())}.order().by(incr).select('a');";
-		//			queryString += "B"+i+ " = A.as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(lat"+i+",lon"+i+").getPoint())}.order().by(incr).select('a').clone();";
-		//			//TODO: if B hasNext ou "vertexID" exists... duplicate values...
-		////			queryString += "if(B"+i+".hasNext()){C"+i+" = B"+i+".next();}else{CAux"+i+" = graph.addVertex(label,'unmapped_location','vertexID', vertexID"+i+",'location', Geoshape.point(lat"+i+",lon"+i+"));C"+i+" = g.V(CAux"+i+").next();};";
-		//			queryString += "if(B"+i+".hasNext()){C"+i+" = B"+i+".next();}else{CAux"+i+" = graph.addVertex(label,'unmapped_location','vertexID', vertexID"+i+",'location', Geoshape.point(lat"+i+",lon"+i+"));C"+i+" = g.V().has('vertexID',vertexID"+i+").next();};";
-		//			queryString += "C"+(i-1)+".addEdge('session', C"+i+", 'type', 'trajectory', 'sessionID', sessionID, 'date', date"+i+");";
-		//		}
-		////		
-		//		queryString += "C"+(route.size()-1)+".addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
-
-		//		System.out.println(queryString);
-
-		//		results = query(queryString,params);
-
-		//Old code
-		//		for(TraceVertex v : route){
-		//			success = put(sessionID, v) && success;
-		//		}
-
-		return success;
+		return results!=null;
 	}
 
 	//TODO: try to find a way to delete both edges and vertices in a single query
