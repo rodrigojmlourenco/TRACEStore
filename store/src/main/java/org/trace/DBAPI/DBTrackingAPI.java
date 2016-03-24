@@ -893,6 +893,9 @@ public class DBTrackingAPI extends DBAPI{
 		
 		//Get the session "finish" edge
 		queryString += "E0 = g.V().hasLabel('session').has('sessionID', sessionID).inE().has('type','finish');";
+		
+		//Get the ID of the last vertex
+		queryString += "finishID = E0.clone().next().id();";
 
 		//Get the Vertex of the last location of the session
 		queryString += "S = E0.clone().outV().next();";
@@ -952,12 +955,12 @@ public class DBTrackingAPI extends DBAPI{
 			queryString += "g.V(C"+(i-1)+").next().addEdge('session', g.V(C"+i+").next(), 'type', 'trajectory', 'sessionID', sessionID, 'date', date"+i+");";
 		}
 
-		//Drop the session "finish" edge
-		queryString += "E0.drop();";
-		
 //		//Complete the cycle and close the route with the "finish" edge
 		queryString += "g.V(C"+(route.size()-1)+").next().addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
-
+		
+		//Drop the session "finish" edge
+		queryString += "g.V(finishID).drop();";
+				
 		LOG.info("submitMoreRoutes: route length:" + route.size());
 		LOG.info("submitMoreRoutes: queryString has a length of:" + queryString.length());
 		
