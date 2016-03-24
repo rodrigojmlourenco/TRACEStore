@@ -164,6 +164,25 @@ class TraceLocationMethods {
 		return roadVertices;
 	}
 	
+	public static List<TraceVertex> routeParser(List<TraceVertex> submittedRoute){
+		List<TraceVertex> route = new ArrayList<>();
+		TraceVertex lastVertex = null;
+		
+		for(TraceVertex v : submittedRoute){
+			if(lastVertex != null){
+				if(lastVertex.getLatitude() != v.getLatitude() && lastVertex.getLongitude() != v.getLongitude() ){
+					route.add(v);
+					lastVertex = v;
+				}
+			}else{
+				route.add(v);
+				lastVertex = v;
+			}
+		}
+		return route;
+	}
+
+	
 	public static double routeTotalDistance(List<TraceVertex> route){
 		double totalDistance = 0;
 		

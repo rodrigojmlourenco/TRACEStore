@@ -698,11 +698,14 @@ public class DBTrackingAPI extends DBAPI{
 
 	//TODO: Insertion must be done in chronological order, is this assumed or should it be checked here?
 	//TODO: Note that ArrayList() keeps the order of insertion, that at least is assured.
-	public boolean submitRoute(String sessionID, List<TraceVertex> route){
+	public boolean submitRoute(String sessionID, List<TraceVertex> submittedRoute){
 		boolean success = true;
 
-		//TODO: Do some kind of route parsing so that there are no two subsequent points being added with the same coords.
-		//routeParsing()
+		//Route parsing so that there are no two subsequent points being added with the same coords.
+		List<TraceVertex> route = TraceLocationMethods.routeParser(submittedRoute);
+		
+		LOG.info("submitRoute: submittedRoute: " + submittedRoute.size());
+		LOG.info("submitRoute: route: " + submittedRoute.size());
 
 		//Verify there's actually a sessionID and that we can associate this route with it
 		if(!login(sessionID)){
