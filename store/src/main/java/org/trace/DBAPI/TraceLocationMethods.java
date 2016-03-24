@@ -50,6 +50,13 @@ class TraceLocationMethods {
 	//	}
 
 	public static double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
+		
+//		System.out.println("lat1:" + lat1 + " lon1:" + lon1 + " lat2:" + lat2 + " long2:" + lon2);
+		
+		if(lat1 == lat2 && lon1 == lon2){
+			return 0;
+		}
+		
 		double theta = lon1 - lon2;
 		double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
 		dist = Math.acos(dist);
@@ -163,7 +170,10 @@ class TraceLocationMethods {
 		TraceVertex lastVertice = null;
 		for(TraceVertex v : route){
 			if(lastVertice != null){
-				totalDistance+=distance(lastVertice.getLatitude(), lastVertice.getLongitude(), v.getLatitude(), v.getLongitude(), "K");
+//				double d = distance(lastVertice.getLatitude(), lastVertice.getLongitude(), v.getLatitude(), v.getLongitude(), "K");
+//				System.out.println("d:" + d);
+				totalDistance+=distance(lastVertice.getLatitude(), lastVertice.getLongitude(), v.getLatitude(), v.getLongitude(), "K");;
+//				System.out.println("totalDistance:" + totalDistance);
 			}
 			lastVertice = v;
 		}

@@ -692,14 +692,14 @@ public class DBTrackingAPI extends DBAPI{
 
 		//TODO: Do some kind of route parsing so that there are no two subsequent points being added with the same coords.
 
-		System.out.println("route size: " + route.size());
+//		System.out.println("route size: " + route.size());
 
 		login(sessionID);
-		System.out.println("sessionID: " + sessionID);
+//		System.out.println("sessionID: " + sessionID);
 
 		//First: identify the total amount of Km's that have been travelled (travelledDistance).
 		double totalDistance = TraceLocationMethods.routeTotalDistance(route); 
-		System.out.println("totalDistance = " + totalDistance);
+//		System.out.println("totalDistance = " + totalDistance);
 
 		//Second: prepare a query that does a geowithin based on the first point of the trajectory and with a radius of "travelledDistanced". (geoPoints)
 		//Submit each point of the route and always use the geoPoints universe instead of the whole DB.
@@ -717,8 +717,8 @@ public class DBTrackingAPI extends DBAPI{
 		params.put("date", route.get(0).getDate());
 		params.put("gpsTolerance", GPS_TOLERANCE);
 
-		System.out.println("lat:" + route.get(0).getLatitude());
-		System.out.println("lon:" + route.get(0).getLongitude());
+//		System.out.println("lat:" + route.get(0).getLatitude());
+//		System.out.println("lon:" + route.get(0).getLongitude());
 
 		//ArrayList to save the trajectory 
 		//		results = query("g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance))).values('vertexID');"
@@ -750,58 +750,63 @@ public class DBTrackingAPI extends DBAPI{
 		//Get the session Vertex
 		queryString += "S = g.V().hasLabel('session').has('sessionID', sessionID).next();";
 
-		//Set A as the sub collection of vertices that we will need for this route
-		queryString += "A = g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance))).outE().filter{it.get().label() != 'session'};";
+		//Set A as the sub collection of vertices that we will need for this route (removed this: filter{it.get().label() != 'session'})
+		queryString += "A = g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance))).outE();";
 		
+		//Set subGraph as the graph that only contains those vertices
 		queryString += "subGraph = A.subgraph('subGraph').cap('subGraph').next();";
 		
+		//Set the traversal graph
 		queryString += "sg = subGraph.traversal(standard());";
 		
+		//Set A
+		queryString += "A = sg.V();";
+		
 		//Set P0 as the route point we are considering now.
-		queryString += "P0 = Geoshape.point(latitude,longitude).getPoint();";
+		queryString += "P0 = Geoshape.point(latitude,longitude);";
 		
-		queryString += "A = sg.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance)));";
-
-		//Clone A and order the vertices based on proximity to the vertex we are considering right now, i.e., closest as the first of the collection.
-		queryString += "B0 = A.as('a').map{it.get().value('location').getPoint().distance(P0)}.order().by(incr).select('a').clone();";
+		//Filter based on the gpsToleranceolerance and order the vertices based on proximity to the vertex we are considering right now, i.e., closest as the first of the collection.
+		queryString += "B0 = A.clone().has('location', geoWithin(Geoshape.circle(latitude, longitude, gpsTolerance))).as('a').map{it.get().value('location').getPoint().distance(P0.getPoint())}.order().by(incr).select('a');";
 		
-//		queryString += "B0 = A.has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance))).clone();";
-
-
 		//Check if the list is not empty. Check if the 1st entry is within the acceptable gps tolerance. 
 		//In case it's acceptable consider this point
 		//In case the point is not acceptable, add a new point to the DB and also to the initial "A" collection.
-		queryString += "if(B0.hasNext() && B0.clone().next().value('location').getPoint().distance(P0) <= gpsTolerance){C0 = B0.next();}else{CAux0 = graph.addVertex(label,'unmapped_location','vertexID', vertexID,'location', Geoshape.point(latitude,longitude));C0 = g.V(CAux0).next(); A.union(C0);};";
+		queryString += "if(B0.hasNext()){C0 = B0.next().id();}else{"
+				+ "Aux0 = g.V().has('vertexID',vertexID);"
+				+ "if(Aux0.hasNext()){C0 = Aux0.next().id();}else{C0 = graph.addVertex(label,'unmapped_location','vertexID', vertexID,'location', P0).id();};"
+				+ "};";
 
 		//Connect the session vertex to the first point of the route.
-		queryString += "S.addEdge('session', C0, 'type', 'start', 'sessionID', sessionID, 'date', date);";
+		queryString += "S.addEdge('session', g.V(C0).next(), 'type', 'start', 'sessionID', sessionID, 'date', date);";
 
 		//Now "kinda" repeat for every point of the route
-//		for(int i = 1; i < route.size(); i++){
-//
+		for(int i = 1; i < route.size(); i++){
 //			//First get the latitude, longitude, possible vertexID and date for each point of the route
-//			params.put("lat"+i, route.get(i).getLatitude());
-//			params.put("lon"+i, route.get(i).getLongitude());
-//			params.put("vertexID"+i, "" + route.get(i).getLatitude() + "_" + route.get(i).getLongitude());
-//			params.put("date"+i, route.get(i).getDate());
+			params.put("lat"+i, route.get(i).getLatitude());
+			params.put("lon"+i, route.get(i).getLongitude());
+			params.put("vertexID"+i, "" + route.get(i).getLatitude() + "_" + route.get(i).getLongitude());
+			params.put("date"+i, route.get(i).getDate());
 //
 //			//Set Pi as the route point we are considering now.
-//			queryString += "P"+i+" = Geoshape.point(lat"+i+",lon"+i+").getPoint();";
+			queryString += "P"+i+" = Geoshape.point(lat"+i+",lon"+i+");";
 //
 //			//Clone A and order the vertices based on the proximity to Pi
-//			queryString += "B"+i+ " = A.clone().as('a').map{it.get().value('location').getPoint().distance(P"+i+")}.order().by(incr).select('a');";
+			queryString += "B"+i+ " = A.clone().has('location', geoWithin(Geoshape.circle(lat"+i+", lon"+i+", gpsTolerance))).as('a').map{it.get().value('location').getPoint().distance(P"+i+".getPoint())}.order().by(incr).select('a');";
 //
 //			//Check if the list is not empty. Check if the 1st entry is within the acceptable gps tolerance. 
 //			//In case it's acceptable consider this point
 //			//In case the point is not acceptable, add a new point to the DB and also to the initial "A" collection.
-//			queryString += "if(B"+i+".hasNext() && B"+i+".clone().next().value('location').getPoint().distance(P"+i+") <= gpsTolerance){C"+i+" = B"+i+".next();}else{CAux"+i+" = graph.addVertex(label,'unmapped_location','vertexID', vertexID"+i+",'location', P"+i+");C"+i+" = g.V(CAux"+i+").next(); A.union(C"+i+");};";
+			queryString += "if(B"+i+".hasNext()){C"+i+" = B"+i+".next().id();}else{"
+					+ "Aux"+i+" = g.V().has('vertexID',vertexID"+i+");"
+					+ "if(Aux"+i+".hasNext()){C"+i+" = Aux"+i+".next().id();}else{C"+i+" = graph.addVertex(label,'unmapped_location','vertexID', vertexID"+i+",'location', P"+i+").id();};"
+					+ "};";
 //
 //			//Connect the session vertex to the first point of the route.
-//			queryString += "C"+(i-1)+".addEdge('session', C"+i+", 'type', 'trajectory', 'sessionID', sessionID, 'date', date"+i+");";
-//		}
+			queryString += "g.V(C"+(i-1)+").next().addEdge('session', g.V(C"+i+").next(), 'type', 'trajectory', 'sessionID', sessionID, 'date', date"+i+");";
+		}
 //
 //		//Complete the cicle and close the route with the "finish" edge
-//		queryString += "C"+(route.size()-1)+".addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
+		queryString += "g.V(C"+(route.size()-1)+").next().addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
 
 //		System.out.println(queryString);
 

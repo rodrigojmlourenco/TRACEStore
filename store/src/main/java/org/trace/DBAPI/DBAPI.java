@@ -43,8 +43,8 @@ public class DBAPI {
 
 //			Date date2 = new Date();
 //			Long time = date2.getTime() - date1.getTime();
-			
-			//Printing the results
+//			
+//			//Printing the results
 //			System.out.println("-----------");
 //			System.out.println("Results (" + time + "ms):");
 //			for (Result result : results) {
