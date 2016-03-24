@@ -700,7 +700,8 @@ public class Trace {
 			
 			Date date1 = new Date();
 			
-			String sessionID = new TraceSession().getSessionID();
+//			String sessionID = new TraceSession().getSessionID();
+			String sessionID = "123";
 			
 			//route submission
 			apiTracking.submitRoute(sessionID, routeForSubmission);
@@ -712,7 +713,7 @@ public class Trace {
 			System.out.println("Total Points: " + routeForSubmission.size());
 			System.out.println("Total Effective Points: " + TraceLocationMethods.routeParser(routeForSubmission).size());
 			System.out.println("Avg per effective point:" + time/TraceLocationMethods.routeParser(routeForSubmission).size() + "ms.");
-//			System.out.println("sessionID:" + sessionID);
+			System.out.println("sessionID:" + sessionID);
 			
 //			System.out.println("route submitted");
 			
