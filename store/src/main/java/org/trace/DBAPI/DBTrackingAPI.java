@@ -42,7 +42,7 @@ public class DBTrackingAPI extends DBAPI{
 	private boolean login(String sessionID){
 		
 		if(sessionID == null){
-			LOG.error("DBTrackingAPI.java - login: sessionID is null!");
+			LOG.error("login: sessionID is null!");
 			return false;
 		}
 
@@ -57,12 +57,17 @@ public class DBTrackingAPI extends DBAPI{
 		//begin a session
 		results = query("g.V().has('sessionID', sessionID).hasNext();"
 				+ "", params);
+		
+		LOG.error("login: session exists? " + results.get(0).getBoolean());
 
 		if(!results.get(0).getBoolean()){
 			//begin a session
+			results = null;
 			results = query("S = graph.addVertex(label,'session','sessionID', sessionID, 'date', date);"
 					+ "", params);
 		}
+		
+		LOG.error("login: results != null:" + (results != null));
 
 		return results != null;
 	}
