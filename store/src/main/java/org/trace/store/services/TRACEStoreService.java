@@ -355,6 +355,7 @@ public class TRACEStoreService {
 					LOG.error("Failed to insert route");
 					try {
 						sDriver.reopenTrackingSession(session);
+						LOG.info("Session {"+session+"} was reopened.");
 					} catch (UnableToPerformOperation e) {
 						LOG.error(e);
 					}
