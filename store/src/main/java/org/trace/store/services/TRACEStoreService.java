@@ -173,7 +173,7 @@ public class TRACEStoreService {
 							request.getPhone(),
 							Role.user);
 
-			return activationToken;
+			return generateSuccessResponse(activationToken);
 		}catch (UnableToRegisterUserException e) {
 			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
 			return generateFailedResponse(10, e.getMessage());
@@ -208,6 +208,13 @@ public class TRACEStoreService {
 	private String generateSuccessResponse(){
 		JsonObject response = new JsonObject();
 		response.addProperty("success", true);
+		return gson.toJson(response);
+	}
+	
+	private String generateSuccessResponse(String payload){
+		JsonObject response = new JsonObject();
+		response.addProperty("success", true);
+		response.addProperty("token", true); //TODO: isto deveria ser enviado por email.
 		return gson.toJson(response);
 	}
 

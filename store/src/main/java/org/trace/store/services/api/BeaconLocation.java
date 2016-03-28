@@ -1,6 +1,5 @@
 package org.trace.store.services.api;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.gson.JsonObject;
@@ -11,7 +10,7 @@ public class BeaconLocation {
 
 	private long timestamp;
 	private int beaconId;
-	@XmlElement(defaultValue="")private String attributes;
+	private String attributes;
 	
 	public BeaconLocation(){}
 	
