@@ -4,8 +4,10 @@ package org.trace.store.middleware;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -16,15 +18,24 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.log4j.Logger;
-import org.trace.store.middleware.drivers.SessionDriver;
+import org.trace.store.middleware.backend.exceptions.InvalidAuthTokenException;
 import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.InvalidIdentifierException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
-import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.exceptions.SecretKeyNotFoundException;
 import org.trace.store.services.api.data.Session;
+
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -41,10 +52,11 @@ public class TRACESecurityManager{
 	
 	private static TRACESecurityManager MANAGER = new TRACESecurityManager();
 	
+	//Json Utils
+	private final JsonParser mJsonParser = new JsonParser();
+	
 	//Drivers
 	private final UserDriver uDriver = UserDriverImpl.getDriver();
-	private final SessionDriver sDriver = SessionDriverImpl.getDriver();
-	
 	
 	//Support Data Structures
 	private ConcurrentHashMap<String, Date>	expirationDates;
@@ -55,6 +67,7 @@ public class TRACESecurityManager{
 	
 	private final String SECRET;
 	private final String SECRET_FILE = System.getenv("TRACE_DIR")+"/.secret/key";
+	
 	
 	private String loadSecretFromFile() throws IOException{
 		File key = new File(SECRET_FILE);
@@ -244,13 +257,118 @@ public class TRACESecurityManager{
 		expirationDates.put(jti, expiration);
 		userTokens.put(subject, jti);
 		
-		
-		//Step 3 - Store the session in Graph and SQL
-
 		return jwt;
 	}
 	
-	//Asynchronous-Work
+
+	/* Google Federated Authentication
+	 **************************************************************************
+	 **************************************************************************
+	 **************************************************************************
+	 */
+	
+	private final String GOOGLE_INFO_PATH = "/var/trace/auth/client_secret.json";
+	
+	private String gAudience = null;
+	private final JsonFactory gJsonFactory = new GsonFactory();
+	private final HttpTransport gTransport = new NetHttpTransport();
+	private GoogleIdTokenVerifier gTokenVerifier = null;
+	
+	private boolean setupGoogleTokenVerifier(String path){
+		
+		try {
+			String googleClientSecret = new String(Files.readAllBytes(new File("/var/trace/auth/client_secret.json").toPath()));
+			gAudience = ((JsonObject)mJsonParser.parse(googleClientSecret)).get("web").getAsJsonObject().get("client_id").getAsString();
+			
+			gTokenVerifier = 
+					new GoogleIdTokenVerifier.Builder(gTransport, gJsonFactory)
+					.setAudience(Arrays.asList(gAudience))
+					.setIssuer("accounts.google.com")
+					.build();
+			
+			return true;
+		} catch (IOException e) {
+			LOG.error(e);
+			return false;
+		}
+	}
+	
+	public Payload validateGoogleAuthToken(String idToken) throws InvalidAuthTokenException{
+		
+		String error = null;
+		
+		if(gTokenVerifier == null){
+			LOG.info("Setting up the Google Token Verifier...");
+			setupGoogleTokenVerifier(GOOGLE_INFO_PATH);
+		}
+
+		try {
+			
+			GoogleIdToken token = gTokenVerifier.verify(idToken);
+			
+			if(token != null && token.getPayload().getEmailVerified()){
+				return token.getPayload();
+			}else{
+				error = "Token is not valid or the user's email is not verifiable.";
+			}
+			
+		} catch (GeneralSecurityException e) {
+			error = e.getMessage();
+		} catch (IOException e) {
+			error = e.getMessage();
+		} finally {
+			
+			if(error != null){
+				unregisterToken(idToken);
+				throw new InvalidAuthTokenException(error);
+			}
+			
+		}
+		
+		throw new InvalidAuthTokenException();
+	}
+	
+	 /* Token Type Differentiation
+	  * Token Type Differentiation
+	  * Token Type Differentiation
+	 **************************************************************************
+	 **************************************************************************
+	 **************************************************************************
+	 */
+	public enum TokenType {
+		trace,
+		google,
+		facebook,
+		github,
+		linkedin,
+		invalid
+	}
+	
+	public ConcurrentHashMap<String, TokenType> mTokenTypes = new ConcurrentHashMap<>();
+	
+	public void registerToken(String token, TokenType type){
+		mTokenTypes.put(token, type);
+	}
+	
+	public void unregisterToken(String token){
+		mTokenTypes.remove(token);
+	}
+	
+	public TokenType getTokenType(String token){
+		
+		TokenType type = mTokenTypes.get(token);
+		
+		return type == null ? TokenType.invalid : type; 
+	}
+	
+	
+	/* Asynchronous-Work
+	 * Asynchronous-Work
+	 * Asynchronous-Work
+	 **************************************************************************
+	 **************************************************************************
+	 **************************************************************************
+	 */
 	private final ScheduledExecutorService scheduledService = Executors.newScheduledThreadPool(1);
 	
 	private void scheduleCleanerTask(){

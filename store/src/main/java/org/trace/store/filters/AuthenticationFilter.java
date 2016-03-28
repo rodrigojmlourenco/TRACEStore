@@ -15,6 +15,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.log4j.Logger;
 import org.trace.store.middleware.TRACESecurityManager;
+import org.trace.store.middleware.TRACESecurityManager.TokenType;
 
 @Secured
 @Provider
@@ -91,7 +92,18 @@ public class AuthenticationFilter implements ContainerRequestFilter{
 	private String validateToken(String token) throws Exception {
 
 		try {
-			String username = manager.validateAndExtractSubject(token);
+			String username = null;
+			TokenType type = manager.getTokenType(token);
+			
+			switch (type) {
+			case google:
+				username = manager.validateGoogleAuthToken(token).getSubject();
+				break;
+			case trace:
+				username = manager.validateAndExtractSubject(token);
+			default:
+				break;
+			}
 			
 			if(username!=null && !username.isEmpty())
 				return username;

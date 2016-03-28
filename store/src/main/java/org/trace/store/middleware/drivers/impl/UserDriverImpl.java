@@ -38,7 +38,7 @@ import org.trace.store.services.api.PrivacyPolicies;
 public class UserDriverImpl implements UserDriver{
 
 	private Logger log = Logger.getLogger(UserDriverImpl.class);
-	
+
 	protected final int HASHING_ITERATIONS = 0;
 	protected final int SALT_SIZE = 64;
 	protected final int TOKEN_SIZE = 25;
@@ -61,19 +61,35 @@ public class UserDriverImpl implements UserDriver{
 			String username, String email,
 			String pass1, String pass2,
 			String name, String address, String phone, Role role) 
-					throws UserRegistryException, NonMatchingPasswordsException,
-					UnableToRegisterUserException, UnableToPerformOperation {
+					throws UnableToRegisterUserException, UnableToPerformOperation {
 
 		int userId = -1;
 		boolean success = false;
 		Exception error = null; 
 
+		
+		/*
 		// 1 - Validate the security of the provided fields.
 		try {
 			validateFields(username, email, pass1, pass2);
+			
+			name 	= name == null ? "" : name;
+			phone 	= phone == null ? "" : phone;
+			address = address == null ? "" :address;
+			
+			if(!name.isEmpty() && !FormFieldValidator.isValidName(name))
+				throw new UnableToRegisterUserException("Invalid name.");
+				
+			if(!phone.isEmpty() && !FormFieldValidator.isValidPhoneNumber(phone))
+				throw new UnableToRegisterUserException("Invalid phone number.");
+			
+			if(!address.isEmpty() && !FormFieldValidator.isValidAddress(address))
+				throw new UnableToRegisterUserException("Invalid address");
+			
 		} catch (SQLException e1) {
 			throw new UnableToPerformOperation(e1.getMessage());
 		}
+		*/
 
 		// 2 - Secure the password
 		byte[] hashSalt;
@@ -105,6 +121,9 @@ public class UserDriverImpl implements UserDriver{
 
 		// 4 - Update the user's detailed information
 		try {
+			
+			
+			
 			success = insertUserDetails(userId, name, address, phone);
 		} catch (SQLException e) {
 			error = e;
@@ -122,6 +141,76 @@ public class UserDriverImpl implements UserDriver{
 		}
 
 		// 6 - Setup the activation token
+		String token = "";
+		if(success){
+
+			try {
+				token = SecurityUtils.generateSecureActivationToken(25);
+				byte[] hashedToken = SecurityUtils.hashSHA1(token);
+				success = insertValidationRequest(userId, Base64.encodeBase64String(hashedToken));
+			} catch (NoSuchAlgorithmException e) {
+				error = e;
+				success = false;
+			} catch (SQLException e) {
+				error = e;
+				success = false;
+			}
+		}
+
+		if(!success){
+
+			try{
+				if(error != null)error.printStackTrace();
+				deleteUser(userId);
+				throw new UnableToRegisterUserException();
+			}catch(SQLException e){
+				throw new UnableToRegisterUserException();
+			}
+		}else
+			return token;
+
+	}
+
+	@Override
+	public String registerFederatedUser(String username, String email, String name)
+			throws UserRegistryException, UnableToRegisterUserException, UnableToPerformOperation {
+
+		int userId = -1;
+		boolean success = false;
+		Exception error = null;
+		
+		// 3 - Create new user entry
+		try {
+
+			userId = insertUser(username,email,"","");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new UnableToRegisterUserException();
+		} finally {
+			if(userId == -1) throw new UnableToRegisterUserException();;
+		}
+
+		// 4 - Update the user's detailed information
+		try {
+			success = insertUserDetails(userId, name, "", "");
+		} catch (SQLException e) {
+			error = e;
+			success = false;
+		}
+
+		// 5 - Update the user's role
+		if(success){
+			try {
+				success = updateUserRole(userId, Role.user);
+			} catch (SQLException e) {
+				error = e;
+				success = false;
+			}
+		}
+
+
+		//6 - Setup the activation token
 		String token = "";
 		if(success){
 
@@ -178,16 +267,12 @@ public class UserDriverImpl implements UserDriver{
 	@Override
 	public int getUserID(String identifier) throws UnableToPerformOperation, UnknownUserException {
 		int UID;
-		
-		
-		
-		
 		try{
 			if(FormFieldValidator.isValidEmail(identifier)){
-				log.debug(identifier+" is an email.");
 				UID =  getUserIDfromEmail(identifier);
 			}else if(FormFieldValidator.isValidUsername(identifier)){
-				log.debug(identifier+" is an username.");
+				UID = getUserIDfromUsername(identifier);
+			}else if(FormFieldValidator.isValidSubject(identifier)){
 				UID = getUserIDfromUsername(identifier);
 			}else
 				throw new UnableToPerformOperation("Invalid identifier.");
@@ -225,8 +310,8 @@ public class UserDriverImpl implements UserDriver{
 		return result;
 	}
 
-	
-	
+
+
 
 	@Override
 	public boolean activateAccount(String token) throws ExpiredTokenException, UnableToPerformOperation {
@@ -289,17 +374,17 @@ public class UserDriverImpl implements UserDriver{
 
 		statement.setLong(1, userID);
 		ResultSet set = statement.executeQuery();
-		
+
 
 		if(set.next())
 			result = set.getString(1);
 		else
 			result = null;
-		
+
 		statement.close();
 		return result;
 	}
-	
+
 	@Override
 	public boolean isValidPassword(String identifier, String password)
 			throws InvalidIdentifierException, UnableToPerformOperation, UnknownUserException {
@@ -308,7 +393,7 @@ public class UserDriverImpl implements UserDriver{
 		byte[] salt;
 
 		try{
-			
+
 			userID = getUserID(identifier);
 			salt = Base64.decodeBase64(getUserSalt(userID));
 
@@ -327,7 +412,7 @@ public class UserDriverImpl implements UserDriver{
 
 			ResultSet set = statement.executeQuery();
 			statement.close();
-			
+
 			if(set.next()) 
 				return true;
 			else 
@@ -341,39 +426,39 @@ public class UserDriverImpl implements UserDriver{
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public boolean isValidRole(String identifier, Role role) throws UnableToPerformOperation, UnknownUserException {
 		int userId;
 		String dbRole;
-		
+
 		try {
 			dbRole = SecurityRoleUtils.translateRole(role);
 		} catch (UnknownSecurityRoleException e) {
 			return false;
 		}
-		
+
 		userId = getUserID(identifier);
 		try{
-		PreparedStatement statement = conn.prepareStatement(
-				"SELECT "+dbRole+" "
-				+"FROM user_roles "
-				+ "WHERE Id = ?");
-		
-		statement.setInt(1, userId);
-		ResultSet set = statement.executeQuery();
-		statement.close();
-		
-		
-		if(set.next())
-			return set.getBoolean(1);
-		else
-			return false;
+			PreparedStatement statement = conn.prepareStatement(
+					"SELECT "+dbRole+" "
+							+"FROM user_roles "
+							+ "WHERE Id = ?");
+
+			statement.setInt(1, userId);
+			ResultSet set = statement.executeQuery();
+			statement.close();
+
+
+			if(set.next())
+				return set.getBoolean(1);
+			else
+				return false;
 		}catch(SQLException e){
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public boolean setPrivacyPolicies(String identifier, PrivacyPolicies policies) {
 		// TODO Auto-generated method stub
@@ -386,7 +471,7 @@ public class UserDriverImpl implements UserDriver{
 	 **************************************************************************
 	 **************************************************************************
 	 */
-	
+
 	private boolean isUsernameRegistered(String username) throws SQLException{
 
 		boolean exists;
@@ -416,7 +501,7 @@ public class UserDriverImpl implements UserDriver{
 		return exists;
 	}
 
-	private void validateFields(String username, String email, String pass1, String pass2) 
+	public void validateFields(String username, String email, String pass1, String pass2) 
 			throws InvalidEmailException, InvalidUsernameException, InvalidPasswordException, UsernameAlreadyRegisteredException, EmailAlreadyRegisteredException, NonMatchingPasswordsException, SQLException{
 
 		if(!FormFieldValidator.isValidEmail(email))
@@ -441,7 +526,7 @@ public class UserDriverImpl implements UserDriver{
 			throw new NonMatchingPasswordsException();
 	}
 
-	
+
 	private int insertUser(String username, String email, String passwordHash, String salt)
 			throws SQLException{
 
@@ -560,13 +645,13 @@ public class UserDriverImpl implements UserDriver{
 
 	private int getUserIDfromEmail(String email) throws SQLException{
 
-		
-		
+
+
 		int result;
 		PreparedStatement statement =
-				conn.prepareStatement("SELECT Id FROM users WHERE email = ?");
+				conn.prepareStatement("SELECT Id FROM users WHERE Email = ?");
 
-		statement.setString(0, email);
+		statement.setString(1, email);
 		ResultSet set = statement.executeQuery();
 
 
@@ -578,7 +663,7 @@ public class UserDriverImpl implements UserDriver{
 		statement.close();
 		return result;
 	}
-	
+
 	private boolean isTokenExpired(String token) throws NoSuchTokenException, SQLException  {
 
 		boolean result;
@@ -602,7 +687,7 @@ public class UserDriverImpl implements UserDriver{
 	private int getTokenActivationID(String token) throws SQLException, NoSuchTokenException {
 
 		int result;
-		
+
 		PreparedStatement statement = 
 				conn.prepareStatement(
 						"SELECT Id "
@@ -629,7 +714,7 @@ public class UserDriverImpl implements UserDriver{
 	 **************************************************************************
 	 **************************************************************************
 	 */
-	
+
 	protected void clearAll(){
 		try {
 			Statement statement = conn.createStatement();
@@ -638,32 +723,26 @@ public class UserDriverImpl implements UserDriver{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	public static void main(String[] args){
 		UserDriverImpl d = (UserDriverImpl)UserDriverImpl.getDriver();
 
 		try {
-			
+
 			int id;
 			d.clearAll();
 			String activation = d.registerUser("bonobo", "bonobo@somemail.com", "passWord123#", "passWord123#", "Bonobo da Silva", "Av Alves Redol n9", "+351919999999", Role.user);
 			System.out.println(activation);
 			d.activateAccount(activation);
 			System.out.println(id=d.getUserID("bonobo"));
-			
+
 			if(!d.isPendingActivation(id) && d.isValidPassword("bonobo", "passWord123#"))
 				System.out.println("YES IT IS CORRECT");
 			else
 				System.out.println("SOMETHING IS NOT RIGHT!");
-			
-		} catch (UserRegistryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NonMatchingPasswordsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		} catch (UnableToRegisterUserException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -681,4 +760,6 @@ public class UserDriverImpl implements UserDriver{
 			e.printStackTrace();
 		}
 	}
+
+
 }

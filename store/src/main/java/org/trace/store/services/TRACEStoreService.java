@@ -1,5 +1,6 @@
 package org.trace.store.services;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,13 +28,18 @@ import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.TRACETrackingDriver;
 import org.trace.store.middleware.drivers.UserDriver;
+import org.trace.store.middleware.drivers.exceptions.EmailAlreadyRegisteredException;
+import org.trace.store.middleware.drivers.exceptions.InvalidEmailException;
+import org.trace.store.middleware.drivers.exceptions.InvalidPasswordException;
+import org.trace.store.middleware.drivers.exceptions.InvalidUsernameException;
 import org.trace.store.middleware.drivers.exceptions.NonMatchingPasswordsException;
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.middleware.drivers.exceptions.UnableToRegisterUserException;
-import org.trace.store.middleware.drivers.exceptions.UserRegistryException;
+import org.trace.store.middleware.drivers.exceptions.UsernameAlreadyRegisteredException;
 import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
+import org.trace.store.middleware.drivers.utils.FormFieldValidator;
 import org.trace.store.services.api.BeaconLocation;
 import org.trace.store.services.api.GeoLocation;
 import org.trace.store.services.api.Location;
@@ -81,7 +87,6 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public TraceTrack samoleTrack(){
 
-
 		Location l1 = new Location(1, 1, 1,"a");
 		Location l2 = new Location(2, 2, 2,"b");
 		Location l3 = new Location(3, 3, 3,"c");
@@ -89,7 +94,6 @@ public class TRACEStoreService {
 		TraceTrack t = new TraceTrack(locations);
 
 		return t;
-
 	}
 
 
@@ -112,15 +116,56 @@ public class TRACEStoreService {
 	@POST
 	@Path("/register")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response registerUser(UserRegistryRequest request){
+	@Produces(MediaType.APPLICATION_JSON)
+	public String registerUser(UserRegistryRequest request){
 
 
 
 		String activationToken;
+		String name, phone, address;
 
 		try {
 
-			activationToken = 
+			((UserDriverImpl)uDriver).validateFields(request.getUsername(), request.getEmail(), request.getPassword(), request.getConfirm());
+
+			name 	= request.getName();
+			phone	= request.getPhone();
+			address	= request.getAddress();
+
+			name 	= name == null ? "" : name;
+			phone 	= phone == null ? "" : phone;
+			address = address == null ? "" :address;
+
+			if(!name.isEmpty() && !FormFieldValidator.isValidName(name))
+				return generateFailedResponse(6, "Invalid name");
+
+			if(!phone.isEmpty() && !FormFieldValidator.isValidPhoneNumber(phone))
+				return generateFailedResponse(7, "Invalid phone number");
+
+			if(!address.isEmpty() && !FormFieldValidator.isValidAddress(address))
+				return generateFailedResponse(8, "Invalid address");
+
+
+		} catch (InvalidEmailException e) {
+			return generateFailedResponse(2, "Invalid email address");
+		} catch (InvalidUsernameException e) {
+			return generateFailedResponse(1, "Invalid username");
+		} catch (InvalidPasswordException e) {
+			return generateFailedResponse(3, "Invalid password");
+		} catch (UsernameAlreadyRegisteredException e) {
+			return generateFailedResponse(4, "Username already registered");
+		} catch (EmailAlreadyRegisteredException e) {
+			return generateFailedResponse(5, "Email address already registered");
+		} catch (NonMatchingPasswordsException e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
+			return generateFailedResponse(5, "Non matching passwords.");
+		} catch (SQLException e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
+			return generateFailedResponse(9, e.getMessage());
+		}
+
+		try{
+			activationToken =	 
 					uDriver.registerUser(
 							request.getUsername(),
 							request.getEmail(),
@@ -131,22 +176,13 @@ public class TRACEStoreService {
 							request.getPhone(),
 							Role.user);
 
-			LOG.info("User '"+request.getUsername()+"' successfully registered.");
-
-			return Response.ok(activationToken).build();
-
-		} catch (UserRegistryException e) {
+			return generateSuccessResponse(activationToken);
+		}catch (UnableToRegisterUserException e) {
 			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return Response.ok(e.getMessage()).build();
-		} catch (NonMatchingPasswordsException e) {
+			return generateFailedResponse(10, e.getMessage());
+		}	 catch (UnableToPerformOperation e) {
 			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return Response.ok(e.getMessage()).build();
-		} catch (UnableToRegisterUserException e) {
-			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return Response.ok(e.getMessage()).build();
-		} catch (UnableToPerformOperation e) {
-			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return Response.ok(e.getMessage()).build();
+			return generateFailedResponse(11, e.getMessage());
 		}
 	}
 
@@ -177,9 +213,24 @@ public class TRACEStoreService {
 		response.addProperty("success", true);
 		return gson.toJson(response);
 	}
+	
+	private String generateSuccessResponse(String payload){
+		JsonObject response = new JsonObject();
+		response.addProperty("success", true);
+		response.addProperty("token", payload); //TODO: isto deveria ser enviado por email.
+		return gson.toJson(response);
+	}
 
 	private String generateFailedResponse(String msg){
 		JsonObject response = new JsonObject();
+		response.addProperty("success", false);
+		response.addProperty("error", msg);
+		return gson.toJson(response);
+	}
+	private String generateFailedResponse(int code, String msg){
+
+		JsonObject response = new JsonObject();
+		response.addProperty("code", code);
 		response.addProperty("success", false);
 		response.addProperty("error", msg);
 		return gson.toJson(response);
@@ -219,23 +270,23 @@ public class TRACEStoreService {
 
 
 	private Map<String, Object> extractLocationAttributes(Location location){
-		
+
 		HashMap<String, Object> map = new HashMap<>();
 		try{
-		
-		JsonObject attributes = (JsonObject) location.getLocationAsJsonObject().get("attributes");
-		
-		
-		for(Entry<String, JsonElement> attribute : attributes.entrySet())
-			map.put(attribute.getKey(), attribute.getValue());
+
+			JsonObject attributes = (JsonObject) location.getLocationAsJsonObject().get("attributes");
+
+
+			for(Entry<String, JsonElement> attribute : attributes.entrySet())
+				map.put(attribute.getKey(), attribute.getValue());
 		}catch(ClassCastException e){
 			LOG.error("Unable to extract the attributes because, "+e.getMessage());
 			return null;
 		}
-		
+
 		return map;
 	}
-	
+
 	/**
 	 * Enables a tracking application to report a traced tracked, as a whole.
 	 *  
@@ -273,7 +324,7 @@ public class TRACEStoreService {
 
 			@Override
 			public void run() {
-				
+
 				boolean success;
 				Location location;
 				TraceVertex v;
@@ -353,20 +404,12 @@ public class TRACEStoreService {
 		throw new UnsupportedOperationException();
 	}	
 
-
-	/*
-	 ************************************************************************
-	 ************************************************************************
-	 *** REUNIÃO 23/02/2016												  ***
-	 ************************************************************************
-	 ************************************************************************
-	 */
-
 	/**
 	 * Fetches the coordinates sequence that makes up the route associated
 	 * with the provided session identifyer
 	 */
 	@GET
+	@Secured
 	@Path("/route/{sessionId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getRouteBySession(@PathParam("sessionId") String sessionId){
@@ -383,9 +426,83 @@ public class TRACEStoreService {
 	 * @return List of sessions as a Json array.
 	 */
 	@GET
+	@Secured
 	@Path("/sessions/{username}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getUserSessions(@PathParam("username") String username){
+	public String getUserSessions(@Context SecurityContext context){
+		Gson gson = new Gson();
+		String username = context.getUserPrincipal().getName();
+		return gson.toJson(mDriver.getUserSessions(username));
+
+	}
+
+	/**
+	 * Fetches the list of tracking sessions and corresponding dates that are associated with the
+	 * specified user.
+	 * 
+	 * @param username The user's username.
+	 * 
+	 * @return List of sessions and dates as a Json array.
+	 */
+	@GET
+	@Secured
+	@Path("/sessionsAndDates/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getUserSessionsAndDates(@Context SecurityContext context){
+		Gson gson = new Gson();
+		String username = context.getUserPrincipal().getName();
+		return gson.toJson(mDriver.getUserSessionsAndDates(username));
+	}
+
+	/**
+	 * Fetches the list of all tracking sessions.
+	 * 
+	 * @return List of sessions as a Json array.
+	 */
+	@GET
+	@Secured
+	@Path("/sessions")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getAllSessions(){
+		Gson gson = new Gson();
+		return gson.toJson(mDriver.getAllSessions());
+	}
+
+	/*
+	 ************************************************************************
+	 ************************************************************************
+	 *** REUNIÃO 23/02/2016												  ***
+	 ************************************************************************
+	 ************************************************************************
+	 */
+
+
+
+	/**
+	 * Fetches the coordinates sequence that makes up the route associated
+	 * with the provided session identifyer
+	 */
+	@GET
+	@Path("/test/route/{sessionId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String unsecuredGetRouteBySession(@PathParam("sessionId") String sessionId){
+		Gson gson = new Gson();
+		return gson.toJson(mDriver.getRouteBySession(sessionId));
+	}
+
+
+	/**
+	 * Fetches the list of tracking sessions that are associated with the
+	 * specified user.
+	 * 
+	 * @param username The user's username.
+	 * 
+	 * @return List of sessions as a Json array.
+	 */
+	@GET
+	@Path("/test/sessions/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String unsecureGetUserSessions(@PathParam("username") String username){
 		Gson gson = new Gson();
 		return gson.toJson(mDriver.getUserSessions(username));
 
@@ -400,9 +517,9 @@ public class TRACEStoreService {
 	 * @return List of sessions and dates as a Json array.
 	 */
 	@GET
-	@Path("/sessionsAndDates/{username}")
+	@Path("/test/sessionsAndDates/{username}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getUserSessionsAndDates(@PathParam("username") String username){
+	public String unsecuredGetUserSessionsAndDates(@PathParam("username") String username){
 		Gson gson = new Gson();
 		return gson.toJson(mDriver.getUserSessionsAndDates(username));
 	}
@@ -413,9 +530,9 @@ public class TRACEStoreService {
 	 * @return List of sessions as a Json array.
 	 */
 	@GET
-	@Path("/sessions")
+	@Path("/test/sessions")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getAllSessions(){
+	public String unsecureGetAllSessions(){
 		Gson gson = new Gson();
 		return gson.toJson(mDriver.getAllSessions());
 	}

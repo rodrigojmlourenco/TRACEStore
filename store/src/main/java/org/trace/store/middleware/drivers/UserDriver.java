@@ -2,8 +2,12 @@ package org.trace.store.middleware.drivers;
 
 
 import org.trace.store.filters.Role;
+import org.trace.store.middleware.drivers.exceptions.EmailAlreadyRegisteredException;
 import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
+import org.trace.store.middleware.drivers.exceptions.InvalidEmailException;
 import org.trace.store.middleware.drivers.exceptions.InvalidIdentifierException;
+import org.trace.store.middleware.drivers.exceptions.InvalidPasswordException;
+import org.trace.store.middleware.drivers.exceptions.InvalidUsernameException;
 import org.trace.store.middleware.drivers.exceptions.NonMatchingPasswordsException;
 import org.trace.store.middleware.drivers.exceptions.PasswordReuseException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
@@ -12,6 +16,7 @@ import org.trace.store.middleware.drivers.exceptions.UnableToUnregisterUserExcep
 import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
 import org.trace.store.middleware.drivers.exceptions.UnknownUserIdentifierException;
 import org.trace.store.middleware.drivers.exceptions.UserRegistryException;
+import org.trace.store.middleware.drivers.exceptions.UsernameAlreadyRegisteredException;
 import org.trace.store.services.api.PrivacyPolicies;
 
 public interface UserDriver {
@@ -36,8 +41,21 @@ public interface UserDriver {
 	 *  
 	 */
 	public String registerUser(String username, String email, String pass1, String pass2, String name, String address, String phone, Role role)
-		throws UserRegistryException, NonMatchingPasswordsException, UnableToRegisterUserException, UnableToPerformOperation;
+		throws UnableToRegisterUserException, UnableToPerformOperation;
 	
+	/**
+	 * 
+	 * @param username
+	 * @param email
+	 * @param name
+	 * @param role
+	 * @return
+	 * @throws UserRegistryException
+	 * @throws UnableToRegisterUserException
+	 * @throws UnableToPerformOperation
+	 */
+	public String registerFederatedUser(String username, String email, String name)
+			throws UserRegistryException, UnableToRegisterUserException, UnableToPerformOperation;
 	
 	/**
 	 * Unregister a user, however, only if presents a correct password.

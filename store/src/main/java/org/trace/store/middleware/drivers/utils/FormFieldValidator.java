@@ -28,10 +28,12 @@ public class FormFieldValidator {
 	private final static PasswordValidator PASSWORD_VALIDATOR;
 	private final static EmailValidator EMAIL_VALIDATOR = EmailValidator.getInstance();
 	
-	private final static Pattern USERNAME_VALIDATOR  	= Pattern.compile("^[a-z0-9_]{5,15}$");
+	private final static Pattern NAME_VALIDATOR  		= Pattern.compile("^[a-zA-Z çãõéáâ]{3,64}$");
+	private final static Pattern USERNAME_VALIDATOR  	= Pattern.compile("^[a-zA-Z0-9_]{5,15}$");
 	private final static Pattern ADDRESS_VALIDATOR		= Pattern.compile("[a-zA-Z0-9,ºª]{5,254}");
 	private final static Pattern PHONE_VALIDATOR		= Pattern.compile("^([+]?[0-9]{1,3})?[0-9]{12,15}$");
 	
+	private final static Pattern SUBJECT_VALIDATOR  	= Pattern.compile("^[a-zA-Z0-9_]{5,25}$");
 	static {
 		// password must be between 8 and 16 chars long
 		LengthRule lengthRule = new LengthRule(8, 25);
@@ -63,6 +65,11 @@ public class FormFieldValidator {
 
 		PASSWORD_VALIDATOR = new PasswordValidator(ruleList);
 	}
+	
+	public static boolean isValidSubject(String subject){
+		Matcher m = SUBJECT_VALIDATOR.matcher(subject);
+		return m.matches();
+	}
 		
 	public static boolean isValidEmail(String email){
 		return EMAIL_VALIDATOR.isValid(email);
@@ -86,6 +93,11 @@ public class FormFieldValidator {
 	
 	public static boolean isValidAddress(String address){
 		Matcher m = ADDRESS_VALIDATOR.matcher(address);
+		return m.matches();
+	}
+
+	public static boolean isValidName(String name) {
+		Matcher m = NAME_VALIDATOR.matcher(name);
 		return m.matches();
 	}
 }
