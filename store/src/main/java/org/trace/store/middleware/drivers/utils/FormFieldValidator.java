@@ -29,7 +29,7 @@ public class FormFieldValidator {
 	private final static EmailValidator EMAIL_VALIDATOR = EmailValidator.getInstance();
 	
 	private final static Pattern NAME_VALIDATOR  		= Pattern.compile("^[a-zA-Z çãõéáâ]{3,64}$");
-	private final static Pattern USERNAME_VALIDATOR  	= Pattern.compile("^[a-z0-9_]{5,15}$");
+	private final static Pattern USERNAME_VALIDATOR  	= Pattern.compile("^[a-zA-Z0-9_]{5,15}$");
 	private final static Pattern ADDRESS_VALIDATOR		= Pattern.compile("[a-zA-Z0-9,ºª]{5,254}");
 	private final static Pattern PHONE_VALIDATOR		= Pattern.compile("^([+]?[0-9]{1,3})?[0-9]{12,15}$");
 	
