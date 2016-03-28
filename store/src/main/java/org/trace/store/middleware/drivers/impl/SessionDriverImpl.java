@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.trace.DBAPI.data.SimpleSession;
 import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
@@ -16,6 +17,8 @@ import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 
 public class SessionDriverImpl implements SessionDriver{
 
+	private Logger LOG = Logger.getLogger(SessionDriverImpl.class);
+	
 	private Connection conn;
 	private SessionDriverImpl() {
 		conn = MariaDBDriver.getMariaConnection();
@@ -59,6 +62,7 @@ public class SessionDriverImpl implements SessionDriver{
 	
 	@Override
 	public void reopenTrackingSession(String sessionToken) throws UnableToPerformOperation {
+		
 		int modified = 0;
 		try {
 			PreparedStatement stmt = conn.prepareStatement("UPDATE sessions SET IsClosed=0 WHERE Session=?");
@@ -67,12 +71,13 @@ public class SessionDriverImpl implements SessionDriver{
 			stmt.close();
 			
 			if(modified <= 0)
-				System.err.println("Nothing was modified for session "+sessionToken);
+				LOG.error("Nothing was modified in session "+sessionToken);
+			else
+				LOG.info(sessionToken +" successfully reopenened.");
 			
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
-		
 	}
 
 	@Override
