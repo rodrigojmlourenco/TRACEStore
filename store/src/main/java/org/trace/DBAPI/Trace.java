@@ -16,7 +16,7 @@ public class Trace {
 		System.out.println("Trace.java");
 		
 		//Logger configurations
-		org.apache.log4j.BasicConfigurator.configure();
+//		org.apache.log4j.BasicConfigurator.configure();
 		
 		//Data Base connection class, hides unnecessary complexity
 		TraceDB db = new TraceDB();
@@ -641,51 +641,51 @@ public class Trace {
 			routeForSubmission.add(new TraceVertex(38.73477935791,-9.1393356323242));
 			routeForSubmission.add(new TraceVertex(38.73477935791,-9.1393356323242));
 			routeForSubmission.add(new TraceVertex(38.734550476074,-9.1389074325562));
-			routeForSubmission.add(new TraceVertex(38.734550476074,-9.1389074325562));
-			routeForSubmission.add(new TraceVertex(38.734497070312,-9.1388320922852));
-			routeForSubmission.add(new TraceVertex(38.734497070312,-9.1388320922852));
-			routeForSubmission.add(new TraceVertex(38.734294891357,-9.1388339996338));
-			routeForSubmission.add(new TraceVertex(38.734294891357,-9.1388339996338));
-			routeForSubmission.add(new TraceVertex(38.734134674072,-9.1387538909912));
-			routeForSubmission.add(new TraceVertex(38.734134674072,-9.1387538909912));
-			routeForSubmission.add(new TraceVertex(38.733959197998,-9.1385116577148));
-			routeForSubmission.add(new TraceVertex(38.733959197998,-9.1385116577148));
-			routeForSubmission.add(new TraceVertex(38.733745574951,-9.1383647918701));
-			routeForSubmission.add(new TraceVertex(38.733745574951,-9.1383647918701));
+//			routeForSubmission.add(new TraceVertex(38.734550476074,-9.1389074325562));
+//			routeForSubmission.add(new TraceVertex(38.734497070312,-9.1388320922852));
+//			routeForSubmission.add(new TraceVertex(38.734497070312,-9.1388320922852));
+//			routeForSubmission.add(new TraceVertex(38.734294891357,-9.1388339996338));
+//			routeForSubmission.add(new TraceVertex(38.734294891357,-9.1388339996338));
+//			routeForSubmission.add(new TraceVertex(38.734134674072,-9.1387538909912));
+//			routeForSubmission.add(new TraceVertex(38.734134674072,-9.1387538909912));
+//			routeForSubmission.add(new TraceVertex(38.733959197998,-9.1385116577148));
+//			routeForSubmission.add(new TraceVertex(38.733959197998,-9.1385116577148));
+//			routeForSubmission.add(new TraceVertex(38.733745574951,-9.1383647918701));
+//			routeForSubmission.add(new TraceVertex(38.733745574951,-9.1383647918701));
 			
-			routeForSubmission.add(new TraceVertex(38.735374450684,-9.1406631469727));
-			routeForSubmission.add(new TraceVertex(38.735374450684,-9.1406631469727));
-			routeForSubmission.add(new TraceVertex(38.735172271729,-9.140739440918));
-			routeForSubmission.add(new TraceVertex(38.735172271729,-9.140739440918));
-			routeForSubmission.add(new TraceVertex(38.735282897949,-9.1403131484985));
-			routeForSubmission.add(new TraceVertex(38.735282897949,-9.1403131484985));
-			routeForSubmission.add(new TraceVertex(38.735118865967,-9.1405467987061));
-			routeForSubmission.add(new TraceVertex(38.735118865967,-9.1405467987061));
-			routeForSubmission.add(new TraceVertex(38.735328674316,-9.1404991149902));
-			routeForSubmission.add(new TraceVertex(38.735328674316,-9.1404991149902));
-			routeForSubmission.add(new TraceVertex(38.735210418701,-9.1404447555542));
-			routeForSubmission.add(new TraceVertex(38.735210418701,-9.1404447555542));
-			routeForSubmission.add(new TraceVertex(38.73490524292,-9.1402463912964));
-			routeForSubmission.add(new TraceVertex(38.73490524292,-9.1402463912964));
-			routeForSubmission.add(new TraceVertex(38.734748840332,-9.1401968002319));
-			routeForSubmission.add(new TraceVertex(38.734748840332,-9.1401968002319));
+//			routeForSubmission.add(new TraceVertex(38.735374450684,-9.1406631469727));
+//			routeForSubmission.add(new TraceVertex(38.735374450684,-9.1406631469727));
+//			routeForSubmission.add(new TraceVertex(38.735172271729,-9.140739440918));
+//			routeForSubmission.add(new TraceVertex(38.735172271729,-9.140739440918));
+//			routeForSubmission.add(new TraceVertex(38.735282897949,-9.1403131484985));
+//			routeForSubmission.add(new TraceVertex(38.735282897949,-9.1403131484985));
+//			routeForSubmission.add(new TraceVertex(38.735118865967,-9.1405467987061));
+//			routeForSubmission.add(new TraceVertex(38.735118865967,-9.1405467987061));
+//			routeForSubmission.add(new TraceVertex(38.735328674316,-9.1404991149902));
+//			routeForSubmission.add(new TraceVertex(38.735328674316,-9.1404991149902));
+//			routeForSubmission.add(new TraceVertex(38.735210418701,-9.1404447555542));
+//			routeForSubmission.add(new TraceVertex(38.735210418701,-9.1404447555542));
+//			routeForSubmission.add(new TraceVertex(38.73490524292,-9.1402463912964));
+//			routeForSubmission.add(new TraceVertex(38.73490524292,-9.1402463912964));
+//			routeForSubmission.add(new TraceVertex(38.734748840332,-9.1401968002319));
+//			routeForSubmission.add(new TraceVertex(38.734748840332,-9.1401968002319));
 			
-			routeForSubmission.add(new TraceVertex(38.735374450684,-9.1406631469727));
-			routeForSubmission.add(new TraceVertex(38.735374450684,-9.1406631469727));
-			routeForSubmission.add(new TraceVertex(38.735172271729,-9.140739440918));
-			routeForSubmission.add(new TraceVertex(38.735172271729,-9.140739440918));
-			routeForSubmission.add(new TraceVertex(38.735282897949,-9.1403131484985));
-			routeForSubmission.add(new TraceVertex(38.735282897949,-9.1403131484985));
-			routeForSubmission.add(new TraceVertex(38.735118865967,-9.1405467987061));
-			routeForSubmission.add(new TraceVertex(38.735118865967,-9.1405467987061));
-			routeForSubmission.add(new TraceVertex(38.735328674316,-9.1404991149902));
-			routeForSubmission.add(new TraceVertex(38.735328674316,-9.1404991149902));
-			routeForSubmission.add(new TraceVertex(38.735210418701,-9.1404447555542));
-			routeForSubmission.add(new TraceVertex(38.735210418701,-9.1404447555542));
-			routeForSubmission.add(new TraceVertex(38.73490524292,-9.1402463912964));
-			routeForSubmission.add(new TraceVertex(38.73490524292,-9.1402463912964));
-			routeForSubmission.add(new TraceVertex(38.734748840332,-9.1401968002319));
-			routeForSubmission.add(new TraceVertex(38.734748840332,-9.1401968002319));
+//			routeForSubmission.add(new TraceVertex(38.735374450684,-9.1406631469727));
+//			routeForSubmission.add(new TraceVertex(38.735374450684,-9.1406631469727));
+//			routeForSubmission.add(new TraceVertex(38.735172271729,-9.140739440918));
+//			routeForSubmission.add(new TraceVertex(38.735172271729,-9.140739440918));
+//			routeForSubmission.add(new TraceVertex(38.735282897949,-9.1403131484985));
+//			routeForSubmission.add(new TraceVertex(38.735282897949,-9.1403131484985));
+//			routeForSubmission.add(new TraceVertex(38.735118865967,-9.1405467987061));
+//			routeForSubmission.add(new TraceVertex(38.735118865967,-9.1405467987061));
+//			routeForSubmission.add(new TraceVertex(38.735328674316,-9.1404991149902));
+//			routeForSubmission.add(new TraceVertex(38.735328674316,-9.1404991149902));
+//			routeForSubmission.add(new TraceVertex(38.735210418701,-9.1404447555542));
+//			routeForSubmission.add(new TraceVertex(38.735210418701,-9.1404447555542));
+//			routeForSubmission.add(new TraceVertex(38.73490524292,-9.1402463912964));
+//			routeForSubmission.add(new TraceVertex(38.73490524292,-9.1402463912964));
+//			routeForSubmission.add(new TraceVertex(38.734748840332,-9.1401968002319));
+//			routeForSubmission.add(new TraceVertex(38.734748840332,-9.1401968002319));
 			
 			System.out.println("route created");
 //			
@@ -701,7 +701,7 @@ public class Trace {
 			Date date1 = new Date();
 			
 //			String sessionID = new TraceSession().getSessionID();
-			String sessionID = "123";
+			String sessionID = "12345";
 			
 			//route submission
 			apiTracking.submitRoute(sessionID, routeForSubmission);

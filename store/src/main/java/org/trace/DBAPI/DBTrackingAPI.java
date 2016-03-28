@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Result;
+import org.trace.DBAPI.data.RouteBoundingBox;
 import org.trace.DBAPI.data.TraceVertex;
 import org.trace.store.services.TRACEStoreService;
 
@@ -781,9 +782,14 @@ public class DBTrackingAPI extends DBAPI{
 			LOG.error("submitFirstRoute: The login failed");
 			return false;
 		}
+		
+		if(route == null || route.isEmpty()){
+			LOG.error("submitFirstRoute: route is null or empty");
+			return false;
+		}
 
-		//First: identify the total amount of Km's that have been traveled (travelledDistance).
-		double totalDistance = TraceLocationMethods.routeTotalDistance(route); 
+		//First: identify the bounding box of the trajectory
+		RouteBoundingBox routeBoundingBox = TraceLocationMethods.getRouteBoundingBox(route); 
 
 		//return values list
 		List<Result> results = null;
@@ -791,11 +797,15 @@ public class DBTrackingAPI extends DBAPI{
 		//params
 		Map<String,Object> params = new HashMap<>();
 		params.put("sessionID", sessionID);
-		params.put("totalDistance", totalDistance);
+		params.put("SWLat", routeBoundingBox.getSWLat());
+		params.put("SWLon", routeBoundingBox.getSWLon());
+		params.put("NELat", routeBoundingBox.getNELat());
+		params.put("NELon", routeBoundingBox.getNELon());
+		
 		params.put("latitude", route.get(0).getLatitude());
 		params.put("longitude", route.get(0).getLongitude());
 		params.put("vertexID", ""+route.get(0).getLatitude()+"_"+route.get(0).getLongitude());
-		params.put("date", route.get(0).getDate());
+		params.put("date0", route.get(0).getDate());
 		params.put("gpsTolerance", GPS_TOLERANCE);
 
 		//String that will be submitted for the query
@@ -805,7 +815,7 @@ public class DBTrackingAPI extends DBAPI{
 		queryString += "S = g.V().hasLabel('session').has('sessionID', sessionID).next();";
 
 		//Set A as the sub collection of vertices that we will need for this route (removed this: filter{it.get().label() != 'session'})
-		queryString += "A = g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance))).outE();";
+		queryString += "A = g.V().has('location', geoWithin(Geoshape.box(SWLat,SWLon,NELat,NELon))).outE();";
 		
 		//Set subGraph as the graph that only contains those vertices
 		queryString += "subGraph = A.subgraph('subGraph').cap('subGraph').next();";
@@ -831,7 +841,7 @@ public class DBTrackingAPI extends DBAPI{
 				+ "};";
 
 		//Connect the session vertex to the first point of the route.
-		queryString += "S.addEdge('session', g.V(C0).next(), 'type', 'start', 'sessionID', sessionID, 'date', date);";
+		queryString += "S.addEdge('session', g.V(C0).next(), 'type', 'start', 'sessionID', sessionID, 'date', date0);";
 
 		//Now "kinda" repeat for every point of the route
 		for(int i = 1; i < route.size(); i++){
@@ -877,9 +887,14 @@ public class DBTrackingAPI extends DBAPI{
 			LOG.error("submitMoreRoutes: Session is empty, this method expects at least one route submitted before");
 			return false;
 		}
+		
+		if(route == null || route.isEmpty()){
+			LOG.error("submitMoreRoutes: route is null or empty");
+			return false;
+		}
 
-		//First: identify the total amount of Km's that have been traveled (travelledDistance).
-		double totalDistance = TraceLocationMethods.routeTotalDistance(route); 
+		//First: identify the bounding box of the trajectory
+		RouteBoundingBox routeBoundingBox = TraceLocationMethods.getRouteBoundingBox(route); 
 
 		//return values list
 		List<Result> results = null;
@@ -887,11 +902,15 @@ public class DBTrackingAPI extends DBAPI{
 		//params
 		Map<String,Object> params = new HashMap<>();
 		params.put("sessionID", sessionID);
-		params.put("totalDistance", totalDistance);
+		params.put("SWLat", routeBoundingBox.getSWLat());
+		params.put("SWLon", routeBoundingBox.getSWLon());
+		params.put("NELat", routeBoundingBox.getNELat());
+		params.put("NELon", routeBoundingBox.getNELon());
+		
 		params.put("latitude", route.get(0).getLatitude());
 		params.put("longitude", route.get(0).getLongitude());
 		params.put("vertexID", ""+route.get(0).getLatitude()+"_"+route.get(0).getLongitude());
-		params.put("date", route.get(0).getDate());
+		params.put("date0", route.get(0).getDate());
 		params.put("gpsTolerance", GPS_TOLERANCE);
 
 		//String that will be submitted for the query
@@ -907,7 +926,7 @@ public class DBTrackingAPI extends DBAPI{
 		queryString += "S = E0.clone().outV().next();";
 		
 		//Set A as the sub collection of vertices that we will need for this route (removed this: filter{it.get().label() != 'session'})
-		queryString += "A = g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, totalDistance))).outE();";
+		queryString += "A = g.V().has('location', geoWithin(Geoshape.box(SWLat,SWLon,NELat,NELon))).outE();";
 		
 		//Set subGraph as the graph that only contains those vertices
 		queryString += "subGraph = A.subgraph('subGraph').cap('subGraph').next();";
@@ -933,7 +952,7 @@ public class DBTrackingAPI extends DBAPI{
 				+ "};";
 
 		//Connect the session vertex to the first point of the route.
-		queryString += "S.addEdge('session', g.V(C0).next(), 'type', 'trajectory', 'sessionID', sessionID, 'date', date);";
+		queryString += "S.addEdge('session', g.V(C0).next(), 'type', 'trajectory', 'sessionID', sessionID, 'date', date0);";
 
 		//Now "kinda" repeat for every point of the route
 		for(int i = 1; i < route.size(); i++){

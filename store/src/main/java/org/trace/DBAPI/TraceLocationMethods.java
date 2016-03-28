@@ -31,14 +31,18 @@ package org.trace.DBAPI;
 
 import java.util.*;
 
-import org.apache.tinkerpop.gremlin.process.traversal.step.util.HasContainer;
-import org.codehaus.groovy.transform.LazyASTTransformation;
+import org.apache.log4j.Logger;
+import org.apache.tinkerpop.shaded.minlog.Log;
+import org.trace.DBAPI.data.RouteBoundingBox;
 import org.trace.DBAPI.data.TraceVertex;
+import org.trace.store.services.TRACEStoreService;
 
 import java.lang.*;
 import java.io.*;
 
 class TraceLocationMethods {
+
+	private final static Logger LOG = Logger.getLogger(TRACEStoreService.class); 
 
 	//	protected static final double MAX_DISTANCE = 0.016; 
 
@@ -166,9 +170,17 @@ class TraceLocationMethods {
 	
 	public static List<TraceVertex> routeParser(List<TraceVertex> submittedRoute){
 		List<TraceVertex> route = new ArrayList<>();
+		
 		TraceVertex lastVertex = null;
 		
+		if(submittedRoute == null){
+			LOG.error("routeParser: The submittedRoute is null");
+			return null;
+		}
+		
 		for(TraceVertex v : submittedRoute){
+
+//			Make sure there are no two following vertices with the same coords.
 			if(lastVertex != null){
 				if(lastVertex.getLatitude() != v.getLatitude() && lastVertex.getLongitude() != v.getLongitude() ){
 					route.add(v);
@@ -198,5 +210,39 @@ class TraceLocationMethods {
 		}
 		
 		return totalDistance;
+	}
+	
+	public static RouteBoundingBox getRouteBoundingBox(List<TraceVertex> route){
+		if(route == null){
+			LOG.error("getBoundingBox: route is null");
+			return null;
+		}
+		
+		double minLat = route.get(0).getLatitude();
+		double maxLat = route.get(0).getLatitude();
+		double minLon = route.get(0).getLongitude();
+		double maxLon = route.get(0).getLongitude();
+				
+		for(TraceVertex v : route){
+			double lat = v.getLatitude();
+			double lon = v.getLongitude();
+			
+			if(lat < minLat){
+				minLat = lat;
+			}else{
+				if(lat > maxLat){
+					maxLat = lat;
+				}
+			}
+			
+			if(lon < minLon){
+				minLon = lon;
+			}else{
+				if(lon > maxLon){
+					maxLon = lon;
+				}
+			}
+		}
+		return new RouteBoundingBox(minLat, maxLat, minLon, maxLon);
 	}
 }
