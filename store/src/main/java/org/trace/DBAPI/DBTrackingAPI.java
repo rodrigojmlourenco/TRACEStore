@@ -761,7 +761,13 @@ public class DBTrackingAPI extends DBAPI{
 		}
 		LOG.info("submitRoute: i:" + i);
 		if(route.size() > i){
-			success = submitMoreRoutes(sessionID, route.subList(i, route.size())) && success;
+			if(firstOne){
+				firstOne = false;
+				success = submitFirstRoute(sessionID, route.subList(i, route.size())) && success;
+			}else{
+				success = submitMoreRoutes(sessionID, route.subList(i, route.size())) && success;
+			}
+//			success = submitMoreRoutes(sessionID, route.subList(i, route.size())) && success;
 		}
 		
 		return success;
