@@ -317,18 +317,20 @@ public class TRACEStoreService {
 			return generateFailedResponse(4, "Failed to upload track because :"+e.getMessage());
 		} 
 
+		try {
+			sDriver.closeTrackingSession(session);
+		} catch (UnableToPerformOperation e) {
+			LOG.error("Failed to close the session because "+e);
+			return generateFailedResponse(5, "Failed to close the tracking session because "+e.getMessage());
+		}
+		
 
 		Thread thread = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				
-				try {
-					sDriver.closeTrackingSession(session);
-				} catch (UnableToPerformOperation e) {
-					LOG.error("Failed to close the session because "+e);
-					return;
-				}
+				
 
 				boolean success;
 				Location location;
