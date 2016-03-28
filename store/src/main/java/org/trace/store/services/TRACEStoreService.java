@@ -214,7 +214,7 @@ public class TRACEStoreService {
 	private String generateSuccessResponse(String payload){
 		JsonObject response = new JsonObject();
 		response.addProperty("success", true);
-		response.addProperty("token", true); //TODO: isto deveria ser enviado por email.
+		response.addProperty("token", payload); //TODO: isto deveria ser enviado por email.
 		return gson.toJson(response);
 	}
 
