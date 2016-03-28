@@ -1,5 +1,6 @@
 package org.trace.store.services;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,13 +25,18 @@ import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.TRACETrackingDriver;
 import org.trace.store.middleware.drivers.UserDriver;
+import org.trace.store.middleware.drivers.exceptions.EmailAlreadyRegisteredException;
+import org.trace.store.middleware.drivers.exceptions.InvalidEmailException;
+import org.trace.store.middleware.drivers.exceptions.InvalidPasswordException;
+import org.trace.store.middleware.drivers.exceptions.InvalidUsernameException;
 import org.trace.store.middleware.drivers.exceptions.NonMatchingPasswordsException;
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.middleware.drivers.exceptions.UnableToRegisterUserException;
-import org.trace.store.middleware.drivers.exceptions.UserRegistryException;
+import org.trace.store.middleware.drivers.exceptions.UsernameAlreadyRegisteredException;
 import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
+import org.trace.store.middleware.drivers.utils.FormFieldValidator;
 import org.trace.store.services.api.BeaconLocation;
 import org.trace.store.services.api.GeoLocation;
 import org.trace.store.services.api.Location;
@@ -107,15 +113,56 @@ public class TRACEStoreService {
 	@POST
 	@Path("/register")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response registerUser(UserRegistryRequest request){
+	@Produces(MediaType.APPLICATION_JSON)
+	public String registerUser(UserRegistryRequest request){
 
 
 
 		String activationToken;
+		String name, phone, address;
 
 		try {
 
-			activationToken = 
+			((UserDriverImpl)uDriver).validateFields(request.getUsername(), request.getEmail(), request.getPassword(), request.getConfirm());
+
+			name 	= request.getName();
+			phone	= request.getPhone();
+			address	= request.getAddress();
+
+			name 	= name == null ? "" : name;
+			phone 	= phone == null ? "" : phone;
+			address = address == null ? "" :address;
+
+			if(!name.isEmpty() && !FormFieldValidator.isValidName(name))
+				return generateFailedResponse(6, "Invalid name");
+
+			if(!phone.isEmpty() && !FormFieldValidator.isValidPhoneNumber(phone))
+				return generateFailedResponse(7, "Invalid phone number");
+
+			if(!address.isEmpty() && !FormFieldValidator.isValidAddress(address))
+				return generateFailedResponse(8, "Invalid address");
+
+
+		} catch (InvalidEmailException e) {
+			return generateFailedResponse(2, "Invalid email address");
+		} catch (InvalidUsernameException e) {
+			return generateFailedResponse(1, "Invalid username");
+		} catch (InvalidPasswordException e) {
+			return generateFailedResponse(3, "Invalid password");
+		} catch (UsernameAlreadyRegisteredException e) {
+			return generateFailedResponse(4, "Username already registered");
+		} catch (EmailAlreadyRegisteredException e) {
+			return generateFailedResponse(5, "Email address already registered");
+		} catch (NonMatchingPasswordsException e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
+			return generateFailedResponse(5, "Non matching passwords.");
+		} catch (SQLException e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
+			return generateFailedResponse(9, e.getMessage());
+		}
+
+		try{
+			activationToken =	 
 					uDriver.registerUser(
 							request.getUsername(),
 							request.getEmail(),
@@ -126,22 +173,13 @@ public class TRACEStoreService {
 							request.getPhone(),
 							Role.user);
 
-			LOG.info("User '"+request.getUsername()+"' successfully registered.");
-
-			return Response.ok(activationToken).build();
-
-		} catch (UserRegistryException e) {
+			return activationToken;
+		}catch (UnableToRegisterUserException e) {
 			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return Response.ok(e.getMessage()).build();
-		} catch (NonMatchingPasswordsException e) {
+			return generateFailedResponse(10, e.getMessage());
+		}	 catch (UnableToPerformOperation e) {
 			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return Response.ok(e.getMessage()).build();
-		} catch (UnableToRegisterUserException e) {
-			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return Response.ok(e.getMessage()).build();
-		} catch (UnableToPerformOperation e) {
-			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return Response.ok(e.getMessage()).build();
+			return generateFailedResponse(11, e.getMessage());
 		}
 	}
 
@@ -175,6 +213,14 @@ public class TRACEStoreService {
 
 	private String generateFailedResponse(String msg){
 		JsonObject response = new JsonObject();
+		response.addProperty("success", false);
+		response.addProperty("error", msg);
+		return gson.toJson(response);
+	}
+	private String generateFailedResponse(int code, String msg){
+
+		JsonObject response = new JsonObject();
+		response.addProperty("code", code);
 		response.addProperty("success", false);
 		response.addProperty("error", msg);
 		return gson.toJson(response);
@@ -214,23 +260,23 @@ public class TRACEStoreService {
 
 
 	private Map<String, Object> extractLocationAttributes(Location location){
-		
+
 		HashMap<String, Object> map = new HashMap<>();
 		try{
-		
-		JsonObject attributes = (JsonObject) location.getLocationAsJsonObject().get("attributes");
-		
-		
-		for(Entry<String, JsonElement> attribute : attributes.entrySet())
-			map.put(attribute.getKey(), attribute.getValue());
+
+			JsonObject attributes = (JsonObject) location.getLocationAsJsonObject().get("attributes");
+
+
+			for(Entry<String, JsonElement> attribute : attributes.entrySet())
+				map.put(attribute.getKey(), attribute.getValue());
 		}catch(ClassCastException e){
 			LOG.error("Unable to extract the attributes because, "+e.getMessage());
 			return null;
 		}
-		
+
 		return map;
 	}
-	
+
 	/**
 	 * Enables a tracking application to report a traced tracked, as a whole.
 	 *  
@@ -268,7 +314,7 @@ public class TRACEStoreService {
 
 			@Override
 			public void run() {
-				
+
 				boolean success;
 				Location location;
 
@@ -277,9 +323,9 @@ public class TRACEStoreService {
 					location = track.getLocation(i);
 
 					if(location != null){
-					
+
 						Map<String, Object> map = extractLocationAttributes(location);
-						
+
 						if(map != null){
 							success = conn.getTrackingAPI().put(
 									session,
@@ -295,7 +341,7 @@ public class TRACEStoreService {
 									location.getLongitude(),
 									extractLocationAttributes(location));
 						}
-						
+
 						if(!success)
 							LOG.error("Failed to inser location "+location);
 					}
@@ -428,8 +474,8 @@ public class TRACEStoreService {
 	 ************************************************************************
 	 */
 
-	
-	
+
+
 	/**
 	 * Fetches the coordinates sequence that makes up the route associated
 	 * with the provided session identifyer
@@ -441,8 +487,8 @@ public class TRACEStoreService {
 		Gson gson = new Gson();
 		return gson.toJson(mDriver.getRouteBySession(sessionId));
 	}
-	
-	
+
+
 	/**
 	 * Fetches the list of tracking sessions that are associated with the
 	 * specified user.
@@ -459,7 +505,7 @@ public class TRACEStoreService {
 		return gson.toJson(mDriver.getUserSessions(username));
 
 	}
-	
+
 	/**
 	 * Fetches the list of tracking sessions and corresponding dates that are associated with the
 	 * specified user.
@@ -475,7 +521,7 @@ public class TRACEStoreService {
 		Gson gson = new Gson();
 		return gson.toJson(mDriver.getUserSessionsAndDates(username));
 	}
-	
+
 	/**
 	 * Fetches the list of all tracking sessions.
 	 * 

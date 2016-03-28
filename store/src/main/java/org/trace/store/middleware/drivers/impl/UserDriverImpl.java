@@ -61,15 +61,14 @@ public class UserDriverImpl implements UserDriver{
 			String username, String email,
 			String pass1, String pass2,
 			String name, String address, String phone, Role role) 
-					throws UserRegistryException, NonMatchingPasswordsException,
-					UnableToRegisterUserException, UnableToPerformOperation {
+					throws UnableToRegisterUserException, UnableToPerformOperation {
 
 		int userId = -1;
 		boolean success = false;
 		Exception error = null; 
 
 		
-		
+		/*
 		// 1 - Validate the security of the provided fields.
 		try {
 			validateFields(username, email, pass1, pass2);
@@ -90,6 +89,7 @@ public class UserDriverImpl implements UserDriver{
 		} catch (SQLException e1) {
 			throw new UnableToPerformOperation(e1.getMessage());
 		}
+		*/
 
 		// 2 - Secure the password
 		byte[] hashSalt;
@@ -501,7 +501,7 @@ public class UserDriverImpl implements UserDriver{
 		return exists;
 	}
 
-	private void validateFields(String username, String email, String pass1, String pass2) 
+	public void validateFields(String username, String email, String pass1, String pass2) 
 			throws InvalidEmailException, InvalidUsernameException, InvalidPasswordException, UsernameAlreadyRegisteredException, EmailAlreadyRegisteredException, NonMatchingPasswordsException, SQLException{
 
 		if(!FormFieldValidator.isValidEmail(email))
@@ -743,12 +743,6 @@ public class UserDriverImpl implements UserDriver{
 			else
 				System.out.println("SOMETHING IS NOT RIGHT!");
 
-		} catch (UserRegistryException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NonMatchingPasswordsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (UnableToRegisterUserException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
