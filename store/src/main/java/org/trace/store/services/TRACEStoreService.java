@@ -304,26 +304,31 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String put(@PathParam("session") String session, TraceTrack track, @Context SecurityContext context){
 
+		// Step 1 - Validate the session token
 		try {
 			if(!sDriver.trackingSessionExists(session))
-				return generateFailedResponse("Unknown session '"+session+"'.");
+				return generateFailedResponse(1, "Unknown session '"+session+"'.");
+			else if(sDriver.isTrackingSessionClosed(session))
+				return generateFailedResponse(2, "Session had already been closed.");
+		}catch (SessionNotFoundException e) {
+			return generateFailedResponse(3, "Failed to upload track because :"+e.getMessage());
 		} catch (UnableToPerformOperation e) {
 			LOG.error("Failed to upload track with session '"+session+"' because : "+e.getMessage());
-			return generateFailedResponse("Failed to upload track because :"+e.getMessage());
-		}
+			return generateFailedResponse(4, "Failed to upload track because :"+e.getMessage());
+		} 
 
-		try {
-			if(sDriver.isTrackingSessionClosed(session))
-				return generateFailedResponse("Session '"+session+"' is already closed.");
-		} catch (UnableToPerformOperation | SessionNotFoundException e) {
-			LOG.error("Failed to upload track with session '"+session+"' because : "+e.getMessage());
-			return generateFailedResponse("Failed to upload track because :"+e.getMessage());
-		}
 
 		Thread thread = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
+				
+				try {
+					sDriver.closeTrackingSession(session);
+				} catch (UnableToPerformOperation e) {
+					LOG.error("Failed to close the session because "+e);
+					return;
+				}
 
 				boolean success;
 				Location location;
@@ -332,7 +337,6 @@ public class TRACEStoreService {
 				GraphDB conn = GraphDB.getConnection();
 				
 				for(int i = 0; i < track.getTrackSize(); i++){
-//					GraphDB conn = GraphDB.getConnection();
 					location = track.getLocation(i);
 
 					if(location != null){
@@ -347,7 +351,13 @@ public class TRACEStoreService {
 				
 				if(!success){
 					LOG.error("Failed to insert route");
-				}
+					try {
+						sDriver.reopenTrackingSession(session);
+					} catch (UnableToPerformOperation e) {
+						LOG.error(e);
+					}
+				} 
+					
 			}
 		});
 

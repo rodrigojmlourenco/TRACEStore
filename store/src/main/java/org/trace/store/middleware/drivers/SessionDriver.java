@@ -86,4 +86,6 @@ public interface SessionDriver {
 	 */
 	public List<SimpleSession> getAllTrackingSessionsCreatedBefore(Date date) throws UnableToPerformOperation;
 
+	void reopenTrackingSession(String sessionToken) throws UnableToPerformOperation;
+
 }

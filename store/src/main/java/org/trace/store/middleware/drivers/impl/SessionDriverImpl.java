@@ -56,6 +56,24 @@ public class SessionDriverImpl implements SessionDriver{
 		}
 		
 	}
+	
+	@Override
+	public void reopenTrackingSession(String sessionToken) throws UnableToPerformOperation {
+		int modified = 0;
+		try {
+			PreparedStatement stmt = conn.prepareStatement("UPDATE sessions SET IsClosed=0 WHERE Session=?");
+			stmt.setString(1, sessionToken);
+			modified = stmt.executeUpdate();
+			stmt.close();
+			
+			if(modified <= 0)
+				System.err.println("Nothing was modified for session "+sessionToken);
+			
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+		
+	}
 
 	@Override
 	public boolean isTrackingSessionClosed(String sessionToken) throws UnableToPerformOperation, SessionNotFoundException {
