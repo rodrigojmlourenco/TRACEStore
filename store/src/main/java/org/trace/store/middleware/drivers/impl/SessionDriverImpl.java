@@ -52,7 +52,9 @@ public class SessionDriverImpl implements SessionDriver{
 			stmt.close();
 			
 			if(modified <= 0)
-				System.err.println("Nothing was modified for session "+sessionToken);
+				LOG.error("Nothing was modified in session "+sessionToken);
+			else
+				LOG.info(sessionToken +" successfully closed.");
 			
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
