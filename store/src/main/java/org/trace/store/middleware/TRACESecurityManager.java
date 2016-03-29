@@ -316,11 +316,15 @@ public class TRACESecurityManager{
 			
 			if(token == null){
 				//Try again with the Android verifier
+				LOG.error("@validateGoogleAuthToken: First try failed...");
 				token = androidTokenVerifier.verify(idToken);
+				if(token == null) LOG.error("@validateGoogleAuthToken: 2nd too...");
 			}
 			
-			if(token == null || token.getPayload().getEmailVerified())
+			if(token == null || token.getPayload().getEmailVerified()){
+				
 				error = "Unable to verify token or unverifiable email address.";
+			}
 				
 			
 			
