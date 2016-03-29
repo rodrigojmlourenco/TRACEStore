@@ -273,6 +273,7 @@ public class TRACESecurityManager{
 	private final JsonFactory gJsonFactory = new GsonFactory();
 	private final HttpTransport gTransport = new NetHttpTransport();
 	private GoogleIdTokenVerifier gTokenVerifier = null;
+	private GoogleIdTokenVerifier androidTokenVerifier = null;
 	
 	private boolean setupGoogleTokenVerifier(String path){
 		
@@ -282,9 +283,16 @@ public class TRACESecurityManager{
 			
 			gTokenVerifier = 
 					new GoogleIdTokenVerifier.Builder(gTransport, gJsonFactory)
-					//.setAudience(Arrays.asList(gAudience))
-					//.setIssuer("accounts.google.com")
+					.setAudience(Arrays.asList(gAudience))
+					.setIssuer("accounts.google.com")
 					.build();
+			
+			androidTokenVerifier =
+					new GoogleIdTokenVerifier.Builder(gTransport, gJsonFactory)
+					.setAudience(Arrays.asList(gAudience))
+					.setIssuer("https://accounts.google.com")
+					.build();
+					
 			
 			return true;
 		} catch (IOException e) {
@@ -306,51 +314,15 @@ public class TRACESecurityManager{
 			
 			GoogleIdToken token = gTokenVerifier.verify(idToken);
 			
-			if(token != null)
-				if(token.getPayload().getEmailVerified())
-					return token.getPayload();
-				else{
-					LOG.error("@validateGoogleAuthToken : user's email is not verifiable");
-					error = "User's email is not verifiable.";
-			}else{
-				LOG.error("@validateGoogleAuthToken : Unable to verify the token!");
-				
-				GoogleIdToken aux = GoogleIdToken.parse(new GsonFactory(), idToken);
-				
-				GoogleIdTokenVerifier mVerifier = new GoogleIdTokenVerifier(new NetHttpTransport(), new GsonFactory());
-				if(mVerifier.verify(aux)){
-					LOG.error("@validateGoogleAuthToken: Validated !!!! \n"+aux.getPayload().toPrettyString());
-				}else{
-					boolean fails = false;
-					
-					if(!aux.getPayload().getAudience().equals(gAudience)){
-						fails = true;
-						LOG.error("@validateGoogleAuthToken: fails with the audience '"+aux.getPayload().getAudience()+"'");
-					}
-					
-					if(!aux.verifyExpirationTime(System.currentTimeMillis(), 1)){
-						fails = true;
-						LOG.error("@validateGoogleAuthToken: fails because it expired");
-					}
-					
-					if(!aux.verifyIssuer("accounts.google.com")){
-						fails = true;
-						LOG.error("@validateGoogleAuthToken: fails because of the issuer '"+aux.getPayload().getIssuer()+"'");
-					}
-						
-					if(!fails)
-						LOG.error("@validateGoogleAuthToken: didnt fail so far so the key is wrong!!!");
-					
-					
-						
-				}
-					
-				
-				
-				
-				error = "Unable to verify token.";
-				
+			if(token == null){
+				//Try again with the Android verifier
+				token = androidTokenVerifier.verify(idToken);
 			}
+			
+			if(token == null || token.getPayload().getEmailVerified())
+				error = "Unable to verify token or unverifiable email address.";
+				
+			
 			
 		} catch (GeneralSecurityException e) {
 			error = e.getMessage();
