@@ -320,8 +320,31 @@ public class TRACESecurityManager{
 				GoogleIdTokenVerifier mVerifier = new GoogleIdTokenVerifier(new NetHttpTransport(), new GsonFactory());
 				if(mVerifier.verify(aux)){
 					LOG.error("@validateGoogleAuthToken: Validated !!!! \n"+aux.getPayload().toPrettyString());
-				}else
-					LOG.error("@validateGoogleAuthToken: Invalid on both tries\n"+aux.getPayload().toPrettyString());
+				}else{
+					boolean fails = false;
+					
+					if(!aux.getPayload().getAudience().equals(gAudience)){
+						fails = true;
+						LOG.error("@validateGoogleAuthToken: fails with the audience '"+aux.getPayload().getAudience()+"'");
+					}
+					
+					if(!aux.verifyExpirationTime(System.currentTimeMillis(), 1)){
+						fails = true;
+						LOG.error("@validateGoogleAuthToken: fails because it expired");
+					}
+					
+					if(!aux.verifyIssuer("accounts.google.com")){
+						fails = true;
+						LOG.error("@validateGoogleAuthToken: fails because of the issuer '"+aux.getPayload().getIssuer()+"'");
+					}
+						
+					if(!fails)
+						LOG.error("@validateGoogleAuthToken: didnt fail so far so the key is wrong!!!");
+					
+					
+						
+				}
+					
 				
 				
 				
