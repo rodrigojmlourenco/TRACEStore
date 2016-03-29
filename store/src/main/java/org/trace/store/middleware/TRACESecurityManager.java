@@ -283,7 +283,7 @@ public class TRACESecurityManager{
 			gTokenVerifier = 
 					new GoogleIdTokenVerifier.Builder(gTransport, gJsonFactory)
 					.setAudience(Arrays.asList(gAudience))
-					.setIssuer("accounts.google.com")
+					//.setIssuer("accounts.google.com")
 					.build();
 			
 			return true;
