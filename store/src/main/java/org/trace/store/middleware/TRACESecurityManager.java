@@ -316,7 +316,13 @@ public class TRACESecurityManager{
 				LOG.error("@validateGoogleAuthToken : Unable to verify the token!");
 				
 				GoogleIdToken aux = GoogleIdToken.parse(new GsonFactory(), idToken);
-				LOG.error("@validateGoogleAuthToken: "+aux.getPayload().toPrettyString());
+				
+				GoogleIdTokenVerifier mVerifier = new GoogleIdTokenVerifier(new NetHttpTransport(), new GsonFactory());
+				if(mVerifier.verify(aux)){
+					LOG.error("@validateGoogleAuthToken: Validated !!!! \n"+aux.getPayload().toPrettyString());
+				}else
+					LOG.error("@validateGoogleAuthToken: Invalid on both tries");
+				
 				error = "Unable to verify token.";
 				
 			}
