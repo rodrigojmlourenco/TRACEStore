@@ -313,11 +313,11 @@ public class TRACESecurityManager{
 					LOG.error("@validateGoogleAuthToken : user's email is not verifiable");
 					error = "User's email is not verifiable.";
 			}else{
-				LOG.error("@validateGoogleAuthToken : Unable to verify the token {"+idToken+"}");
-				LOG.error(GoogleIdToken.parse(gJsonFactory, idToken).getPayload().toPrettyString());
+				LOG.error("@validateGoogleAuthToken : Unable to verify the token!");
+				
+				GoogleIdToken aux = GoogleIdToken.parse(new GsonFactory(), idToken);
+				LOG.error("@validateGoogleAuthToken: "+aux.getPayload().toPrettyString());
 				error = "Unable to verify token.";
-				
-				
 				
 			}
 			
