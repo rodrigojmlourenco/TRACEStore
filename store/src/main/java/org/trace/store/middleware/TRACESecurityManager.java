@@ -321,7 +321,9 @@ public class TRACESecurityManager{
 				if(mVerifier.verify(aux)){
 					LOG.error("@validateGoogleAuthToken: Validated !!!! \n"+aux.getPayload().toPrettyString());
 				}else
-					LOG.error("@validateGoogleAuthToken: Invalid on both tries");
+					LOG.error("@validateGoogleAuthToken: Invalid on both tries\n"+aux.getPayload().toPrettyString());
+				
+				
 				
 				error = "Unable to verify token.";
 				
