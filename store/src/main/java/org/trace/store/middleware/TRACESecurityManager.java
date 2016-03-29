@@ -306,10 +306,13 @@ public class TRACESecurityManager{
 			
 			GoogleIdToken token = gTokenVerifier.verify(idToken);
 			
-			if(token != null && token.getPayload().getEmailVerified()){
-				return token.getPayload();
-			}else{
-				error = "Token is not valid or the user's email is not verifiable.";
+			if(token != null)
+				if(token.getPayload().getEmailVerified())
+					return token.getPayload();
+				else
+					error = "User's email is not verifiable.";
+			else{
+				error = "Unable to verify token.";
 			}
 			
 		} catch (GeneralSecurityException e) {
