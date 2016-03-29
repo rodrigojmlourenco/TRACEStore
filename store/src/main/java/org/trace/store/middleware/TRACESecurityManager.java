@@ -309,10 +309,14 @@ public class TRACESecurityManager{
 			if(token != null)
 				if(token.getPayload().getEmailVerified())
 					return token.getPayload();
-				else
+				else{
+					LOG.error("@validateGoogleAuthToken : user's email is not verifiable");
 					error = "User's email is not verifiable.";
-			else{
+			}else{
+				LOG.error("@validateGoogleAuthToken : Unable to verify the token {"+idToken+"}");
 				error = "Unable to verify token.";
+				
+				
 			}
 			
 		} catch (GeneralSecurityException e) {
