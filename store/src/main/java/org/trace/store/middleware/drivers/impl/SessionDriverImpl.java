@@ -163,7 +163,7 @@ public class SessionDriverImpl implements SessionDriver{
 		List<SimpleSession> sessions = new ArrayList<>();
 		
 		try {
-			stmt = conn.prepareStatement("SELECT Session, CreatedAt FROM sessions WHERE UserId=? AND IsClosed=1 ORDER BY CreatedAt");
+			stmt = conn.prepareStatement("SELECT Session, CreatedAt FROM sessions WHERE UserId=? AND IsClosed=1 ORDER BY CreatedAt DESC");
 			stmt.setInt(1, userId);
 			ResultSet result = stmt.executeQuery();
 			
