@@ -994,6 +994,9 @@ public class DBTrackingAPI extends DBAPI{
 
 		//Get the ID of the last vertex
 		queryString += "finishID = E0.clone().next().id();";
+		
+		//Get the session Vertex
+		queryString += "SessionVertex = g.V().hasLabel('session').has('sessionID', sessionID).next();";
 
 		//Get the Vertex of the last location of the session
 		queryString += "S = E0.clone().outV().next();";
@@ -1054,28 +1057,24 @@ public class DBTrackingAPI extends DBAPI{
 		}
 
 		//		//Complete the cycle and close the route with the "finish" edge
-		queryString += "g.V(C"+(route.size()-1)+").next().addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
+		queryString += "g.V(C"+(route.size()-1)+").next().addEdge('session', SessionVertex, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
 
-		//		queryString += "finishID;";
-
+//		queryString += "finishID;";
+		
 		//Drop the session "finish" edge
 		queryString += "g.E(finishID).drop();";
 
-		LOG.info("submitMoreRoutes: route length:" + route.size());
-		LOG.info("submitMoreRoutes: queryString has a length of:" + queryString.length());
-
 		results = query(queryString,params);
-
-		LOG.info("!results.isEmpty(): " + !results.isEmpty());
-		//		
-		//		params.clear();
-		//		if(!results.isEmpty()){
-		//			LOG.info("finishID: " + results.get(0).getString());
-		//			params.put("finishID", results.get(0).getString());
-		//
-		//			queryString = "g.E(finishID).drop()";
-		//			results = query(queryString,params);
-		//		}
+//		System.out.println("+++++++"+results.get(0).getString());
+		
+//		params.clear();
+//		if(results != null && !results.isEmpty()){
+//			LOG.info("finishID: " + results.get(0).getString());
+//			params.put("finishID", results.get(0).getString());
+//
+//			queryString = "g.E(finishID).drop();";
+//			results = query(queryString,params);
+//		}
 
 		return results!=null;
 	}
