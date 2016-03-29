@@ -314,7 +314,9 @@ public class TRACESecurityManager{
 					error = "User's email is not verifiable.";
 			}else{
 				LOG.error("@validateGoogleAuthToken : Unable to verify the token {"+idToken+"}");
+				LOG.error(GoogleIdToken.parse(gJsonFactory, idToken).getPayload().toPrettyString());
 				error = "Unable to verify token.";
+				
 				
 				
 			}
