@@ -1,5 +1,7 @@
 package org.trace.store.services;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -20,7 +22,9 @@ import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.UserRegistryRequest;
 
+import com.google.api.client.googleapis.notifications.json.gson.GsonNotificationCallback;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 
 /**
  * Local  businesses,  for  instance  shop  owners,  may  leverage  TRACE
@@ -120,10 +124,17 @@ public class RewardSetterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String usersWithDistance(@PathParam("distance") double distance){
 		Gson gson = new Gson();
+		JsonArray jArray = new JsonArray();
 		try {
-			return gson.toJson(rDriver.getUsersWithDistance(distance));
+			List<String> users = rDriver.getUsersWithDistance(distance);
+			
+			for(String s : users){
+				jArray.add(s);
+			}
+			
+			return gson.toJson(jArray);
 		} catch (UnableToPerformOperation e) {
-			throw new UnsupportedOperationException();
+			return e.getMessage();
 		}
 	}
 }

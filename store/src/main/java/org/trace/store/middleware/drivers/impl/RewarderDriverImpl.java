@@ -38,8 +38,7 @@ public class RewarderDriverImpl implements RewarderDriver{
 			stmt = conn.prepareStatement("SELECT a.UserId FROM (SELECT UserId, sum(distance) AS TotalDistance FROM sessions GROUP BY UserId) AS a WHERE a.TotalDistance >= ?;");
 			stmt.setDouble(1, distance);
 			ResultSet result = stmt.executeQuery();
-			
-			String userId;
+
 			while(result.next()){
 				userIDs.add(result.getString(1));
 			}
