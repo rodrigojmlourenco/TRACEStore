@@ -88,4 +88,6 @@ public interface SessionDriver {
 
 	void reopenTrackingSession(String sessionToken) throws UnableToPerformOperation;
 
+	void updateSessionDistance(String sessionToken, double distance) throws UnableToPerformOperation;
+
 }

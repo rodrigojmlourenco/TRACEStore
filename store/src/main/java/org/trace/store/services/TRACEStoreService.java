@@ -332,7 +332,7 @@ public class TRACEStoreService {
 				
 				
 
-				boolean success;
+				double success;
 				Location location;
 				TraceVertex v;
 				List<TraceVertex> route = new ArrayList<>();
@@ -351,7 +351,7 @@ public class TRACEStoreService {
 				}
 				success = conn.getTrackingAPI().submitRoute(session, route);
 				
-				if(!success){
+				if(success == -1){
 					LOG.error("Failed to insert route");
 					try {
 						sDriver.reopenTrackingSession(session);
@@ -359,8 +359,15 @@ public class TRACEStoreService {
 					} catch (UnableToPerformOperation e) {
 						LOG.error(e);
 					}
-				} 
-					
+				}else{
+					try {
+						sDriver.updateSessionDistance(session, success);
+						LOG.info("Session {"+session+"} had its total distance updated.");
+					} catch (UnableToPerformOperation e) {
+						LOG.error("Failed to submit route "+e);
+//						return generateFailedResponse(5, "Failed to close the tracking session because "+e.getMessage());
+					}
+				}
 			}
 		});
 

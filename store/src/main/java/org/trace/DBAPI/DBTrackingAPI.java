@@ -801,7 +801,7 @@ public class DBTrackingAPI extends DBAPI{
 		return ((results != null) && results.get(0).getBoolean());
 	}
 
-	public boolean submitRoute(String sessionID, List<TraceVertex> submittedRoute){
+	public double submitRoute(String sessionID, List<TraceVertex> submittedRoute){
 		boolean success = true;
 
 		//Route parsing so that there are no two subsequent points being added with the same coords.
@@ -812,7 +812,7 @@ public class DBTrackingAPI extends DBAPI{
 
 		if(!sessionIsEmpty(sessionID)){
 			LOG.error("submitRoute: session is not empty!");
-			return false;
+			return -1;
 		}
 
 		Double totalDistance = TraceLocationMethods.routeTotalDistance(route);
@@ -839,8 +839,12 @@ public class DBTrackingAPI extends DBAPI{
 			}
 			//			success = submitMoreRoutes(sessionID, route.subList(i, route.size())) && success;
 		}
-
-		return success;
+		
+		if(success){
+			return totalDistance;
+		}else{
+			return -1;
+		}
 	}
 
 	private boolean submitFirstRoute(String sessionID, List<TraceVertex> route, double totalDistance){

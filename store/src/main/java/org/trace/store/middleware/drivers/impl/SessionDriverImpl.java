@@ -59,7 +59,27 @@ public class SessionDriverImpl implements SessionDriver{
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
-		
+	}
+	
+	@Override
+	public void updateSessionDistance(String sessionToken, double distance) throws UnableToPerformOperation {
+		int modified = 0;
+		try {
+			PreparedStatement stmt = conn.prepareStatement("UPDATE sessions SET Distance=? WHERE Session=?");
+			stmt.setDouble(1, distance);
+			stmt.setString(2, sessionToken);
+
+			modified = stmt.executeUpdate();
+			stmt.close();
+			
+			if(modified <= 0)
+				LOG.error("Nothing was modified in session "+sessionToken);
+			else
+				LOG.info(sessionToken +" successfully closed.");
+			
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
 	}
 	
 	@Override
