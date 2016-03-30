@@ -130,6 +130,7 @@ public class RewardSetterService {
 			
 			for(String s : users){
 				jArray.add(s);
+				System.out.println(s);
 			}
 			
 			return gson.toJson(jArray);
