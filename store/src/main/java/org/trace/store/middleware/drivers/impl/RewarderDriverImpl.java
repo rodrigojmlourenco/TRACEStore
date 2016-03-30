@@ -40,7 +40,7 @@ public class RewarderDriverImpl implements RewarderDriver{
 			ResultSet result = stmt.executeQuery();
 
 			while(result.next()){
-				userIDs.add(result.getString(1));
+				userIDs.add("" + result.getInt(1));
 			}
 			stmt.close();
 			return userIDs;
