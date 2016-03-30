@@ -1,16 +1,26 @@
 package org.trace.store.services;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.trace.store.filters.Role;
 import org.trace.store.filters.Secured;
+import org.trace.store.middleware.drivers.RewarderDriver;
+import org.trace.store.middleware.drivers.UserDriver;
+import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.middleware.drivers.impl.RewarderDriverImpl;
+import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.UserRegistryRequest;
+
+import com.google.gson.Gson;
 
 /**
  * Local  businesses,  for  instance  shop  owners,  may  leverage  TRACE
@@ -23,8 +33,9 @@ import org.trace.store.services.api.UserRegistryRequest;
  */
 @Path("/reward")
 public class RewardSetterService {
-
 	
+	private RewarderDriver rDriver = RewarderDriverImpl.getDriver();
+
 	/*
 	 ************************************************************************
 	 ************************************************************************
@@ -99,5 +110,20 @@ public class RewardSetterService {
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response setBaseLocation(RewardingPolicy policy){
 		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * Fetches all the users that have traveled X or more Kms
+	 */
+	@GET
+	@Path("/usersWithDistance/{distance}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String usersWithDistance(@PathParam("distance") double distance){
+		Gson gson = new Gson();
+		try {
+			return gson.toJson(rDriver.getUsersWithDistance(distance));
+		} catch (UnableToPerformOperation e) {
+			throw new UnsupportedOperationException();
+		}
 	}
 }
