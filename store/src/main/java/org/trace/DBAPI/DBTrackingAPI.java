@@ -810,9 +810,11 @@ public class DBTrackingAPI extends DBAPI{
 		LOG.info("submitRoute: submittedRoute:" + submittedRoute.size());
 		LOG.info("submitRoute: route:" + route.size());
 
+		//TODO remove the "removeSession()" and uncomment the rest after DEBUG PHASE is completed
 		if(!sessionIsEmpty(sessionID)){
-			LOG.error("submitRoute: session is not empty!");
-			return -1;
+			removeSession(sessionID);
+//			LOG.error("submitRoute: session is not empty!");
+//			return -1;
 		}
 
 		Double totalDistance = TraceLocationMethods.routeTotalDistance(route);
