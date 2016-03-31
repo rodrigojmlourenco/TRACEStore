@@ -215,6 +215,8 @@ public class RewardSetterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getRegisteredRewards(@Context SecurityContext context){
 		
+		LOG.info("@getRegisteredRewards: User ");
+		
 		int ownerId;
 		String user = context.getUserPrincipal().getName();
 		
