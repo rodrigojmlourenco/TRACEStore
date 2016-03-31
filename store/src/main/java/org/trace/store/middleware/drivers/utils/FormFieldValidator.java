@@ -30,7 +30,7 @@ public class FormFieldValidator {
 	
 	private final static Pattern NAME_VALIDATOR  		= Pattern.compile("^[a-zA-Z çãõéáâ]{3,64}$");
 	private final static Pattern USERNAME_VALIDATOR  	= Pattern.compile("^[a-zA-Z0-9_]{5,15}$");
-	private final static Pattern ADDRESS_VALIDATOR		= Pattern.compile("^[a-zA-Z0-9,ºª]{5,254}$");
+	private final static Pattern ADDRESS_VALIDATOR		= Pattern.compile("^[a-zA-Z0-9, ºª]{5,254}$");
 	private final static Pattern PHONE_VALIDATOR		= Pattern.compile("^([+]?[0-9]{1,3})?[0-9]{9,15}$");
 	
 	private final static Pattern SUBJECT_VALIDATOR  	= Pattern.compile("^[a-zA-Z0-9_]{5,25}$");
@@ -99,5 +99,9 @@ public class FormFieldValidator {
 	public static boolean isValidName(String name) {
 		Matcher m = NAME_VALIDATOR.matcher(name);
 		return m.matches();
+	}
+	
+	public static void main(String[] args){
+		System.out.println(isValidAddress("Pastelaria Rialva, Rua ALVES Redol"));
 	}
 }
