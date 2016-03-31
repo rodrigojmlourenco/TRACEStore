@@ -226,6 +226,8 @@ public class RewardSetterService {
 			if(!hasRewarderRole(user))
 				return generateFailedResponse(1, "The user is not a rewarder");
 			
+			LOG.info("@getRegisteredRewards: Rewarder<"+user+">");
+			
 			List<SimpleReward> rewards = rDriver.getAllOwnerRewards(ownerId);
 			
 			Gson gson = new Gson();
