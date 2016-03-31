@@ -35,10 +35,8 @@ import org.trace.store.middleware.drivers.utils.FormFieldValidator;
 import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.UserRegistryRequest;
 import org.trace.store.services.api.data.DistanceBasedRewardRequest;
-import org.trace.store.services.api.data.RewardRequest;
 import org.trace.store.services.api.data.SimpleReward;
 
-import com.google.api.client.googleapis.notifications.json.gson.GsonNotificationCallback;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -215,7 +213,7 @@ public class RewardSetterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getRegisteredRewards(@Context SecurityContext context){
 		
-		LOG.info("@getRegisteredRewards: User ");
+		
 		
 		int ownerId;
 		String user = context.getUserPrincipal().getName();
@@ -223,10 +221,12 @@ public class RewardSetterService {
 		try {
 			ownerId = uDriver.getUserID(user);
 			
+			LOG.info("@getRegisteredRewards: Rewarder<"+user+">?");
+			
 			if(!hasRewarderRole(user))
 				return generateFailedResponse(1, "The user is not a rewarder");
 			
-			LOG.info("@getRegisteredRewards: Rewarder<"+user+">");
+			
 			
 			List<SimpleReward> rewards = rDriver.getAllOwnerRewards(ownerId);
 			
