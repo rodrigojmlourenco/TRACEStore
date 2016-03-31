@@ -16,6 +16,8 @@ import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 
+import com.google.gson.JsonObject;
+
 public class RewarderDriverImpl implements RewarderDriver{
 
 	private Logger LOG = Logger.getLogger(RewarderDriverImpl.class);
@@ -47,6 +49,37 @@ public class RewarderDriverImpl implements RewarderDriver{
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
+	}
+
+	private String createDistanceCondition(double distance){
+		JsonObject condition = new JsonObject();
+		condition.addProperty("distance", distance);
+		return condition.toString();
+		
+	}
+	
+	@Override
+	public boolean registerDistanceBasedReward(int userId, double distance, String reward) throws UnableToPerformOperation {
+		
+		PreparedStatement stmt;
+		
+		try{
+			stmt = conn.prepareStatement("INSERT INTO rewards (OwnerId, Conditions, Reward) VALUES (?,?,?)");
+			
+			stmt.setInt(1, userId);
+			stmt.setString(2, createDistanceCondition(distance));
+			stmt.setString(3, reward);
+			
+			ResultSet set = stmt.executeQuery();
+			stmt.close();
+			
+			return true;
+			
+		}catch(SQLException e){
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+		
+		
 	}
 
 //	@Override

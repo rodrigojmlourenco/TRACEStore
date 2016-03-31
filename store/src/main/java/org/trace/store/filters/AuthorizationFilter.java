@@ -16,6 +16,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import org.trace.store.middleware.drivers.UserDriver;
+import org.trace.store.middleware.drivers.impl.UserDriverImpl;
+
 /**
  * This filter may be employed to restrict access to resources given the roles
  * of authenticated users.
@@ -29,6 +32,8 @@ import javax.ws.rs.ext.Provider;
 @Priority(Priorities.AUTHORIZATION)
 public class AuthorizationFilter implements ContainerRequestFilter{
 
+	private UserDriver uDriver = UserDriverImpl.getDriver();
+	
 	@Context
 	private ResourceInfo resourceInfo;
 	
@@ -77,9 +82,7 @@ public class AuthorizationFilter implements ContainerRequestFilter{
     }
 
     private void checkPermissions(List<Role> allowedRoles) throws Exception {
-        // Check if the user contains one of the allowed roles
-        // Throw an Exception if the user has not permission to execute the method
-    	//TODO
+        //TODO: COMO OBTER O USERNAME ?
     }
 
 }

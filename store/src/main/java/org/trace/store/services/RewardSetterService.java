@@ -10,8 +10,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.apache.log4j.Logger;
 import org.trace.store.filters.Role;
@@ -25,12 +27,15 @@ import org.trace.store.middleware.drivers.exceptions.InvalidUsernameException;
 import org.trace.store.middleware.drivers.exceptions.NonMatchingPasswordsException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.middleware.drivers.exceptions.UnableToRegisterUserException;
+import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
 import org.trace.store.middleware.drivers.exceptions.UsernameAlreadyRegisteredException;
 import org.trace.store.middleware.drivers.impl.RewarderDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.drivers.utils.FormFieldValidator;
 import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.UserRegistryRequest;
+import org.trace.store.services.api.data.DistanceBasedRewardRequest;
+import org.trace.store.services.api.data.RewardRequest;
 
 import com.google.api.client.googleapis.notifications.json.gson.GsonNotificationCallback;
 import com.google.gson.Gson;
@@ -164,7 +169,36 @@ public class RewardSetterService {
 			return generateFailedResponse(11, e.getMessage());
 		}
 	}
-	
+
+	@POST
+	@Path("/set/reward")
+	@Secured(Role.rewarder)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String registerReward(DistanceBasedRewardRequest request, @Context SecurityContext context){
+		
+		String user = context.getUserPrincipal().getName();
+		
+		try {
+			int ownerId = uDriver.getUserID(user);
+			
+			List<Role> roles = uDriver.getUserRoles(user);
+			
+			if(!roles.contains(Role.rewarder))
+				return generateFailedResponse(1, "The user is not a rewarder");
+			
+			rDriver.registerDistanceBasedReward(ownerId, request.getTravelledDistance(), request.getReward());
+			
+			return generateSuccessResponse("");
+			
+		} catch (UnknownUserException e){
+			return generateFailedResponse(2, e.getMessage());
+		}catch (UnableToPerformOperation e) {
+			return generateFailedResponse(3, e.getMessage());
+		}
+		
+		
+	}
 	/*
 	 ************************************************************************
 	 ************************************************************************

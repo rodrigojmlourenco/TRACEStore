@@ -16,4 +16,6 @@ public interface RewarderDriver {
 	 * @throws UnableToPerformOperation
 	 */
 	public List<String> getUsersWithDistance(double distance) throws UnableToPerformOperation;
+	
+	public boolean registerDistanceBasedReward(int ownerId, double distance, String reward) throws UnableToPerformOperation;
 }
