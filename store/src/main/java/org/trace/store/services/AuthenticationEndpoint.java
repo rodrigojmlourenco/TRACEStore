@@ -302,24 +302,25 @@ public class AuthenticationEndpoint {
 	}
 	
 	@GET
-	@Path("/roles/{username}")
+	@Secured
+	@Path("/roles")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getUserRoles(@PathParam("username") String username){
+	public String getUserRoles(@Context SecurityContext context){
+		
+		
 		Gson gson = new Gson();
 		JsonArray roles = new JsonArray();
+		String user = context.getUserPrincipal().getName();
 		
 		try {
-			List<Role> rolesAsList = userDriver.getUserRoles(username);
+			List<Role> rolesAsList = userDriver.getUserRoles(user);
 			for(Role r : rolesAsList)
 				roles.add(r.toString());
 			
 			return gson.toJson(roles);
 			
 		} catch (UnableToPerformOperation | UnknownUserException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return generateError(1, e.getMessage());
 		}
-		
-		return "{success: false}";
 	}
 }
