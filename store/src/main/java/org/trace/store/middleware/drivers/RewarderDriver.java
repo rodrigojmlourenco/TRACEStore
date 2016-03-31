@@ -1,11 +1,9 @@
 package org.trace.store.middleware.drivers;
 
-import java.util.Date;
 import java.util.List;
 
-import org.trace.DBAPI.data.SimpleSession;
-import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.services.api.data.SimpleReward;
 
 public interface RewarderDriver {
 	
@@ -18,4 +16,6 @@ public interface RewarderDriver {
 	public List<String> getUsersWithDistance(double distance) throws UnableToPerformOperation;
 	
 	public boolean registerDistanceBasedReward(int ownerId, double distance, String reward) throws UnableToPerformOperation;
+
+	public List<SimpleReward> getAllOwnerRewards(int ownerId) throws UnableToPerformOperation;
 }

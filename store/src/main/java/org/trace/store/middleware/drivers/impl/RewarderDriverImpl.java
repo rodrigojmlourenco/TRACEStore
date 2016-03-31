@@ -15,6 +15,7 @@ import org.trace.store.middleware.drivers.RewarderDriver;
 import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.services.api.data.SimpleReward;
 
 import com.google.gson.JsonObject;
 
@@ -80,6 +81,27 @@ public class RewarderDriverImpl implements RewarderDriver{
 		}
 		
 		
+	}
+
+	@Override
+	public List<SimpleReward> getAllOwnerRewards(int ownerId) throws UnableToPerformOperation {
+		PreparedStatement stmt;
+		List<SimpleReward> rewards = new ArrayList<>();
+		try {
+			stmt = conn.prepareStatement("SELECT Id, Reward FROM rewards WHERE OwnerId=?");
+			stmt.setInt(1, ownerId);
+			ResultSet result = stmt.executeQuery();
+
+			while(result.next()){
+				int id = result.getInt(1);
+				String reward = result.getString(2);
+				rewards.add(new SimpleReward(id, reward));
+			}
+			stmt.close();
+			return rewards;
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
 	}
 
 //	@Override

@@ -36,6 +36,7 @@ import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.UserRegistryRequest;
 import org.trace.store.services.api.data.DistanceBasedRewardRequest;
 import org.trace.store.services.api.data.RewardRequest;
+import org.trace.store.services.api.data.SimpleReward;
 
 import com.google.api.client.googleapis.notifications.json.gson.GsonNotificationCallback;
 import com.google.gson.Gson;
@@ -169,6 +170,19 @@ public class RewardSetterService {
 			return generateFailedResponse(11, e.getMessage());
 		}
 	}
+	
+	private boolean hasRewarderRole(String identifier){
+		List<Role> roles;
+		try {
+			roles = uDriver.getUserRoles(identifier);
+			return !roles.contains(Role.rewarder);
+		} catch (UnableToPerformOperation | UnknownUserException e) {
+			return false;
+		}
+		
+		
+			
+	}
 
 	@POST
 	@Path("/set/reward")
@@ -182,9 +196,7 @@ public class RewardSetterService {
 		try {
 			int ownerId = uDriver.getUserID(user);
 			
-			List<Role> roles = uDriver.getUserRoles(user);
-			
-			if(!roles.contains(Role.rewarder))
+			if(!hasRewarderRole(user))
 				return generateFailedResponse(1, "The user is not a rewarder");
 			
 			rDriver.registerDistanceBasedReward(ownerId, request.getTravelledDistance(), request.getReward());
@@ -196,9 +208,39 @@ public class RewardSetterService {
 		}catch (UnableToPerformOperation e) {
 			return generateFailedResponse(3, e.getMessage());
 		}
-		
-		
 	}
+	
+	@GET
+	@Path("/get/rewards")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getRegisteredRewards(@Context SecurityContext context){
+		
+		int ownerId;
+		String user = context.getUserPrincipal().getName();
+		
+		try {
+			ownerId = uDriver.getUserID(user);
+			
+			if(!hasRewarderRole(user))
+				return generateFailedResponse(1, "The user is not a rewarder");
+			
+			List<SimpleReward> rewards = rDriver.getAllOwnerRewards(ownerId);
+			
+			Gson gson = new Gson();
+			JsonArray payload = new JsonArray();
+			for(SimpleReward r : rewards){
+				payload.add(r.toJson());
+			}
+			
+			return generateSuccessResponse(gson.toJson(payload));
+			
+		} catch (UnknownUserException e){
+			return generateFailedResponse(2, e.getMessage());
+		}catch( UnableToPerformOperation e) {
+			return generateFailedResponse(3, e.getMessage());
+		}
+	}
+	
 	/*
 	 ************************************************************************
 	 ************************************************************************
