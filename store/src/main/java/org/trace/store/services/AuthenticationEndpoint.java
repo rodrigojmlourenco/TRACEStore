@@ -1,10 +1,13 @@
 package org.trace.store.services;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -12,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.log4j.Logger;
+import org.trace.store.filters.Role;
 import org.trace.store.filters.Secured;
 import org.trace.store.middleware.TRACESecurityManager;
 import org.trace.store.middleware.TRACESecurityManager.TokenType;
@@ -31,6 +35,7 @@ import org.trace.store.middleware.drivers.utils.SecurityUtils;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 @Path("/auth")
@@ -294,5 +299,27 @@ public class AuthenticationEndpoint {
 		} catch (SessionNotFoundException e) {
 			return generateError(3, e.getMessage());
 		}
+	}
+	
+	@GET
+	@Path("/roles/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getUserRoles(@PathParam("username") String username){
+		Gson gson = new Gson();
+		JsonArray roles = new JsonArray();
+		
+		try {
+			List<Role> rolesAsList = userDriver.getUserRoles(username);
+			for(Role r : rolesAsList)
+				roles.add(r.toString());
+			
+			return gson.toJson(roles);
+			
+		} catch (UnableToPerformOperation | UnknownUserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return "{success: false}";
 	}
 }

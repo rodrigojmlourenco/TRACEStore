@@ -1,6 +1,9 @@
 package org.trace.store.middleware.drivers;
 
 
+import java.sql.SQLException;
+import java.util.List;
+
 import org.trace.store.filters.Role;
 import org.trace.store.middleware.drivers.exceptions.EmailAlreadyRegisteredException;
 import org.trace.store.middleware.drivers.exceptions.ExpiredTokenException;
@@ -131,5 +134,7 @@ public interface UserDriver {
 	 * @return True if the privacy policies were successfully added, false otherwise.
 	 */
 	public boolean setPrivacyPolicies(String identifier, PrivacyPolicies policies);
+
+	public List<Role> getUserRoles(String identifier) throws UnableToPerformOperation, UnknownUserException;
 	
 }

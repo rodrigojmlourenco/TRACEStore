@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
@@ -684,6 +686,47 @@ public class UserDriverImpl implements UserDriver{
 		statement.close();
 		return result;
 	}
+	
+	@Override
+	public List<Role> getUserRoles(String identifier) throws UnableToPerformOperation, UnknownUserException{
+	
+		int id = getUserID(identifier);
+		
+		try {
+			PreparedStatement statement = 
+					conn.prepareStatement("SELECT User, Rewarder, UrbanPlanner, Admin "
+											+ "FROM user_roles "
+											+ "WHERE Id = ?");
+			
+			statement.setInt(1, id);
+			ResultSet set = statement.executeQuery();
+			
+			List<Role> roles = new ArrayList<>();
+			boolean isUser, isRewarder, isUrbanPlanner, isAdmin;
+			if(set.next()){
+				
+				isUser = set.getInt(1) == 1;
+				isRewarder =  set.getInt(2) == 1;
+				isUrbanPlanner = set.getInt(3) == 1;
+				isAdmin = set.getInt(3) == 1;
+				
+				if(isUser) roles.add(Role.user);
+				if(isRewarder) roles.add(Role.rewarder);
+				if(isUrbanPlanner) roles.add(Role.planner);
+				if(isAdmin) roles.add(Role.admin);
+			}
+			
+			
+			
+			statement.close();			
+			
+			return roles;
+			
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
+	
 
 	/*
 	 **************************************************************************
