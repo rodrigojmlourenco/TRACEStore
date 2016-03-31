@@ -173,7 +173,7 @@ public class RewardSetterService {
 		List<Role> roles;
 		try {
 			roles = uDriver.getUserRoles(identifier);
-			return !roles.contains(Role.rewarder);
+			return roles.contains(Role.rewarder);
 		} catch (UnableToPerformOperation | UnknownUserException e) {
 			return false;
 		}
@@ -194,8 +194,10 @@ public class RewardSetterService {
 		try {
 			int ownerId = uDriver.getUserID(user);
 			
-			if(!hasRewarderRole(user))
+			if(!hasRewarderRole(user)){
+				LOG.error(user+" is not a rewarder");
 				return generateFailedResponse(1, "The user is not a rewarder");
+			}
 			
 			rDriver.registerDistanceBasedReward(ownerId, request.getTravelledDistance(), request.getReward());
 			
@@ -223,14 +225,12 @@ public class RewardSetterService {
 		
 		try {
 			ownerId = uDriver.getUserID(user);
-			
-			
-			
-			if(!hasRewarderRole(user))
+						
+			if(!hasRewarderRole(user)){
+				LOG.error(user+" is not a rewarder");
 				return generateFailedResponse(1, "The user is not a rewarder");
-			
-			
-			
+			}
+						
 			List<SimpleReward> rewards = rDriver.getAllOwnerRewards(ownerId);
 			
 			Gson gson = new Gson();
