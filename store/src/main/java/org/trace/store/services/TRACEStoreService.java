@@ -63,7 +63,6 @@ import com.google.gson.JsonObject;
 public class TRACEStoreService {
 
 	private final String LOG_TAG = "TRACEStoreService"; 
-
 	private final Logger LOG = Logger.getLogger(TRACEStoreService.class); 
 
 	private UserDriver uDriver = UserDriverImpl.getDriver();
@@ -118,8 +117,6 @@ public class TRACEStoreService {
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	@Produces(MediaType.APPLICATION_JSON)
 	public String registerUser(UserRegistryRequest request){
-
-
 
 		String activationToken;
 		String name, phone, address;

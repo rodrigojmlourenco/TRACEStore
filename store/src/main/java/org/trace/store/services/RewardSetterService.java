@@ -1,5 +1,6 @@
 package org.trace.store.services;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -12,19 +13,29 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.trace.store.filters.Role;
 import org.trace.store.filters.Secured;
 import org.trace.store.middleware.drivers.RewarderDriver;
 import org.trace.store.middleware.drivers.UserDriver;
+import org.trace.store.middleware.drivers.exceptions.EmailAlreadyRegisteredException;
+import org.trace.store.middleware.drivers.exceptions.InvalidEmailException;
+import org.trace.store.middleware.drivers.exceptions.InvalidPasswordException;
+import org.trace.store.middleware.drivers.exceptions.InvalidUsernameException;
+import org.trace.store.middleware.drivers.exceptions.NonMatchingPasswordsException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.middleware.drivers.exceptions.UnableToRegisterUserException;
+import org.trace.store.middleware.drivers.exceptions.UsernameAlreadyRegisteredException;
 import org.trace.store.middleware.drivers.impl.RewarderDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
+import org.trace.store.middleware.drivers.utils.FormFieldValidator;
 import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.UserRegistryRequest;
 
 import com.google.api.client.googleapis.notifications.json.gson.GsonNotificationCallback;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 /**
  * Local  businesses,  for  instance  shop  owners,  may  leverage  TRACE
@@ -39,7 +50,35 @@ import com.google.gson.JsonArray;
 public class RewardSetterService {
 	
 	private RewarderDriver rDriver = RewarderDriverImpl.getDriver();
+	private UserDriver uDriver = UserDriverImpl.getDriver();
 
+	private final String LOG_TAG = "TRACEStoreService"; 
+	private final Logger LOG = Logger.getLogger(TRACEStoreService.class);
+	
+	private Gson gson = new Gson();
+	
+	private String generateSuccessResponse(String payload){
+		JsonObject response = new JsonObject();
+		response.addProperty("success", true);
+		response.addProperty("token", payload); //TODO: isto deveria ser enviado por email.
+		return gson.toJson(response);
+	}
+
+	private String generateFailedResponse(String msg){
+		JsonObject response = new JsonObject();
+		response.addProperty("success", false);
+		response.addProperty("error", msg);
+		return gson.toJson(response);
+	}
+	private String generateFailedResponse(int code, String msg){
+
+		JsonObject response = new JsonObject();
+		response.addProperty("code", code);
+		response.addProperty("success", false);
+		response.addProperty("error", msg);
+		return gson.toJson(response);
+	}
+	
 	/*
 	 ************************************************************************
 	 ************************************************************************
@@ -59,8 +98,71 @@ public class RewardSetterService {
 	@POST
 	@Path("/register")
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response registerRewarder(UserRegistryRequest request){
-		throw new UnsupportedOperationException();
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+	public String registerRewarder(UserRegistryRequest request){
+		String activationToken;
+		String name, phone, address;
+
+		try {
+
+			((UserDriverImpl)uDriver).validateFields(request.getUsername(), request.getEmail(), request.getPassword(), request.getConfirm());
+
+			name 	= request.getName();
+			phone	= request.getPhone();
+			address	= request.getAddress();
+
+			name 	= name == null ? "" : name;
+			phone 	= phone == null ? "" : phone;
+			address = address == null ? "" :address;
+
+			if(!name.isEmpty() && !FormFieldValidator.isValidName(name))
+				return generateFailedResponse(6, "Invalid name");
+
+			if(!phone.isEmpty() && !FormFieldValidator.isValidPhoneNumber(phone))
+				return generateFailedResponse(7, "Invalid phone number");
+
+			if(!address.isEmpty() && !FormFieldValidator.isValidAddress(address))
+				return generateFailedResponse(8, "Invalid address");
+
+
+		} catch (InvalidEmailException e) {
+			return generateFailedResponse(2, "Invalid email address");
+		} catch (InvalidUsernameException e) {
+			return generateFailedResponse(1, "Invalid username");
+		} catch (InvalidPasswordException e) {
+			return generateFailedResponse(3, "Invalid password");
+		} catch (UsernameAlreadyRegisteredException e) {
+			return generateFailedResponse(4, "Username already registered");
+		} catch (EmailAlreadyRegisteredException e) {
+			return generateFailedResponse(5, "Email address already registered");
+		} catch (NonMatchingPasswordsException e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
+			return generateFailedResponse(5, "Non matching passwords.");
+		} catch (SQLException e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
+			return generateFailedResponse(9, e.getMessage());
+		}
+
+		try{
+			activationToken =	 
+					uDriver.registerUser(
+							request.getUsername(),
+							request.getEmail(),
+							request.getPassword(),
+							request.getConfirm(),
+							request.getName(), 
+							request.getAddress(),
+							request.getPhone(),
+							Role.rewarder);
+
+			return generateSuccessResponse(activationToken);
+		}catch (UnableToRegisterUserException e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
+			return generateFailedResponse(10, e.getMessage());
+		}	 catch (UnableToPerformOperation e) {
+			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
+			return generateFailedResponse(11, e.getMessage());
+		}
 	}
 	
 	/*
