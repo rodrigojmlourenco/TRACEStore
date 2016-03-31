@@ -218,10 +218,12 @@ public class RewardSetterService {
 		int ownerId;
 		String user = context.getUserPrincipal().getName();
 		
+		LOG.info("@getRegisteredRewards: Rewarder<"+user+">?");
+		
 		try {
 			ownerId = uDriver.getUserID(user);
 			
-			LOG.info("@getRegisteredRewards: Rewarder<"+user+">?");
+			
 			
 			if(!hasRewarderRole(user))
 				return generateFailedResponse(1, "The user is not a rewarder");
