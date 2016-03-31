@@ -231,12 +231,15 @@ public class RewardSetterService {
 			for(SimpleReward r : rewards){
 				payload.add(r.toJson());
 			}
-			
+
+			LOG.info("Fetched "+rewards.size()+" associated with "+user);
 			return generateSuccessResponse(gson.toJson(payload));
 			
 		} catch (UnknownUserException e){
+			LOG.error(e.getMessage());
 			return generateFailedResponse(2, e.getMessage());
 		}catch( UnableToPerformOperation e) {
+			LOG.error(e.getMessage());
 			return generateFailedResponse(3, e.getMessage());
 		}
 	}
