@@ -209,6 +209,7 @@ public class RewardSetterService {
 	}
 	
 	@GET
+	@Secured
 	@Path("/get/rewards")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getRegisteredRewards(@Context SecurityContext context){
