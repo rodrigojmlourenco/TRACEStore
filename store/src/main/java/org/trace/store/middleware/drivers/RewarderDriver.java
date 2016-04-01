@@ -3,7 +3,7 @@ package org.trace.store.middleware.drivers;
 import java.util.List;
 
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
-import org.trace.store.services.api.data.SimpleReward;
+import org.trace.store.services.api.data.TraceReward;
 
 public interface RewarderDriver {
 	
@@ -17,5 +17,9 @@ public interface RewarderDriver {
 	
 	public boolean registerDistanceBasedReward(int ownerId, double distance, String reward) throws UnableToPerformOperation;
 
-	public List<SimpleReward> getAllOwnerRewards(int ownerId) throws UnableToPerformOperation;
+	public List<TraceReward> getAllOwnerRewards(int ownerId) throws UnableToPerformOperation;
+
+	public boolean ownsReward(int ownerId, int rewardId) throws UnableToPerformOperation;
+
+	public boolean unregisterReward(int rewardId) throws UnableToPerformOperation;
 }

@@ -3,7 +3,9 @@ package org.trace.store.services;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.print.attribute.standard.Media;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -35,7 +37,7 @@ import org.trace.store.middleware.drivers.utils.FormFieldValidator;
 import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.UserRegistryRequest;
 import org.trace.store.services.api.data.DistanceBasedRewardRequest;
-import org.trace.store.services.api.data.SimpleReward;
+import org.trace.store.services.api.data.TraceReward;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -231,11 +233,15 @@ public class RewardSetterService {
 				return generateFailedResponse(1, "The user is not a rewarder");
 			}
 						
-			List<SimpleReward> rewards = rDriver.getAllOwnerRewards(ownerId);
+			List<TraceReward> rewards = rDriver.getAllOwnerRewards(ownerId);
 			
 			Gson gson = new Gson();
 			JsonArray payload = new JsonArray();
-			for(SimpleReward r : rewards){
+			for(TraceReward r : rewards){
+				
+				//TODO: mais tarde fazer isto de forma inteligente
+				
+				
 				payload.add(r.toJson());
 			}
 
@@ -302,6 +308,45 @@ public class RewardSetterService {
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response setBaseLocation(RewardingPolicy policy){
 		throw new UnsupportedOperationException();
+	}
+	
+	
+	@POST
+	@Path("/del/reward")
+	@Secured(Role.rewarder)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String unregisterReward(@FormParam("reward")int rewardId, @Context SecurityContext context){
+		
+		int ownerId;
+		String user = context.getUserPrincipal().getName();
+		
+		if(!hasRewarderRole(user)){
+			LOG.error("Unauthorized access, no 'reward' capabilities");
+			return generateFailedResponse(1, "Unauthorized access, no 'reward' capabilities");
+		}
+			
+		
+		try {
+			ownerId = uDriver.getUserID(user);
+			
+			if(rDriver.ownsReward(ownerId, rewardId))
+				return generateFailedResponse(2, "This rewards does not belong to the user");
+			
+			if(rDriver.unregisterReward(rewardId))
+				return generateSuccessResponse("");
+			else
+				return generateFailedResponse(3, "The reward was not removed as it didn't exist anyhow.");
+			
+			
+		} catch (UnknownUserException e) {
+			LOG.error(e.getMessage());
+			return generateFailedResponse(2, e.getMessage());
+		} catch (UnableToPerformOperation e) {
+			LOG.error(e.getMessage());
+			return generateFailedResponse(3, e.getMessage());
+		}
+		
 	}
 	
 	/**

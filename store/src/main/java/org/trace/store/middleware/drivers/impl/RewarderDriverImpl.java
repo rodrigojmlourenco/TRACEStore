@@ -4,18 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.trace.DBAPI.data.SimpleSession;
 import org.trace.store.middleware.drivers.RewarderDriver;
-import org.trace.store.middleware.drivers.SessionDriver;
-import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
-import org.trace.store.services.api.data.SimpleReward;
+import org.trace.store.services.api.data.TraceReward;
 
 import com.google.gson.JsonObject;
 
@@ -84,24 +79,63 @@ public class RewarderDriverImpl implements RewarderDriver{
 	}
 
 	@Override
-	public List<SimpleReward> getAllOwnerRewards(int ownerId) throws UnableToPerformOperation {
+	public List<TraceReward> getAllOwnerRewards(int ownerId) throws UnableToPerformOperation {
 		PreparedStatement stmt;
-		List<SimpleReward> rewards = new ArrayList<>();
+		List<TraceReward> rewards = new ArrayList<>();
 		try {
-			stmt = conn.prepareStatement("SELECT Id, Reward FROM rewards WHERE OwnerId=?");
+			stmt = conn.prepareStatement("SELECT Id, Conditions, Reward FROM rewards WHERE OwnerId=?");
 			stmt.setInt(1, ownerId);
 			ResultSet result = stmt.executeQuery();
 
 			while(result.next()){
 				int id = result.getInt(1);
-				String reward = result.getString(2);
-				rewards.add(new SimpleReward(id, reward));
+				String conditions = result.getString(2);
+				String reward = result.getString(3);
+				rewards.add(new TraceReward(id, conditions, reward));
 			}
 			stmt.close();
 			return rewards;
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
+	}
+
+	@Override
+	public boolean ownsReward(int ownerId, int rewardId) throws UnableToPerformOperation {
+		PreparedStatement stmt;
+		boolean owns=false;
+		try {
+			stmt = conn.prepareStatement("SELECT * FROM rewards WHERE OwnerId=? AND RewardId=?");
+			stmt.setInt(1, ownerId);
+			stmt.setInt(2, rewardId);
+			ResultSet result = stmt.executeQuery();
+
+			owns =result.next();
+			
+			stmt.close();
+			return owns;
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
+
+	@Override
+	public boolean unregisterReward(int rewardId) throws UnableToPerformOperation {
+		PreparedStatement stmt;
+		boolean success=false;
+		try {
+			stmt = conn.prepareStatement("DELETE FROM rewards WHERE RewardId=?");
+			stmt.setInt(1, rewardId);
+			ResultSet result = stmt.executeQuery();
+
+			success=result.next();
+			
+			stmt.close();
+			return success;
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+		
 	}
 
 //	@Override
