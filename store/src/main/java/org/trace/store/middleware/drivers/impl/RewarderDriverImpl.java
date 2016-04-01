@@ -124,20 +124,12 @@ public class RewarderDriverImpl implements RewarderDriver{
 	@Override
 	public boolean unregisterReward(int rewardId) throws UnableToPerformOperation {
 		PreparedStatement stmt;
-		boolean success=false;
 		try {
 			stmt = conn.prepareStatement("DELETE FROM rewards WHERE Id=?");
 			stmt.setInt(1, rewardId);
-			
-			LOG.debug("1");
-			ResultSet result = stmt.executeQuery();
-			LOG.debug("2");
-			
-			success=result.next();
-			LOG.debug("3");
+			int result = stmt.executeUpdate();
 			stmt.close();
-			LOG.debug("4");
-			return success;
+			return result >= 1;
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
