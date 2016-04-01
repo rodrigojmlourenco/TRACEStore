@@ -341,6 +341,7 @@ public class RewardSetterService {
 				return generateSuccessResponse("success");
 			}catch(Exception e){
 				LOG.error(e.getMessage());
+				return generateFailedResponse(5, e.getMessage());
 			}
 
 		} catch (UnknownUserException e) {
