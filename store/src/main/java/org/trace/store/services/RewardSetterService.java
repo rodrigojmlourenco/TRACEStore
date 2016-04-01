@@ -334,10 +334,13 @@ public class RewardSetterService {
 			if(!rDriver.ownsReward(ownerId, rewardId))
 				return generateFailedResponse(2, "This rewards does not belong to the user");
 			
-			if(rDriver.unregisterReward(rewardId))
+			if(rDriver.unregisterReward(rewardId)){
+				LOG.info("The user's <"+ownerId+"> reward <"+rewardId+"> was removed.");
 				return generateSuccessResponse("");
-			else
+			}else{
+				LOG.error("The reward was not removed as it didn't exist anyhow.");
 				return generateFailedResponse(3, "The reward was not removed as it didn't exist anyhow.");
+			}
 			
 			
 		} catch (UnknownUserException e) {
