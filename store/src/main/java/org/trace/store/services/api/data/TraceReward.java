@@ -42,6 +42,7 @@ public class TraceReward {
 	}
 
 	public JsonObject toJson(){
+		
 		JsonObject json = new JsonObject();
 		json.addProperty("identifier", getIdentifier());
 		json.addProperty("conditions", condition);
@@ -55,7 +56,8 @@ public class TraceReward {
 	}
 	
 	public static void main(String[] args){
-		
+		TraceReward r = new TraceReward(1, "{distance : 10 }" , "Um pastel de nata");
+		System.out.println(r.getMinimumDistance());
 	}
 	
 }
