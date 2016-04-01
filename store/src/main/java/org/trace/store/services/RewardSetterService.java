@@ -331,7 +331,7 @@ public class RewardSetterService {
 		try {
 			ownerId = uDriver.getUserID(user);
 			
-			if(rDriver.ownsReward(ownerId, rewardId))
+			if(!rDriver.ownsReward(ownerId, rewardId))
 				return generateFailedResponse(2, "This rewards does not belong to the user");
 			
 			if(rDriver.unregisterReward(rewardId))

@@ -106,7 +106,6 @@ public class RewarderDriverImpl implements RewarderDriver{
 		boolean owns=false;
 		
 		try {
-			LOG.debug("OWNER: "+ownerId+" reward :" +rewardId);
 			stmt = conn.prepareStatement("SELECT * FROM rewards WHERE OwnerId=? AND Id=?");
 			stmt.setInt(1, ownerId);
 			stmt.setInt(2, rewardId);
@@ -114,7 +113,6 @@ public class RewarderDriverImpl implements RewarderDriver{
 
 			owns =result.next();
 			
-			LOG.debug(result.getString(3));
 			
 			stmt.close();
 			return owns;
