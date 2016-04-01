@@ -319,40 +319,26 @@ public class RewardSetterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String unregisterReward(@FormParam("reward")int rewardId, @Context SecurityContext context){
 		
-		
-		
 		int ownerId;
 		String user = context.getUserPrincipal().getName();
-		
-		
 		
 		if(!hasRewarderRole(user)){
 			LOG.error("Unauthorized access, no 'reward' capabilities");
 			return generateFailedResponse(1, "Unauthorized access, no 'reward' capabilities");
-		}else{
-			LOG.info("@unregisterReward - "+user+" is a rewarder");
 		}
 			
 		
 		try {
 			ownerId = uDriver.getUserID(user);
-			LOG.info("@unregisterReward - "+user+" is a rewarder and has id "+ownerId);
-			
 			
 			if(!rDriver.ownsReward(ownerId, rewardId)){
+				LOG.error("This rewards does not belong to the user");
 				return generateFailedResponse(2, "This rewards does not belong to the user");
-			}else
-				LOG.info("@unregisterReward - "+user+" is a rewarder and has id "+ownerId+" and owns the reward "+rewardId);
-			
-			if(rDriver.unregisterReward(rewardId)){
-				LOG.info("The user's <"+ownerId+"> reward <"+rewardId+"> was removed.");
-				return generateSuccessResponse("");
-			}else{
-				LOG.error("The reward was not removed as it didn't exist anyhow.");
-				return generateFailedResponse(3, "The reward was not removed as it didn't exist anyhow.");
 			}
 			
-			
+			rDriver.unregisterReward(rewardId);
+			return generateSuccessResponse("");
+
 		} catch (UnknownUserException e) {
 			LOG.error(e.getMessage());
 			return generateFailedResponse(2, e.getMessage());
