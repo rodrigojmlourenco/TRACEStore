@@ -338,11 +338,14 @@ public class RewardSetterService {
 			
 			try{
 				rDriver.unregisterReward(rewardId);
-				return generateSuccessResponse("success");
+				
 			}catch(Exception e){
 				LOG.error(e.getMessage());
+				LOG.error(e.getClass().getSimpleName());
 				return generateFailedResponse(5, e.getMessage());
 			}
+			
+			return generateSuccessResponse("success");
 
 		} catch (UnknownUserException e) {
 			LOG.error(e.getMessage());
