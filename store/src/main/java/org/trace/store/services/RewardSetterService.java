@@ -339,8 +339,10 @@ public class RewardSetterService {
 			LOG.info("@unregisterReward - "+user+" is a rewarder and has id "+ownerId);
 			
 			
-			if(!rDriver.ownsReward(ownerId, rewardId))
+			if(!rDriver.ownsReward(ownerId, rewardId)){
 				return generateFailedResponse(2, "This rewards does not belong to the user");
+			}else
+				LOG.info("@unregisterReward - "+user+" is a rewarder and has id "+ownerId+" and owns the reward "+rewardId);
 			
 			if(rDriver.unregisterReward(rewardId)){
 				LOG.info("The user's <"+ownerId+"> reward <"+rewardId+"> was removed.");
