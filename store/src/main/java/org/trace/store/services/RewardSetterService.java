@@ -324,16 +324,20 @@ public class RewardSetterService {
 		int ownerId;
 		String user = context.getUserPrincipal().getName();
 		
-		LOG.info("@unregisterReward - "+user);
+		
 		
 		if(!hasRewarderRole(user)){
 			LOG.error("Unauthorized access, no 'reward' capabilities");
 			return generateFailedResponse(1, "Unauthorized access, no 'reward' capabilities");
+		}else{
+			LOG.info("@unregisterReward - "+user+" is a rewarder");
 		}
 			
 		
 		try {
 			ownerId = uDriver.getUserID(user);
+			LOG.info("@unregisterReward - "+user+" is a rewarder and has id "+ownerId);
+			
 			
 			if(!rDriver.ownsReward(ownerId, rewardId))
 				return generateFailedResponse(2, "This rewards does not belong to the user");
