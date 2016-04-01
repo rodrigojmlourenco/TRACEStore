@@ -45,7 +45,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class TRACESecurityManager{
 
 	public final static int TOKEN_MAX_TRIES = 10000;
-	public final static int TOKEN_TTL		= 3600000; //1hour
+	public final static int TOKEN_TTL		= 21600000 ; //6hours
 	public final static String TOKEN_ISSUER = "org.trace";
 	
 	private Logger LOG = Logger.getLogger(TRACESecurityManager.class); 
