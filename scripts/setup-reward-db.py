@@ -59,7 +59,6 @@ rewards += "FOREIGN KEY(OwnerId) REFERENCES users(Id) ON DELETE CASCADE, "
 rewards	+= "Conditions VARCHAR(512) NOT NULL, "
 rewards	+= "Reward VARCHAR(256) NOT NULL)"
 
-
 winners	 = "CREATE TABLE IF NOT EXISTS winners ("
 winners += "RewardId int(11) unsigned NOT NULL, "
 winners	+= "FOREIGN KEY(RewardId) REFERENCES rewards(Id) ON DELETE CASCADE, "
@@ -68,7 +67,6 @@ winners	+= "FOREIGN KEY(WinnerId) REFERENCES users(Id) ON DELETE CASCADE, "
 winners += "PRIMARY KEY(RewardId, WinnerId), "
 winners += "isNotified TINYINT(1) NOT NULL DEFAULT 0, "
 winners += "hasCheckedIn TINYINT(1) NOT NULL DEFAULT 0)"
-
 
 cursor.execute(rewards)
 cursor.execute(winners)
