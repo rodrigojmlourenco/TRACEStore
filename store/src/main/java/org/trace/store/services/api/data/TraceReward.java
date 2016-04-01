@@ -42,22 +42,16 @@ public class TraceReward {
 	}
 
 	public JsonObject toJson(){
-		
+		JsonParser parser = new JsonParser();
 		JsonObject json = new JsonObject();
 		json.addProperty("identifier", getIdentifier());
-		json.addProperty("conditions", condition);
+		json.add("conditions", parser.parse(getCondition()));
 		json.addProperty("reward", getReward());
 		return json;
 	}
 	
-	public double getMinimumDistance(){
+	public double getMinimumDistance(){ //TODO: temporary
 		JsonObject c = this.toJson().getAsJsonObject("conditions");
-		return c.has("distance") ? 0 : c.get("distance").getAsDouble();
-	}
-	
-	public static void main(String[] args){
-		TraceReward r = new TraceReward(1, "{distance : 10 }" , "Um pastel de nata");
-		System.out.println(r.getMinimumDistance());
-	}
-	
+		return c.has("distance") ? c.get("distance").getAsDouble() : 0;
+	}	
 }

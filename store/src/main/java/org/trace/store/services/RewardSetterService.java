@@ -240,9 +240,10 @@ public class RewardSetterService {
 			for(TraceReward r : rewards){
 				
 				//TODO: mais tarde fazer isto de forma inteligente
-				
-				
-				payload.add(r.toJson());
+				int userCount = rDriver.getUsersWithDistance(r.getMinimumDistance()).size();
+				JsonObject aux = r.toJson();
+				aux.addProperty("winners", userCount);
+				payload.add(aux);
 			}
 
 			LOG.info("Fetched "+rewards.size()+" associated with "+user);

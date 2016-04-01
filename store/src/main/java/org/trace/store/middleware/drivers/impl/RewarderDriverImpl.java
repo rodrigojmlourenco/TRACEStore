@@ -105,7 +105,7 @@ public class RewarderDriverImpl implements RewarderDriver{
 		PreparedStatement stmt;
 		boolean owns=false;
 		try {
-			stmt = conn.prepareStatement("SELECT * FROM rewards WHERE OwnerId=? AND RewardId=?");
+			stmt = conn.prepareStatement("SELECT * FROM rewards WHERE OwnerId=? AND Id=?");
 			stmt.setInt(1, ownerId);
 			stmt.setInt(2, rewardId);
 			ResultSet result = stmt.executeQuery();
