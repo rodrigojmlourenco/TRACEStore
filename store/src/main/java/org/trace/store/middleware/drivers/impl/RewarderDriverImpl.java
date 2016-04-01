@@ -104,13 +104,17 @@ public class RewarderDriverImpl implements RewarderDriver{
 	public boolean ownsReward(int ownerId, int rewardId) throws UnableToPerformOperation {
 		PreparedStatement stmt;
 		boolean owns=false;
+		
 		try {
+			LOG.debug("OWNER: "+ownerId+" reward :" +rewardId);
 			stmt = conn.prepareStatement("SELECT * FROM rewards WHERE OwnerId=? AND Id=?");
 			stmt.setInt(1, ownerId);
 			stmt.setInt(2, rewardId);
 			ResultSet result = stmt.executeQuery();
 
 			owns =result.next();
+			
+			LOG.debug(result.getString(3));
 			
 			stmt.close();
 			return owns;
