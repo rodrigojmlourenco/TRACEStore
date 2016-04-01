@@ -126,7 +126,7 @@ public class RewarderDriverImpl implements RewarderDriver{
 		PreparedStatement stmt;
 		boolean success=false;
 		try {
-			stmt = conn.prepareStatement("DELETE FROM rewards WHERE RewardId=?");
+			stmt = conn.prepareStatement("DELETE FROM rewards WHERE Id=?");
 			stmt.setInt(1, rewardId);
 			ResultSet result = stmt.executeQuery();
 
