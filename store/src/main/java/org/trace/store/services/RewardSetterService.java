@@ -304,7 +304,7 @@ public class RewardSetterService {
 	 * @see RewardingPolicy
 	 */
 	@POST
-	@Path("/set/reward")
+	@Path("/set/beacon")
 	@Secured(Role.rewarder)
 	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response setBaseLocation(RewardingPolicy policy){
@@ -319,10 +319,12 @@ public class RewardSetterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String unregisterReward(@FormParam("reward")int rewardId, @Context SecurityContext context){
 		
-		LOG.info("@unregisterReward");
+		
 		
 		int ownerId;
 		String user = context.getUserPrincipal().getName();
+		
+		LOG.info("@unregisterReward - "+user);
 		
 		if(!hasRewarderRole(user)){
 			LOG.error("Unauthorized access, no 'reward' capabilities");
