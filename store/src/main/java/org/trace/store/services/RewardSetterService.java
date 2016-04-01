@@ -336,8 +336,12 @@ public class RewardSetterService {
 				return generateFailedResponse(2, "This rewards does not belong to the user");
 			}
 			
-			rDriver.unregisterReward(rewardId);
-			return generateSuccessResponse("");
+			try{
+				rDriver.unregisterReward(rewardId);
+				return generateSuccessResponse("success");
+			}catch(Exception e){
+				LOG.error(e.getMessage());
+			}
 
 		} catch (UnknownUserException e) {
 			LOG.error(e.getMessage());
