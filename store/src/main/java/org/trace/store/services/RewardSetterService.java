@@ -319,6 +319,8 @@ public class RewardSetterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String unregisterReward(@FormParam("reward")int rewardId, @Context SecurityContext context){
 		
+		LOG.info("@unregisterReward");
+		
 		int ownerId;
 		String user = context.getUserPrincipal().getName();
 		
