@@ -342,6 +342,7 @@ public class RewardSetterService {
 			}catch(Exception e){
 				LOG.error(e.getMessage());
 				LOG.error(e.getClass().getSimpleName());
+				LOG.error(e);
 				return generateFailedResponse(5, e.getMessage());
 			}
 			
