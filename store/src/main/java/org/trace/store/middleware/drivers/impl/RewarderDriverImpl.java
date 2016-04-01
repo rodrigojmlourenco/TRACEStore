@@ -128,17 +128,22 @@ public class RewarderDriverImpl implements RewarderDriver{
 		try {
 			stmt = conn.prepareStatement("DELETE FROM rewards WHERE Id=?");
 			stmt.setInt(1, rewardId);
-			ResultSet result = stmt.executeQuery();
-
-			success=result.next();
 			
+			LOG.debug("1");
+			ResultSet result = stmt.executeQuery();
+			LOG.debug("2");
+			
+			success=result.next();
+			LOG.debug("3");
 			stmt.close();
+			LOG.debug("4");
 			return success;
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 		
 	}
+
 
 //	@Override
 //	public List<String> getUsersWithKilometers(double kilometers) throws UnableToPerformOperation {
