@@ -14,6 +14,8 @@ import org.trace.DBAPI.data.RouteBoundingBox;
 import org.trace.DBAPI.data.TraceVertex;
 import org.trace.store.services.TRACEStoreService;
 
+import com.google.gson.Gson;
+
 import io.netty.util.internal.SystemPropertyUtil;
 
 public class DBTrackingAPI extends DBAPI{
@@ -22,20 +24,77 @@ public class DBTrackingAPI extends DBAPI{
 
 	public DBTrackingAPI(Client client){
 		super(client);
+		setup();
 	}
 
-	public boolean register(String username, String name, String address){
-		boolean success = true;
+	//	public boolean removeSession(String sessionID){
+	//		boolean success = true;
+	//
+	//		//return values list
+	//		List<Result> results = null;
+	//
+	//		//params
+	//		Map<String,Object> params = new HashMap<>();
+	//		params.put("sessionID", sessionID);
+	//
+	//		//ArrayList to save the trajectory
+	//		results = query(""
+	//				//				+ "g.V().has('sessionID', sessionID).drop();"
+	//				+ "g.E().has('sessionID', sessionID).drop();"
+	//				+ "",params);
+	//
+	//		results = query(""
+	//				+ "g.V().has('sessionID', sessionID).drop();"
+	//				//				+ "g.E().has('sessionID', sessionID).drop();"
+	//				+ "",params);
+	//
+	//		return success;
+	//	}
+
+	private boolean setup(){
 		List<Result> results = null;
 
 		//params
 		Map<String,Object> params = new HashMap<>();
-		params.put("username",username);
-		params.put("name",name);
-		params.put("address",address);
 
 		//query
-		results = query("graph.addVertex(label,'user','username', username, 'name', name, 'address', address)", params);
+		results = query(""
+				+ ""
+				+ ""
+				//Returns a String List of all the sessions currently registered in the TraceDB
+				+ "public List<String> tracking_getAllSessions(){"
+				+ 	"return g.V().hasLabel('session').values('sessionID').toList();"
+				+ "};"
+				+ ""
+				+ ""
+				//Registers a specific session in TraceDB in case it hasn't been done before
+				+ "public boolean tracking_login(String sessionID){"
+				+ 	"if(g.V().has('sessionID',sessionID).hasNext()){"
+				+ 		"return true;"
+				+ 	"}else{"
+				+ 		"S = graph.addVertex(label,'session','sessionID', sessionID, 'date', new Date());"
+				+ 		"return true;"
+				+ 	"};"
+				+ "};"
+				+ ""
+				+ ""
+				//Removes a specific session from TraceDB
+				+ "public boolean tracking_removeSession(String sessionID){"
+				+ 	"removedV = g.V().has('sessionID', sessionID).drop();"
+				+ 	"removedE = g.E().has('sessionID', sessionID).drop();"
+				+ 	"return (!removedV && !removedE);"
+				+ "};"
+				+ ""
+				+ ""
+				+ "public String tracking_submitRoute(String list){"
+				+ 	"return list;"
+//				+ 	"String returnString = '';"
+//				+ 	"for(String s : list){"
+//				+ 		"returnString += s;"
+//				+ 	"};"
+//				+ 	"return returnString;"
+				+ "};"
+				+ "", params);
 
 		return results != null;
 	}
@@ -53,502 +112,22 @@ public class DBTrackingAPI extends DBAPI{
 		//params
 		Map<String,Object> params = new HashMap<>();
 		params.put("sessionID",sessionID);
-		params.put("date",new Date());
 
 		//begin a session
-		results = query("g.V().has('sessionID', sessionID).hasNext();"
+		results = query("tracking_login(sessionID);"
 				+ "", params);
 
-		//		LOG.info("login: session exists? " + results.get(0).getBoolean());
-
-		if(!results.get(0).getBoolean()){
-			//begin a session
-			results = null;
-			results = query("S = graph.addVertex(label,'session','sessionID', sessionID, 'date', date);"
-					+ "", params);
-		}
-
-		//		LOG.info("login: results != null:" + (results != null));
-
-		return results != null;
-	}
-
-	public boolean put(String sessionID, Date date, double latitude, double longitude){
-		//return values list
-		List<Result> results = null;
-
-		//Make sure the user has the appointed session registered in the DB.
-		login(sessionID);
-
-		//params
-		Map<String,Object> params = new HashMap<>();
-		params.put("longitude",longitude);
-		params.put("latitude",latitude);
-		params.put("sessionID",sessionID);
-		params.put("date", date);
-		//		params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
-		//		params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
-
-		//		List<String> adjacentLatitudeGridID = TraceLocationMethods.getAdjacentGridIDs(latitude);
-		//		List<String> adjacentLongitudeGridID = TraceLocationMethods.getAdjacentGridIDs(longitude);
-
-		//		String latitudeOR = "has('latitudeGridID','" + adjacentLatitudeGridID.get(0) + "'),"
-		//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(1) + "'),"
-		//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(2) + "')";
-
-		//		String longitudeOR = "has('longitudeGridID','" + adjacentLongitudeGridID.get(0) + "'),"
-		//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(1) + "'),"
-		//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(2) + "')";
-
-		//		String orString = latitudeOR + "," + longitudeOR;
-
-		//		params.put("vertexID",tSession.getVertexID());
-
-		//get id of the "finish" edge
-		results = query("Lreturn = new ArrayList<>(); " //return array
-				+ "E = g.V().has('sessionID',sessionID).inE().hasLabel('session').has('type','finish').id();" //ID of the "finish" edge
-				+ "if(E.hasNext()){" //if there's a finish edge this means that this is not the 1st point being added to the session
-				+		"Lreturn.add(true);" //Not the 1st point of session: index(0) - true (has finish edge)
-				+ 		"Lreturn.add(E.next());" //index(1) - id
-				+ "}else{"//otherwise if there's no "finish" edge this means we are the first point of the session
-				+ 		"Lreturn.add(false);" //1st point of session: index(0) - false (does not have finish edge)
-				+ 		"Lreturn.add('nothing')"//index(1) - nothing
-				+ "};"
-
-				//				+ "preL = g.V().or(" + orString + ").dedup();" 	
-				//				+ "L = g.V().or(" + orString + ").has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
-				+ "L = g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
-
-				+ "if(L.hasNext()){" //is there any location on map with these coords?
-				+ 		"Lreturn.add(true);" //yes: index(2) - true
-				+ 		"Lreturn.add(L.next().value('vertexID'));" //location id: index(3) - vertexID
-				+ "}else{"
-				+ 		"Lreturn.add(false);" //no: index(2) - false
-				+ "};"
-				+ "Lreturn;"
-				+ "",params);
-
-		//		System.out.println("Size: " + results.size());
-
-		if(results == null || results.size() == 0){
-			return false;
-		}
-
-		//If point doesn't exist, add a new one, label: "unmapped_location"
-		if(!results.get(2).getBoolean()){
-			//params
-			params.put("vertexID","" + latitude + "_" + longitude);
-			params.put("latitude",latitude);
-			params.put("longitude",longitude);
-			//			params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
-			//			params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
-
-			//query
-			List<Result> addPoint = null;
-			addPoint = super.query("graph.addVertex(label,'unmapped_location',"
-					+ "'vertexID', vertexID,"
-					+ "'location', Geoshape.point(latitude,longitude));"
-					//					+ "'latitudeGridID', latitudeGridID,"
-					//					+ "'longitudeGridID', longitudeGridID)"
-					+ "", params);
-
-			//failed to add new vertex
-			if(addPoint == null){
-				return false;
-			}
-			//			params.remove("latitudeGridID");
-			//			params.remove("longitudeGridID");
-			params.remove("latitude");
-			params.remove("longitude");
+		if(results != null){
+			return results.get(0).getBoolean();
 		}else{
-			params.put("vertexID",results.get(3).getString());
-		}
-
-		if(!results.get(0).getBoolean()){ //first point of the session
-			//connect session vertex to position vertex:
-			//adds Edge(session - start) [Session --> Location]
-			//and adds Edge(session - finish) [Location --> Session]
-
-			results = query("S = g.V().has('sessionID',sessionID).next(); "
-					+ "L = g.V().has('vertexID',vertexID).next();"
-					+ "S.addEdge('session', L, 'type', 'start', 'sessionID', sessionID, 'date', date); "
-					+ "L.addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date) "
-					+ "",params);
-			//if something went wrong
-			if(results == null){
-				return false;
-			}
-		}else{ //not first point of the session
-			params.put("finishEdgeID",results.get(1).getString());
-
-			results = query("S = g.V().has('sessionID',sessionID).next(); " //Session vertex
-					+ "E = g.E(finishEdgeID).next(); " //"finish" edge
-					+ "newL = g.V().has('vertexID',vertexID).next(); " //new Location
-					+ "oldL = g.E(E).outV().next(); " //old last location
-					+ "E.remove(); " //remove finish edge
-					+ "oldL.addEdge('session', newL, 'type', 'trajectory', 'sessionID', sessionID, 'date', date); " //add edge from last location to new location
-					+ "newL.addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date); " //add finish edge from new location to session
-					+ "",params);
-			//if something went wrong
-			if(results == null){
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public boolean put(String sessionID, Date date, double latitude, double longitude, Map<String,Object> attributes){
-		//return values list
-		List<Result> results = null;
-
-		//Make sure the user has the appointed session registered in the DB.
-		login(sessionID);
-
-		//params
-		Map<String,Object> params = new HashMap<>();
-		params.put("latitude",latitude);
-		params.put("longitude",longitude);
-		params.put("sessionID",sessionID);
-		params.put("date", date);
-		//		params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
-		//		params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
-
-		//		List<String> adjacentLatitudeGridID = TraceLocationMethods.getAdjacentGridIDs(latitude);
-		//		List<String> adjacentLongitudeGridID = TraceLocationMethods.getAdjacentGridIDs(longitude);
-
-		//		String latitudeOR = "has('latitudeGridID','" + adjacentLatitudeGridID.get(0) + "'),"
-		//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(1) + "'),"
-		//				+ "has('latitudeGridID','" + adjacentLatitudeGridID.get(2) + "')";
-
-		//		String longitudeOR = "has('longitudeGridID','" + adjacentLongitudeGridID.get(0) + "'),"
-		//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(1) + "'),"
-		//				+ "has('longitudeGridID','" + adjacentLongitudeGridID.get(2) + "')";
-
-		//		String orString = latitudeOR + "," + longitudeOR;
-
-
-		//get id of the "finish" edge
-		results = query("Lreturn = new ArrayList<>(); " //return array
-				+ "E = g.V().has('sessionID',sessionID).inE().hasLabel('session').has('type','finish').id();" //ID of the "finish" edge
-				+ "if(E.hasNext()){" //if there's a finish edge this means that this is not the 1st point being added to the session
-				+		"Lreturn.add(true);" //Not the 1st point of session: index(0) - true (has finish edge)
-				+ 		"Lreturn.add(E.next());" //index(1) - id
-				+ "}else{"//otherwise if there's no "finish" edge this means we are the first point of the session
-				+ 		"Lreturn.add(false);" //1st point of session: index(0) - false (does not have finish edge)
-				+ 		"Lreturn.add('nothing')"//index(1) - nothing
-				+ "};"
-
-				//						+ "L = g.V().or(" + orString + ").has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
-				+ "L = g.V().has('location', geoWithin(Geoshape.circle(latitude, longitude, " + GPS_TOLERANCE + "))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(latitude,longitude).getPoint())}.order().by(incr).select('a'); " //get location we want to put
-
-				+ "if(L.hasNext()){" //is there any location on map with these coords?
-				+ 		"Lreturn.add(true);" //yes: index(2) - true
-				+ 		"Lreturn.add(L.next().value('vertexID'));" //location id: index(3) - vertexID
-				+ "}else{"
-				+ 		"Lreturn.add(false);" //no: index(2) - false
-				+ "};"
-				+ "Lreturn;"
-				+ "",params);
-
-		//				System.out.println("Size: " + results.size());
-		//		g.V().has('location', geoWithin(Geoshape.circle(10,10,2000))).as('a').map{it.get().value('location').getPoint().distance(Geoshape.point(10,10).getPoint())}.order().by(incr).select('a').valueMap()
-
-		if(results == null || results.size() == 0){
 			return false;
-		}
-
-		//If point doesn't exist, add a new one, label: "unmapped_location"
-		if(!results.get(2).getBoolean()){
-			//params
-			params.put("vertexID","" + longitude + "_" + latitude);
-			//			params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
-			//			params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
-
-			//query
-			List<Result> addPoint = null;
-			addPoint = super.query("graph.addVertex(label,'unmapped_location',"
-					+ "'vertexID', vertexID,"
-					+ "'location', Geoshape.point(latitude,longitude));"
-					//					+ "'latitudeGridID',latitudeGridID,"
-					//					+ "'longitudeGridID',longitudeGridID)"
-					+ "", params);
-
-			//failed to add new vertex
-			if(addPoint == null){
-				return false;
-			}
-			//			params.remove("latitudeGridID");
-			//			params.remove("longitudeGridID");
-			params.remove("latitude");
-			params.remove("longitude");
-		}else{
-			params.put("vertexID",results.get(3).getString());
-		}
-
-
-		//parse attributes
-		String attributesString = "";
-		Set<String> keys = attributes.keySet();
-		if(attributes != null){
-			for(String key : keys){
-				params.put(key,attributes.get(key).toString());
-				attributesString += ", '" +  key + "', " + key;
-			}
-		}
-		attributesString += ");";
-
-		//		System.out.println("newL.addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date" + attributesString);
-
-
-		if(!results.get(0).getBoolean()){ //first point of the session
-			//connect session vertex to position vertex:
-			//adds Edge(session - start) [Session --> Location]
-			//and adds Edge(session - finish) [Location --> Session]
-
-			results = query("S = g.V().has('sessionID',sessionID).next(); "
-					+ "L = g.V().has('vertexID',vertexID).next();"
-					+ "S.addEdge('session', L, 'type', 'start', 'sessionID', sessionID, 'date', date" + attributesString
-					+ "L.addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date); "
-					+ "",params);
-			//if something went wrong
-			if(results == null){
-				return false;
-			}
-		}else{ //not first point of the session
-			params.put("finishEdgeID",results.get(1).getString());
-
-			results = query("S = g.V().has('sessionID',sessionID).next(); " //Session vertex
-					+ "E = g.E(finishEdgeID).next(); " //"finish" edge
-					+ "newL = g.V().has('vertexID',vertexID).next(); " //new Location
-					+ "oldL = g.E(E).outV().next(); " //old last location
-					+ "E.remove(); " //remove finish edge
-					+ "oldL.addEdge('session', newL, 'type', 'trajectory', 'sessionID', sessionID, 'date', date" + attributesString //add edge from last location to new location
-					+ "newL.addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date); " //add finish edge from new location to session
-					+ "",params);
-			//if something went wrong
-			if(results == null){
-				return false;
-			}
-		}
-		return true;
-	}
-
-
-	//TODO implement this method
-	public boolean put(String sessionID, Date date, String traceBeaconID){
-		//return values list
-		List<Result> results = null;
-
-		//Make sure the user has the appointed session registered in the DB.
-		login(sessionID);
-
-		//params
-		Map<String,Object> params = new HashMap<>();
-		params.put("traceBeaconID",traceBeaconID);
-		params.put("sessionID",sessionID);
-		params.put("date", date);
-		//				params.put("vertexID",tSession.getVertexID());
-
-		//get id of the "finish" edge
-		results = query("Lreturn = new ArrayList<>(); " //return array
-				+ "E = g.V().has('sessionID',sessionID).inE().hasLabel('session').has('type','finish').id();" //ID of the "finish" edge
-				+ "if(E.hasNext()){" //if there's a finish edge this means that this is not the 1st point being added to the session
-				+		"Lreturn.add(true);" //Not the 1st point of session: index(0) - true (has finish edge)
-				+ 		"Lreturn.add(E.next());" //index(1) - id
-				+ "}else{"//otherwise if there's no "finish" edge this means we are the first point of the session
-				+ 		"Lreturn.add(false);" //1st point of session: index(0) - false (does not have finish edge)
-				+ 		"Lreturn.add('nothing')"//index(1) - nothing
-				+ "};"
-				+ "L = g.V().has('traceBeaconID',traceBeaconID); " //get beacon we want to put
-				+ "if(L.hasNext()){" //is there any beacon with such an ID?
-				+ 		"Lreturn.add(true);" //yes: index(2) - true
-				+ 		"Lreturn.add(L.next().value('vertexID'));" //beacon id: index(3) - vertexID
-				+ "}else{"
-				+ 		"Lreturn.add(false);" //no: index(2) - false
-				+ "};"
-				+ "Lreturn;"
-				+ "",params);
-
-		//				System.out.println("Size: " + results.size());
-
-		if(results == null || results.size() == 0){
-			return false;
-		}
-
-		//If point doesn't exist, add a new one, label: "unregistered_beacon"
-		if(!results.get(2).getBoolean()){
-			//params
-			params.put("vertexID","" + sessionID + "_" + traceBeaconID);
-
-			//query
-			List<Result> addPoint = null;
-			addPoint = super.query("graph.addVertex(label,'unregistered_beacon','vertexID', vertexID, 'traceBeaconID', traceBeaconID)", params);
-
-			//failed to add new vertex
-			if(addPoint == null){
-				return false;
-			}
-		}else{
-			params.put("vertexID",results.get(3).getString());
-		}
-
-		if(!results.get(0).getBoolean()){ //first point of the session
-			//connect session vertex to position vertex:
-			//adds Edge(session - start) [Session --> Location]
-			//and adds Edge(session - finish) [Location --> Session]
-
-			results = query("S = g.V().has('sessionID',sessionID).next(); "
-					+ "L = g.V().has('vertexID',vertexID).next();"
-					+ "S.addEdge('session', L, 'type', 'start', 'sessionID', sessionID, 'date', date); "
-					+ "L.addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date) "
-					+ "",params);
-			//if something went wrong
-			if(results == null){
-				return false;
-			}
-		}else{ //not first point of the session
-			params.put("finishEdgeID",results.get(1).getString());
-
-			results = query("S = g.V().has('sessionID',sessionID).next(); " //Session vertex
-					+ "E = g.E(finishEdgeID).next(); " //"finish" edge
-					+ "newL = g.V().has('vertexID',vertexID).next(); " //new Location
-					+ "oldL = g.E(E).outV().next(); " //old last location
-					+ "E.remove(); " //remove finish edge
-					+ "oldL.addEdge('session', newL, 'type', 'trajectory', 'sessionID', sessionID, 'date', date); " //add edge from last location to new location
-					+ "newL.addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date); " //add finish edge from new location to session
-					+ "",params);
-			//if something went wrong
-			if(results == null){
-				return false;
-			}
-		}
-		return true;
-	}
-
-	//TODO implement this method
-	public boolean put(String sessionID, Date date, String traceBeaconID, Map<String,Object> attributes){
-		//return values list
-		List<Result> results = null;
-
-		//Make sure the user has the appointed session registered in the DB.
-		login(sessionID);
-
-		//params
-		Map<String,Object> params = new HashMap<>();
-		params.put("traceBeaconID",traceBeaconID);
-		params.put("sessionID",sessionID);
-		params.put("date", date);
-		//				params.put("vertexID",tSession.getVertexID());
-
-		//get id of the "finish" edge
-		results = query("Lreturn = new ArrayList<>(); " //return array
-				+ "E = g.V().has('sessionID',sessionID).inE().hasLabel('session').has('type','finish').id();" //ID of the "finish" edge
-				+ "if(E.hasNext()){" //if there's a finish edge this means that this is not the 1st point being added to the session
-				+		"Lreturn.add(true);" //Not the 1st point of session: index(0) - true (has finish edge)
-				+ 		"Lreturn.add(E.next());" //index(1) - id
-				+ "}else{"//otherwise if there's no "finish" edge this means we are the first point of the session
-				+ 		"Lreturn.add(false);" //1st point of session: index(0) - false (does not have finish edge)
-				+ 		"Lreturn.add('nothing')"//index(1) - nothing
-				+ "};"
-				+ "L = g.V().has('traceBeaconID',traceBeaconID); " //get beacon we want to put
-				+ "if(L.hasNext()){" //is there any beacon with such an ID?
-				+ 		"Lreturn.add(true);" //yes: index(2) - true
-				+ 		"Lreturn.add(L.next().value('vertexID'));" //beacon id: index(3) - vertexID
-				+ "}else{"
-				+ 		"Lreturn.add(false);" //no: index(2) - false
-				+ "};"
-				+ "Lreturn;"
-				+ "",params);
-
-		//				System.out.println("Size: " + results.size());
-
-		if(results == null || results.size() == 0){
-			return false;
-		}
-
-		//If point doesn't exist, add a new one, label: "unregistered_beacon"
-		if(!results.get(2).getBoolean()){
-			//params
-			params.put("vertexID","" + sessionID + "_" + traceBeaconID);
-
-			//query
-			List<Result> addPoint = null;
-			addPoint = super.query("graph.addVertex(label,'unregistered_beacon','vertexID', vertexID, 'traceBeaconID', traceBeaconID)", params);
-
-			//failed to add new vertex
-			if(addPoint == null){
-				return false;
-			}
-		}else{
-			params.put("vertexID",results.get(3).getString());
-		}
-
-		//parse attributes
-		String attributesString = "";
-		Set<String> keys = attributes.keySet();
-		if(attributes != null){
-			for(String key : keys){
-				params.put(key,attributes.get(key));
-				attributesString += ", '" +  key + "', " + key;
-			}
-		}
-		attributesString += ");";
-
-		if(!results.get(0).getBoolean()){ //first point of the session
-			//connect session vertex to position vertex:
-			//adds Edge(session - start) [Session --> Location]
-			//and adds Edge(session - finish) [Location --> Session]
-
-			results = query("S = g.V().has('sessionID',sessionID).next(); "
-					+ "L = g.V().has('vertexID',vertexID).next();"
-					+ "S.addEdge('session', L, 'type', 'start', 'sessionID', sessionID, 'date', date" + attributesString
-					+ "L.addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date); "
-					+ "",params);
-			//if something went wrong
-			if(results == null){
-				return false;
-			}
-		}else{ //not first point of the session
-			params.put("finishEdgeID",results.get(1).getString());
-
-			results = query("S = g.V().has('sessionID',sessionID).next(); " //Session vertex
-					+ "E = g.E(finishEdgeID).next(); " //"finish" edge
-					+ "newL = g.V().has('vertexID',vertexID).next(); " //new Location
-					+ "oldL = g.E(E).outV().next(); " //old last location
-					+ "E.remove(); " //remove finish edge
-					+ "oldL.addEdge('session', newL, 'type', 'trajectory', 'sessionID', sessionID, 'date', date); " //add edge from last location to new location
-					+ "newL.addEdge('session', S, 'type', 'finish', 'sessionID', sessionID, 'date', date); " //add finish edge from new location to session
-					+ "",params);
-			//if something went wrong
-			if(results == null){
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public boolean put(String sessionID, TraceVertex vertex){
-
-		//location
-		if(vertex.getType().equals("location")){
-			if(vertex.hasAttributes()){
-				return put(sessionID,vertex.getDate(), vertex.getLatitude(), vertex.getLongitude(), vertex.getAttributes());
-			}else{
-				return put(sessionID,vertex.getDate(), vertex.getLatitude(), vertex.getLongitude());
-			}
-		}else{ //beacon
-			if(vertex.hasAttributes()){
-				return put(sessionID, vertex.getDate(), vertex.getBeaconID(), vertex.getAttributes());
-			}else{
-				return put(sessionID, vertex.getDate(), vertex.getBeaconID());
-			}
 		}
 	}
 
 	public List<String> getSessionsDetails(List<String> sessions){
 		//return list
 		List<String> sessionsDetails = new ArrayList<>();
-		
+
 		//Nothing to process
 		if(sessions == null || sessions.isEmpty()){
 			LOG.error("getSessionsDetails: provided list of sessions is null or empty");
@@ -557,61 +136,60 @@ public class DBTrackingAPI extends DBAPI{
 
 		//return values list
 		List<Result> results = null;
-				
+
 		//params
 		Map<String,Object> params = new HashMap<>();
-		
+
 		//String with the desired query
 		String queryString = "";
-		
+
 		queryString = "A = new ArrayList<>();";
-		
+
 		//For each given session
 		int i = 0;
 		for(String s : sessions){
 			//Add the corresponding ID in the params
 			params.put("sessionID" + i, s); 
-			
+
 			//Find the corresponding session vertex
 			queryString += "S"+i+" = g.V().has('sessionID',sessionID"+i+");";
-			
+
 			//Add its totalDistance to the returning list
 			queryString += "A.add(S"+i+".clone().values('totalDistance').next());";
-//			
-//			//Get the STARTING POINT
+			//			
+			//			//Get the STARTING POINT
 			queryString += "Start"+i+"= S"+i+".clone().outE().inV().values('location').next().getPoint();";
-//			
-//			//Add its Lat
+			//			
+			//			//Add its Lat
 			queryString += "A.add(Start"+i+".getLatitude());";
-//			//Add its Lon
+			//			//Add its Lon
 			queryString += "A.add(Start"+i+".getLongitude());";
-//
-//			//Get the FINISHING POINT
+			//
+			//			//Get the FINISHING POINT
 			queryString += "Finish"+i+"= S"+i+".clone().inE().outV().values('location').next().getPoint();";
-//			
-//			//Add its Lat
+			//			
+			//			//Add its Lat
 			queryString += "A.add(Finish"+i+".getLatitude());";
-//			//Add its Lon
+			//			//Add its Lon
 			queryString += "A.add(Finish"+i+".getLongitude());";
-			
+
 			i++;
 		}
 		queryString += "A;";
-		
+
 		results = query(queryString,params);
-		
+
 		if(results == null || results.isEmpty()){
 			LOG.error("getSessionsDetails: Results from the query are either null or empty.");
 			return sessionsDetails;
 		}
-		
+
 		for(Result r : results){
 			sessionsDetails.add(r.getString());
 		}
 
 		return sessionsDetails;
 	}
-
 
 	public String getSessionDetails(String sessionID){
 		//return values list
@@ -631,7 +209,6 @@ public class DBTrackingAPI extends DBAPI{
 		}
 		return "";
 	}
-
 
 	public List<TraceVertex> getRouteBySession(String sessionID){
 
@@ -764,6 +341,70 @@ public class DBTrackingAPI extends DBAPI{
 		return userSessions;
 	}
 
+	public double submitRoute(String sessionID, List<TraceVertex> submittedRoute){
+		boolean success = true;
+
+		//Route parsing so that there are no two subsequent points being added with the same coords.
+		List<TraceVertex> route = TraceLocationMethods.routeParser(submittedRoute);
+
+		LOG.info("submitRoute: submittedRoute:" + submittedRoute.size());
+		LOG.info("submitRoute: route:" + route.size());
+
+		//TODO remove the "removeSession()" and uncomment the rest after DEBUG PHASE is completed
+		if(!sessionIsEmpty(sessionID)){
+			removeSession(sessionID);
+			//			LOG.error("submitRoute: session is not empty!");
+			//			return -1;
+		}
+
+		Double totalDistance = TraceLocationMethods.routeTotalDistance(route);
+
+		boolean firstOne = true;
+		int i = 0;
+		for(i = 0; i+79 < route.size(); i+=80){
+			LOG.info("submitRoute: i:" + i);
+			if(firstOne){
+				firstOne = false;
+				success = submitFirstRoute(sessionID,route.subList(i, i+80), totalDistance) && success;
+			}else{
+				success = submitMoreRoutes(sessionID, route.subList(i, i+80)) && success;
+			}
+		}
+		LOG.info("submitRoute: i:" + i);
+		if(route.size() > i){
+			if(firstOne){
+				firstOne = false;
+				success = submitFirstRoute(sessionID, route.subList(i, route.size()), totalDistance) && success;
+			}else{
+				success = submitMoreRoutes(sessionID, route.subList(i, route.size())) && success;
+			}
+			//			success = submitMoreRoutes(sessionID, route.subList(i, route.size())) && success;
+		}
+
+		if(success){
+			return totalDistance;
+		}else{
+			return -1;
+		}
+	}
+
+	public boolean removeSession(String sessionID){
+		boolean success = true;
+
+		//return values list
+		List<Result> results = null;
+
+		//params
+		Map<String,Object> params = new HashMap<>();
+		params.put("sessionID", sessionID);
+
+		//ArrayList to save the trajectory
+		results = query("tracking_removeSession(sessionID);"
+				+ "",params);
+
+		return success;
+	}
+
 	private boolean sessionIsEmpty(String sessionID){
 		if(sessionID == null){
 			LOG.error("sessionIsEmpty: sessionID is null!");
@@ -799,54 +440,6 @@ public class DBTrackingAPI extends DBAPI{
 		//		}
 
 		return ((results != null) && results.get(0).getBoolean());
-	}
-
-	public double submitRoute(String sessionID, List<TraceVertex> submittedRoute){
-		boolean success = true;
-
-		//Route parsing so that there are no two subsequent points being added with the same coords.
-		List<TraceVertex> route = TraceLocationMethods.routeParser(submittedRoute);
-
-		LOG.info("submitRoute: submittedRoute:" + submittedRoute.size());
-		LOG.info("submitRoute: route:" + route.size());
-
-		//TODO remove the "removeSession()" and uncomment the rest after DEBUG PHASE is completed
-		if(!sessionIsEmpty(sessionID)){
-			removeSession(sessionID);
-//			LOG.error("submitRoute: session is not empty!");
-//			return -1;
-		}
-
-		Double totalDistance = TraceLocationMethods.routeTotalDistance(route);
-
-		//TODO: split the route in chunks of 80
-		boolean firstOne = true;
-		int i = 0;
-		for(i = 0; i+79 < route.size(); i+=80){
-			LOG.info("submitRoute: i:" + i);
-			if(firstOne){
-				firstOne = false;
-				success = submitFirstRoute(sessionID,route.subList(i, i+80), totalDistance) && success;
-			}else{
-				success = submitMoreRoutes(sessionID, route.subList(i, i+80)) && success;
-			}
-		}
-		LOG.info("submitRoute: i:" + i);
-		if(route.size() > i){
-			if(firstOne){
-				firstOne = false;
-				success = submitFirstRoute(sessionID, route.subList(i, route.size()), totalDistance) && success;
-			}else{
-				success = submitMoreRoutes(sessionID, route.subList(i, route.size())) && success;
-			}
-			//			success = submitMoreRoutes(sessionID, route.subList(i, route.size())) && success;
-		}
-		
-		if(success){
-			return totalDistance;
-		}else{
-			return -1;
-		}
 	}
 
 	private boolean submitFirstRoute(String sessionID, List<TraceVertex> route, double totalDistance){
@@ -1000,7 +593,7 @@ public class DBTrackingAPI extends DBAPI{
 
 		//Get the ID of the last vertex
 		queryString += "finishID = E0.clone().next().id();";
-		
+
 		//Get the session Vertex
 		queryString += "SessionVertex = g.V().hasLabel('session').has('sessionID', sessionID).next();";
 
@@ -1065,48 +658,46 @@ public class DBTrackingAPI extends DBAPI{
 		//		//Complete the cycle and close the route with the "finish" edge
 		queryString += "g.V(C"+(route.size()-1)+").next().addEdge('session', SessionVertex, 'type', 'finish', 'sessionID', sessionID, 'date', date"+(route.size()-1)+");";
 
-//		queryString += "finishID;";
-		
+		//		queryString += "finishID;";
+
 		//Drop the session "finish" edge
 		queryString += "g.E(finishID).drop();";
 
 		results = query(queryString,params);
-//		System.out.println("+++++++"+results.get(0).getString());
-		
-//		params.clear();
-//		if(results != null && !results.isEmpty()){
-//			LOG.info("finishID: " + results.get(0).getString());
-//			params.put("finishID", results.get(0).getString());
-//
-//			queryString = "g.E(finishID).drop();";
-//			results = query(queryString,params);
-//		}
+		//		System.out.println("+++++++"+results.get(0).getString());
+
+		//		params.clear();
+		//		if(results != null && !results.isEmpty()){
+		//			LOG.info("finishID: " + results.get(0).getString());
+		//			params.put("finishID", results.get(0).getString());
+		//
+		//			queryString = "g.E(finishID).drop();";
+		//			results = query(queryString,params);
+		//		}
 
 		return results!=null;
 	}
 
-	//TODO: try to find a way to delete both edges and vertices in a single query
-	public boolean removeSession(String sessionID){
-		boolean success = true;
-
-		//return values list
+	public String test(List<String> list){
 		List<Result> results = null;
+		
+		Gson gson = new Gson();
 
 		//params
 		Map<String,Object> params = new HashMap<>();
-		params.put("sessionID", sessionID);
+		String gsonString = gson.toJson(list);
+		System.out.println(gsonString);
+		
+		params.put("list", gson);
 
-		//ArrayList to save the trajectory
+		//query
 		results = query(""
-				//				+ "g.V().has('sessionID', sessionID).drop();"
-				+ "g.E().has('sessionID', sessionID).drop();"
+				+ "tracking_submitRoute((String) list);"
 				+ "",params);
 
-		results = query(""
-				+ "g.V().has('sessionID', sessionID).drop();"
-				//				+ "g.E().has('sessionID', sessionID).drop();"
-				+ "",params);
-
-		return success;
+		if(results != null){
+			return results.get(0).getString();
+		}
+		return "";
 	}
 }
