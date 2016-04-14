@@ -233,37 +233,37 @@ public class TRACEStoreService {
 		return gson.toJson(response);
 	}
 
-	/**
-	 * Enables a tracking application to report its location, at a specific moment in time.
-	 * @param sessionId The user's session identifier, which operates as a pseudonym.
-	 * @param location The user's location
-	 * 
-	 * @return
-	 * 
-	 * @see GeoLocation
-	 */
-	@POST
-	@Secured
-	@Path("/put/geo/{session}")
-	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public String put(@PathParam("session") String session, GeoLocation location, @Context SecurityContext context){
-
-		boolean success;
-		GraphDB conn = GraphDB.getConnection();
-		success = conn.getTrackingAPI().put(
-				session,
-				new Date(location.getTimestamp()),
-				location.getLatitude(),
-				location.getLongitude());
-
-		if(success)
-			return generateSuccessResponse();
-		else{
-			LOG.error("Provided location was not accepted. TODO: provide verbose error");
-			return generateFailedResponse("Location insertion failed.");
-		}
-
-	}
+//	/**
+//	 * Enables a tracking application to report its location, at a specific moment in time.
+//	 * @param sessionId The user's session identifier, which operates as a pseudonym.
+//	 * @param location The user's location
+//	 * 
+//	 * @return
+//	 * 
+//	 * @see GeoLocation
+//	 */
+//	@POST
+//	@Secured
+//	@Path("/put/geo/{session}")
+//	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+//	public String put(@PathParam("session") String session, GeoLocation location, @Context SecurityContext context){
+//
+//		boolean success;
+//		GraphDB conn = GraphDB.getConnection();
+//		success = conn.getTrackingAPI().put(
+//				session,
+//				new Date(location.getTimestamp()),
+//				location.getLatitude(),
+//				location.getLongitude());
+//
+//		if(success)
+//			return generateSuccessResponse();
+//		else{
+//			LOG.error("Provided location was not accepted. TODO: provide verbose error");
+//			return generateFailedResponse("Location insertion failed.");
+//		}
+//
+//	}
 
 
 	private Map<String, Object> extractLocationAttributes(Location location){
