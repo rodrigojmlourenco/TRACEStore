@@ -106,7 +106,9 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 	
 	@Override
 	public boolean put(String session, Date timestamp, float latitude, float longitude) {
-		return graph.getTrackingAPI().put(session, timestamp, latitude, longitude);		
+//		return graph.getTrackingAPI().put(session, timestamp, latitude, longitude);		
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 
@@ -147,7 +149,9 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 		
 	@Override
 	public boolean registerUser(String username, String name, String address){
-		return graph.getTrackingAPI().register(username, name, address);
+//		return graph.getTrackingAPI().register(username, name, address);
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 
