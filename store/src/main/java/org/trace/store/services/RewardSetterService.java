@@ -397,4 +397,25 @@ public class RewardSetterService {
 			return e.getMessage();
 		}
 	}
+	
+//	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON})
+	/**
+	 * Fetches the Km of the specified user
+	 */
+	@GET
+	@Path("/userDistanceByDate")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String userDistanceByDate(int userId){
+		Gson gson = new Gson();
+		JsonArray jArray = new JsonArray();
+//		try {
+//			double distance = rDriver.getUserDistance(userId);
+//			
+//			return gson.toJson(distance);
+			return "userId: " + userId;
+//		} catch (UnableToPerformOperation e) {
+//			return e.getMessage();
+//		}
+	}
 }
