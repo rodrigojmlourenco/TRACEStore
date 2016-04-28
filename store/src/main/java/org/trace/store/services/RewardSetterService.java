@@ -404,16 +404,16 @@ public class RewardSetterService {
 	 */
 	@POST
 	@Path("/userDistanceByDate")
-	@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON})
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String userDistanceByDate(String userId, String startDate, String endDate){
+	public String userDistanceByDate(String userId){
 		Gson gson = new Gson();
 		JsonArray jArray = new JsonArray();
 //		try {
 //			double distance = rDriver.getUserDistance(userId);
 //			
 //			return gson.toJson(distance);
-			String toReturn = "userId: " + userId + " startDate: " + startDate + " endDate: " + endDate;
+			String toReturn = "userId: " + userId;
 		
 			return gson.toJson(toReturn);
 //		} catch (UnableToPerformOperation e) {
