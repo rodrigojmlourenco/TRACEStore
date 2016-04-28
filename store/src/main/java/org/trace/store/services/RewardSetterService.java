@@ -406,7 +406,7 @@ public class RewardSetterService {
 	@Path("/userDistanceByDate")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String userDistanceByDate(int userId){
+	public String userDistanceByDate(String userId){
 		Gson gson = new Gson();
 		JsonArray jArray = new JsonArray();
 //		try {
