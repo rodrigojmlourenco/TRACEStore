@@ -413,7 +413,9 @@ public class RewardSetterService {
 //			double distance = rDriver.getUserDistance(userId);
 //			
 //			return gson.toJson(distance);
-			return "userId: " + userId;
+			String toReturn = "userId: " + userId;
+		
+			return gson.toJson(toReturn);
 //		} catch (UnableToPerformOperation e) {
 //			return e.getMessage();
 //		}
