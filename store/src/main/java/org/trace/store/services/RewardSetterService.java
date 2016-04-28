@@ -402,7 +402,7 @@ public class RewardSetterService {
 	/**
 	 * Fetches the Km of the specified user
 	 */
-	@GET
+	@POST
 	@Path("/userDistanceByDate")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
