@@ -59,6 +59,7 @@ public class RewarderDriverImpl implements RewarderDriver{
 			stmt.setInt(1, userId);
 			ResultSet result = stmt.executeQuery();
 
+			result.next();
 			double distance = result.getDouble(1);
 			stmt.close();
 			return distance;
