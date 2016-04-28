@@ -46,6 +46,26 @@ public class RewarderDriverImpl implements RewarderDriver{
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
+	
+	@Override
+	public double getUserDistance(String userId) throws UnableToPerformOperation {
+		
+		PreparedStatement stmt;
+		List<String> userIDs = new ArrayList<>();
+		try {
+//			stmt = conn.prepareStatement("SELECT a.UserId FROM (SELECT UserId, sum(distance) AS TotalDistance FROM sessions GROUP BY UserId) AS a WHERE a.TotalDistance >= ?;");
+			stmt = conn.prepareStatement("SELECT sum(distance) FROM sessions WHERE UserId == ?;");
+
+			stmt.setString(1, userId);
+			ResultSet result = stmt.executeQuery();
+
+			double distance = result.getDouble(1);
+			stmt.close();
+			return distance;
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
 
 	private String createDistanceCondition(double distance){
 		JsonObject condition = new JsonObject();

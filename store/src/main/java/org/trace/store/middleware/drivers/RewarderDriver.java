@@ -22,4 +22,6 @@ public interface RewarderDriver {
 	public boolean ownsReward(int ownerId, int rewardId) throws UnableToPerformOperation;
 
 	public boolean unregisterReward(int rewardId) throws UnableToPerformOperation;
+
+	public double getUserDistance(String userId) throws UnableToPerformOperation;;
 }
