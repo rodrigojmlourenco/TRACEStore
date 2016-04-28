@@ -386,7 +386,7 @@ public class RewardSetterService {
 	@GET
 	@Path("/userDistance/{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String userDistance(@PathParam("userId") String userId){
+	public String userDistance(@PathParam("userId") int userId){
 		Gson gson = new Gson();
 		JsonArray jArray = new JsonArray();
 		try {
