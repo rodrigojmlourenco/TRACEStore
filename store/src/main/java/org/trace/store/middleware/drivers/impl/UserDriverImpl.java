@@ -708,7 +708,7 @@ public class UserDriverImpl implements UserDriver{
 				isUser = set.getInt(1) == 1;
 				isRewarder =  set.getInt(2) == 1;
 				isUrbanPlanner = set.getInt(3) == 1;
-				isAdmin = set.getInt(3) == 1;
+				isAdmin = set.getInt(4) == 1;
 				
 				if(isUser) roles.add(Role.user);
 				if(isRewarder) roles.add(Role.rewarder);
