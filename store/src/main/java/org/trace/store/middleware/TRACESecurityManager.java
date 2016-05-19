@@ -274,7 +274,8 @@ public class TRACESecurityManager{
 	private final HttpTransport gTransport = new NetHttpTransport();
 	private GoogleIdTokenVerifier gTokenVerifier = null;
 	private GoogleIdTokenVerifier androidTokenVerifier = null;
-	private GoogleIdTokenVerifier cycleToShopTokenVerifier = null; 
+	private GoogleIdTokenVerifier cycleToShopTokenVerifier = null;
+	private GoogleIdTokenVerifier ruiTokenVerifier = null;
 	
 	private boolean setupGoogleTokenVerifier(String path){
 		
@@ -297,6 +298,12 @@ public class TRACESecurityManager{
 			cycleToShopTokenVerifier =
 					new GoogleIdTokenVerifier.Builder(gTransport, gJsonFactory)
 					.setAudience(Arrays.asList("39501371553-cap839t9upo52fr71bcde7isgp2rundj.apps.googleusercontent.com"))
+					.setIssuer("https://accounts.google.com")
+					.build();
+			
+			ruiTokenVerifier =
+					new GoogleIdTokenVerifier.Builder(gTransport, gJsonFactory)
+					.setAudience(Arrays.asList("683411081869-9t4eds86t7q9rh1u17kbgvv86bamosuj.apps.googleusercontent.com"))
 					.setIssuer("https://accounts.google.com")
 					.build();
 					
@@ -330,8 +337,14 @@ public class TRACESecurityManager{
 					LOG.error("@validateGoogleAuthToken: 2nd too...");
 					token = cycleToShopTokenVerifier.verify(idToken);
 					
-					if(token == null)
-						LOG.error("@validateGoogleAuthToken: 3rd too...");
+					if(token == null){
+						LOG.error("@validateGoogleAuthToken: cycletoshop too...");
+						token = ruiTokenVerifier.verify(idToken);
+						
+						if(token == null)
+							LOG.error("@validateGoogleAuthToken: rui too... all failed");
+					}
+						
 				}
 			}
 			
