@@ -274,6 +274,7 @@ public class TRACESecurityManager{
 	private final HttpTransport gTransport = new NetHttpTransport();
 	private GoogleIdTokenVerifier gTokenVerifier = null;
 	private GoogleIdTokenVerifier androidTokenVerifier = null;
+	private GoogleIdTokenVerifier cycleToShopTokenVerifier = null; 
 	
 	private boolean setupGoogleTokenVerifier(String path){
 		
@@ -290,6 +291,12 @@ public class TRACESecurityManager{
 			androidTokenVerifier =
 					new GoogleIdTokenVerifier.Builder(gTransport, gJsonFactory)
 					.setAudience(Arrays.asList(gAudience))
+					.setIssuer("https://accounts.google.com")
+					.build();
+			
+			androidTokenVerifier =
+					new GoogleIdTokenVerifier.Builder(gTransport, gJsonFactory)
+					.setAudience(Arrays.asList("39501371553-cap839t9upo52fr71bcde7isgp2rundj.apps.googleusercontent.com"))
 					.setIssuer("https://accounts.google.com")
 					.build();
 					
@@ -319,7 +326,13 @@ public class TRACESecurityManager{
 				LOG.error("@validateGoogleAuthToken: First try failed...");
 				token = androidTokenVerifier.verify(idToken);
 				
-				if(token == null) LOG.error("@validateGoogleAuthToken: 2nd too...");
+				if(token == null){
+					LOG.error("@validateGoogleAuthToken: 2nd too...");
+					token = cycleToShopTokenVerifier.verify(idToken);
+					
+					if(token == null)
+						LOG.error("@validateGoogleAuthToken: 3rd too...");
+				}
 			}
 			
 			if(token != null && token.getPayload().getEmailVerified()){
