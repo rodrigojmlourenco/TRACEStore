@@ -294,7 +294,7 @@ public class TRACESecurityManager{
 					.setIssuer("https://accounts.google.com")
 					.build();
 			
-			androidTokenVerifier =
+			cycleToShopTokenVerifier =
 					new GoogleIdTokenVerifier.Builder(gTransport, gJsonFactory)
 					.setAudience(Arrays.asList("39501371553-cap839t9upo52fr71bcde7isgp2rundj.apps.googleusercontent.com"))
 					.setIssuer("https://accounts.google.com")
