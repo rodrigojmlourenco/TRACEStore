@@ -71,13 +71,14 @@ public class AuthenticationEndpoint {
 	private String performNativeLogin(String username, String password){
 
 		try {
+			
 			if(!manager.isActiveUser(username)){
 				LOG.error("User '"+username+"' attempted to loggin without an active account");
-				return generateError(1, username+" has not activated his account yet");
+				return generateError(2, username+" has not activated his account yet");
 			}
 		} catch (UnknownUserException e1) {
 			LOG.error("Unknown user '"+username+"' attempted to loggin.");
-			return generateError(2, e1.getMessage());
+			return generateError(1, e1.getMessage());
 		}
 
 		//Step 2 - Validate the provided password against the one stored in the database
@@ -116,7 +117,7 @@ public class AuthenticationEndpoint {
 			manager.registerToken(idToken, TokenType.google);
 			
 		} catch (InvalidAuthTokenException e) {
-			return generateError(1, e.getMessage());
+			return generateError(4, e.getMessage());
 		}
 
 		// Step 2 - Check if user exists, and if not register him
@@ -138,13 +139,13 @@ public class AuthenticationEndpoint {
 				userDriver.activateAccount(activationToken);
 			
 			} catch (UserRegistryException | UnableToRegisterUserException | UnableToPerformOperation e1) {
-				return generateError(2, e.getMessage());
+				return generateError(5, e.getMessage());
 			} catch (ExpiredTokenException e1) {
-				return generateError(3, e.getMessage());
+				return generateError(6, e.getMessage());
 			}
 			
 		} catch (UnableToPerformOperation  e) {
-			return generateError(4, e.getMessage());
+			return generateError(7, e.getMessage());
 		}
 		
 		JsonObject jToken = new JsonObject();

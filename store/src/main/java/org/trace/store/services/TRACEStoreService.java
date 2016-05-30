@@ -134,13 +134,13 @@ public class TRACEStoreService {
 			address = address == null ? "" :address;
 
 			if(!name.isEmpty() && !FormFieldValidator.isValidName(name))
-				return generateFailedResponse(6, "Invalid name");
+				return generateFailedResponse(8, "Invalid name");
 
 			if(!phone.isEmpty() && !FormFieldValidator.isValidPhoneNumber(phone))
-				return generateFailedResponse(7, "Invalid phone number");
+				return generateFailedResponse(9, "Invalid phone number");
 
 			if(!address.isEmpty() && !FormFieldValidator.isValidAddress(address))
-				return generateFailedResponse(8, "Invalid address");
+				return generateFailedResponse(10, "Invalid address");
 
 
 		} catch (InvalidEmailException e) {
@@ -155,10 +155,10 @@ public class TRACEStoreService {
 			return generateFailedResponse(5, "Email address already registered");
 		} catch (NonMatchingPasswordsException e) {
 			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return generateFailedResponse(5, "Non matching passwords.");
+			return generateFailedResponse(6, "Non matching passwords.");
 		} catch (SQLException e) {
 			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return generateFailedResponse(9, e.getMessage());
+			return generateFailedResponse(7, e.getMessage());
 		}
 
 		try{
@@ -176,10 +176,10 @@ public class TRACEStoreService {
 			return generateSuccessResponse(activationToken);
 		}catch (UnableToRegisterUserException e) {
 			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return generateFailedResponse(10, e.getMessage());
+			return generateFailedResponse(7, e.getMessage());
 		}	 catch (UnableToPerformOperation e) {
 			LOG.error("User '"+request.getUsername()+"' not registered, because "+e.getMessage());
-			return generateFailedResponse(11, e.getMessage());
+			return generateFailedResponse(7, e.getMessage());
 		}
 	}
 
