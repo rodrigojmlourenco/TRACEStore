@@ -340,7 +340,7 @@ public class DBTrackingAPI extends DBAPI{
 
 		return userSessions;
 	}
-
+	
 	public double submitRoute(String sessionID, List<TraceVertex> submittedRoute){
 		boolean success = true;
 
@@ -678,26 +678,26 @@ public class DBTrackingAPI extends DBAPI{
 		return results!=null;
 	}
 
-	public String test(List<String> list){
-		List<Result> results = null;
-		
-		Gson gson = new Gson();
-
-		//params
-		Map<String,Object> params = new HashMap<>();
-		String gsonString = gson.toJson(list);
-		System.out.println(gsonString);
-		
-		params.put("list", gson);
-
-		//query
-		results = query(""
-				+ "tracking_submitRoute((String) list);"
-				+ "",params);
-
-		if(results != null){
-			return results.get(0).getString();
-		}
-		return "";
-	}
+//	public String test(List<String> list){
+//		List<Result> results = null;
+//		
+//		Gson gson = new Gson();
+//
+//		//params
+//		Map<String,Object> params = new HashMap<>();
+//		String gsonString = gson.toJson(list);
+//		System.out.println(gsonString);
+//		
+//		params.put("list", gson);
+//
+//		//query
+//		results = query(""
+//				+ "tracking_submitRoute((String) list);"
+//				+ "",params);
+//
+//		if(results != null){
+//			return results.get(0).getString();
+//		}
+//		return "";
+//	}
 }

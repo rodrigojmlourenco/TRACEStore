@@ -37,6 +37,7 @@ import org.trace.store.middleware.drivers.utils.FormFieldValidator;
 import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.UserRegistryRequest;
 import org.trace.store.services.api.data.DistanceBasedRewardRequest;
+import org.trace.store.services.api.data.RegisterShopRequest;
 import org.trace.store.services.api.data.TraceReward;
 
 import com.google.gson.Gson;
@@ -419,5 +420,33 @@ public class RewardSetterService {
 //		} catch (UnableToPerformOperation e) {
 //			return e.getMessage();
 //		}
+	}
+	
+	@POST
+	@Path("/set/shop")
+	@Secured(Role.rewarder)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String registerShop(RegisterShopRequest request, @Context SecurityContext context){
+		
+		String user = context.getUserPrincipal().getName();
+		
+		try {
+			int ownerId = uDriver.getUserID(user);
+			
+			if(!hasRewarderRole(user)){
+				LOG.error(user+" is not a rewarder");
+				return generateFailedResponse(1, "The user is not a rewarder");
+			}
+			
+			rDriver.registerShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
+			
+			return generateSuccessResponse("");
+			
+		} catch (UnknownUserException e){
+			return generateFailedResponse(2, e.getMessage());
+		}catch (UnableToPerformOperation e) {
+			return generateFailedResponse(3, e.getMessage());
+		}
 	}
 }

@@ -154,4 +154,29 @@ public class RewarderDriverImpl implements RewarderDriver{
 		}
 		
 	}
+
+	@Override
+	public boolean registerShop(int ownerId, String name, String branding, double latitude, double longitude)
+			throws UnableToPerformOperation {
+		
+		PreparedStatement stmt;
+
+		try{
+			stmt = conn.prepareStatement("INSERT INTO shops (OwnerId, Name, Branding, Latitude, Longitude) VALUES (?,?,?,?,?)");
+			
+			stmt.setInt(1, ownerId);
+			stmt.setString(2, name);
+			stmt.setString(3, branding);
+			stmt.setDouble(4, latitude);
+			stmt.setDouble(5, longitude);
+			
+			ResultSet set = stmt.executeQuery();
+			stmt.close();
+			
+			return true;
+			
+		}catch(SQLException e){
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
 }

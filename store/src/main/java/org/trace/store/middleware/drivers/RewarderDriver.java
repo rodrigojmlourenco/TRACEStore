@@ -23,5 +23,8 @@ public interface RewarderDriver {
 
 	public boolean unregisterReward(int rewardId) throws UnableToPerformOperation;
 
-	public double getUserDistance(int userId) throws UnableToPerformOperation;;
+	public double getUserDistance(int userId) throws UnableToPerformOperation;
+	
+	public boolean registerShop(int ownerId, String name, String branding, double latitude, double longitude) throws UnableToPerformOperation;
+
 }

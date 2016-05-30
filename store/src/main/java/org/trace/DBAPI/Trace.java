@@ -16,7 +16,8 @@ public class Trace {
 		System.out.println("Trace.java");
 		
 		//Logger configurations
-		org.apache.log4j.BasicConfigurator.configure();
+//		org.apache.log4j.BasicConfigurator.configure();
+		
 		
 		//Data Base connection class, hides unnecessary complexity
 		TraceDB db = new TraceDB();
@@ -860,7 +861,6 @@ public class Trace {
 //			System.out.println("#Points: " + routeForSubmission.size());
 			
 //			double totalDistance = TraceLocationMethods.routeTotalDistance(routeForSubmission); 
-//			String sessionID = new TraceSession().getSessionID();
 
 //			String sessionID = "12345";
 //			Date date1 = new Date();
@@ -870,7 +870,7 @@ public class Trace {
 			
 //			Date date2 = new Date();
 //			long time = date2.getTime() - date1.getTime();
-//			
+////			
 //			System.out.println("done: " + time + "ms.");
 //			System.out.println("Total Points: " + routeForSubmission.size());
 //			System.out.println("Total Effective Points: " + TraceLocationMethods.routeParser(routeForSubmission).size());
@@ -919,10 +919,10 @@ public class Trace {
 //			System.out.println(allSessions);
 			
 			
-			List<String> list = new ArrayList<>();
-			list.add("testing1");
-			list.add("testing2");
-			System.out.println(apiTracking.test(list));
+//			List<String> list = new ArrayList<>();
+//			list.add("testing1");
+//			list.add("testing2");
+//			System.out.println(apiTracking.test(list));
 			
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++			
@@ -976,6 +976,9 @@ public class Trace {
 //			for(String d : details){
 //				System.out.println(d);
 //			}
+			
+//			String test = apiTracking.testingThis();
+//			System.out.println("Test: " + test);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
