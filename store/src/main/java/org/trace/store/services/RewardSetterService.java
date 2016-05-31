@@ -180,9 +180,6 @@ public class RewardSetterService {
 		} catch (UnableToPerformOperation | UnknownUserException e) {
 			return false;
 		}
-		
-		
-			
 	}
 
 	@POST
@@ -429,8 +426,6 @@ public class RewardSetterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String registerShop(RegisterShopRequest request, @Context SecurityContext context){
 		
-		LOG.info("registerShop 1st line");
-		
 		String user = context.getUserPrincipal().getName();
 		
 		try {
@@ -441,12 +436,8 @@ public class RewardSetterService {
 				return generateFailedResponse(1, "The user is not a rewarder");
 			}
 
-			LOG.info("registerShop before driver.registerShop");
-
 			rDriver.registerShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
 			
-			LOG.info("registerShop after driver.registerShop");
-
 			return generateSuccessResponse("shop");
 			
 		} catch (UnknownUserException e){

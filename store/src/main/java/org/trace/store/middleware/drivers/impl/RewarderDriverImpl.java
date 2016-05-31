@@ -1,5 +1,6 @@
 package org.trace.store.middleware.drivers.impl;
 
+import java.beans.Statement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.tinkerpop.shaded.minlog.Log;
 import org.trace.store.middleware.drivers.RewarderDriver;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.services.api.data.TraceReward;
@@ -162,7 +164,8 @@ public class RewarderDriverImpl implements RewarderDriver{
 		PreparedStatement stmt;
 
 		try{
-			stmt = conn.prepareStatement("INSERT INTO shops (OwnerId, Name, Branding, Latitude, Longitude) VALUES (?,?,?,?,?)");
+			stmt = conn.prepareStatement("INSERT INTO shops (OwnerId, Name, Branding, Latitude, Longitude) VALUES (?,?,?,?,?)", 
+					java.sql.Statement.RETURN_GENERATED_KEYS);
 			
 			stmt.setInt(1, ownerId);
 			stmt.setString(2, name);
@@ -171,6 +174,19 @@ public class RewarderDriverImpl implements RewarderDriver{
 			stmt.setDouble(5, longitude);
 			
 			ResultSet set = stmt.executeQuery();
+			int genKey;
+			
+			try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+	            if (generatedKeys.next()) {
+	            	genKey = generatedKeys.getInt(1);
+	            }
+	            else {
+	                throw new SQLException("Creating user failed, no ID obtained.");
+	            }
+	        }
+			
+			Log.info("genKey:" + genKey);
+			
 			stmt.close();
 			
 			return true;
