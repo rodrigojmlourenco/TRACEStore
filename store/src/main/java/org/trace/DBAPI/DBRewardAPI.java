@@ -132,7 +132,7 @@ public class DBRewardAPI extends DBAPI{
 
 		//Check if position 
 		
-		query("graph.addVertex(label,'shop','shopId', shopId, 'ownerID', ownerID,'name', name, 'branding', branding, 'location', Geoshape.point(latitude,longitude))"
+		query("graph.addVertex(label,'shop','shopId', shopId, 'ownerId', ownerId,'name', name, 'branding', branding, 'location', Geoshape.point(latitude,longitude))"
 				+ "",params);
 		
 		return true;
