@@ -158,7 +158,7 @@ public class RewarderDriverImpl implements RewarderDriver{
 	}
 
 	@Override
-	public boolean registerShop(int ownerId, String name, String branding, double latitude, double longitude)
+	public int registerShop(int ownerId, String name, String branding, double latitude, double longitude)
 			throws UnableToPerformOperation {
 		
 		PreparedStatement stmt;
@@ -174,7 +174,7 @@ public class RewarderDriverImpl implements RewarderDriver{
 			stmt.setDouble(5, longitude);
 			
 			ResultSet set = stmt.executeQuery();
-			int genKey;
+			int genKey = -1;
 			
 			try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
 	            if (generatedKeys.next()) {
@@ -185,11 +185,10 @@ public class RewarderDriverImpl implements RewarderDriver{
 	            }
 	        }
 			
-			Log.info("genKey:" + genKey);
-			
+//			Log.info("genKey:" + genKey);
 			stmt.close();
 			
-			return true;
+			return genKey;
 			
 		}catch(SQLException e){
 			throw new UnableToPerformOperation(e.getMessage());

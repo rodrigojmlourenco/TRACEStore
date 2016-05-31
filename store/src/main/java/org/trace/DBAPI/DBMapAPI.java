@@ -26,8 +26,8 @@ public class DBMapAPI extends DBAPI{
 		params.put("vertexID",id);
 		params.put("latitude",latitude);
 		params.put("longitude",longitude);
-		params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
-		params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
+//		params.put("latitudeGridID", TraceLocationMethods.getGridID(latitude));
+//		params.put("longitudeGridID", TraceLocationMethods.getGridID(longitude));
 
 		//query
 		results = query("g.V().has('vertexID', vertexID).hasNext()", params);
@@ -38,8 +38,9 @@ public class DBMapAPI extends DBAPI{
 			results = query("graph.addVertex(label,'location',"
 					+ "'vertexID', vertexID,"
 					+ "'location', Geoshape.point(latitude,longitude),"
-					+ "'latitudeGridID', latitudeGridID,"
-					+ "'longitudeGridID', longitudeGridID)", params);
+//					+ "'latitudeGridID', latitudeGridID,"
+//					+ "'longitudeGridID', longitudeGridID)"
+					+ "", params);
 		}
 
 		return results != null;

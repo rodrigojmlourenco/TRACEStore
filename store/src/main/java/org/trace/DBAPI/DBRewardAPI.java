@@ -120,4 +120,21 @@ public class DBRewardAPI extends DBAPI{
 		
 		return true;
 	}
+	
+	public boolean setShop(int shopId, int ownerId, String name, String branding, double latitude, double longitude){
+		Map<String,Object> params = new HashMap<>();
+		params.put("shopId",shopId);
+		params.put("ownerId",ownerId);
+		params.put("name", name);
+		params.put("branding", branding);
+		params.put("latitude",latitude);
+		params.put("longitude",longitude); 
+
+		//Check if position 
+		
+		query("graph.addVertex(label,'shop','shopId', shopId, 'ownerID', ownerID,'name', name, 'branding', branding, 'location', Geoshape.point(latitude,longitude))"
+				+ "",params);
+		
+		return true;
+	}
 }

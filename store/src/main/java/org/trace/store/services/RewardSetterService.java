@@ -20,6 +20,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.apache.log4j.Logger;
 import org.trace.store.filters.Role;
 import org.trace.store.filters.Secured;
+import org.trace.store.middleware.backend.GraphDB;
 import org.trace.store.middleware.drivers.RewarderDriver;
 import org.trace.store.middleware.drivers.UserDriver;
 import org.trace.store.middleware.drivers.exceptions.EmailAlreadyRegisteredException;
@@ -436,7 +437,10 @@ public class RewardSetterService {
 				return generateFailedResponse(1, "The user is not a rewarder");
 			}
 
-			rDriver.registerShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
+			GraphDB conn = GraphDB.getConnection();
+			
+			int shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
+			conn.getRewardAPI().setShop(shopId, ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
 			
 			return generateSuccessResponse("shop");
 			

@@ -26,6 +26,8 @@ public class GraphDB {
 	private final DBMapAPI map;
 	private final TraceDB graphDB;
 	private final DBTrackingAPI tracking;
+	private final DBRewardAPI reward;
+
 	
 	private GraphDB(){
 
@@ -39,6 +41,7 @@ public class GraphDB {
 		
 		map = new DBMapAPI(graphDB.getClient());
 		tracking = new DBTrackingAPI(graphDB.getClient());
+		reward = new DBRewardAPI(graphDB.getClient());
 		LOG.info("Connection with the graph database successfull.");
 	}
 	public static GraphDB getConnection(){
@@ -48,7 +51,10 @@ public class GraphDB {
 	public DBTrackingAPI getTrackingAPI(){
 		return tracking;
 	}
-
+	
+	public DBRewardAPI getRewardAPI() {
+		return reward;
+	}
 	/**
 	 * Given an OSM input file, this method populates the graph database
 	 * with the vertices and edges found in said file. This parsing
