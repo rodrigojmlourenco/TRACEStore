@@ -429,7 +429,7 @@ public class RewardSetterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String registerShop(RegisterShopRequest request, @Context SecurityContext context){
 		
-		LOG.debug("registerShop 1st line");
+		LOG.info("registerShop 1st line");
 		
 		String user = context.getUserPrincipal().getName();
 		
@@ -441,11 +441,11 @@ public class RewardSetterService {
 				return generateFailedResponse(1, "The user is not a rewarder");
 			}
 
-			LOG.debug("registerShop before driver.registerShop");
+			LOG.info("registerShop before driver.registerShop");
 
 			rDriver.registerShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
 			
-			LOG.debug("registerShop after driver.registerShop");
+			LOG.info("registerShop after driver.registerShop");
 
 			return generateSuccessResponse("shop");
 			
