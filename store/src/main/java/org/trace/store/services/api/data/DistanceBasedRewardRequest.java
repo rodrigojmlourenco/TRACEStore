@@ -30,7 +30,4 @@ public class DistanceBasedRewardRequest {
 	public void setReward(String reward) {
 		this.reward = reward;
 	}
-	
-	
-
 }

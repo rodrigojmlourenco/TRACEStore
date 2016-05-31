@@ -429,6 +429,8 @@ public class RewardSetterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String registerShop(RegisterShopRequest request, @Context SecurityContext context){
 		
+		LOG.debug("registerShop 1st line");
+		
 		String user = context.getUserPrincipal().getName();
 		
 		try {
@@ -438,10 +440,14 @@ public class RewardSetterService {
 				LOG.error(user+" is not a rewarder");
 				return generateFailedResponse(1, "The user is not a rewarder");
 			}
-			
+
+			LOG.debug("registerShop before driver.registerShop");
+
 			rDriver.registerShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
 			
-			return generateSuccessResponse("");
+			LOG.debug("registerShop after driver.registerShop");
+
+			return generateSuccessResponse("shop");
 			
 		} catch (UnknownUserException e){
 			return generateFailedResponse(2, e.getMessage());
