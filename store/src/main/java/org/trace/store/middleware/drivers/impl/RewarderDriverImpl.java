@@ -161,7 +161,6 @@ public class RewarderDriverImpl implements RewarderDriver {
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
-
 	}
 
 	@Override
@@ -239,7 +238,8 @@ public class RewarderDriverImpl implements RewarderDriver {
 		PreparedStatement stmt;
 
 		try {
-			stmt = conn.prepareStatement("UPDATE shops SET Name=?, Branding=?, Latitude=?, Longitude=? where OwnerId=?;");
+			stmt = conn
+					.prepareStatement("UPDATE shops SET Name=?, Branding=?, Latitude=?, Longitude=? where OwnerId=?;");
 			stmt.setString(1, name);
 			stmt.setString(2, branding);
 			stmt.setDouble(3, latitude);
@@ -248,12 +248,12 @@ public class RewarderDriverImpl implements RewarderDriver {
 
 			int result = stmt.executeUpdate();
 			stmt.close();
-			
+
 			return result >= 1;
 
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
-		
+
 	}
 }

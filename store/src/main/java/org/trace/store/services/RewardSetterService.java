@@ -435,16 +435,23 @@ public class RewardSetterService {
 		
 		try {
 			int ownerId = uDriver.getUserID(user);
-			
 			if(!hasRewarderRole(user)){
 				LOG.error(user+" is not a rewarder");
 				return generateFailedResponse(1, "The user is not a rewarder");
 			}
-
-			GraphDB conn = GraphDB.getConnection();
 			
-			int shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
-			conn.getRewardAPI().setShop(shopId, ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
+			GraphDB conn = GraphDB.getConnection();
+
+			Shop shop = rDriver.getShop(ownerId);
+			
+			//register
+			if(shop == null){
+				int shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
+				conn.getRewardAPI().setShop(shopId, ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
+				
+			}else{ //update
+				rDriver.updateShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
+			}
 			
 			return generateSuccessResponse("shop");
 			
