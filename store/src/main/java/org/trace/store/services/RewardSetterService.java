@@ -462,20 +462,17 @@ public class RewardSetterService {
 	public String getShop(@Context SecurityContext context){
 		
 		String user = context.getUserPrincipal().getName();
-		Log.info("user: " + user);
 		
 		Shop shop = null;
 		
 		Gson gson = new Gson();
 		try {
 			int ownerId = uDriver.getUserID(user);
-			Log.info("ownerId: " + ownerId);
 
 			shop = rDriver.getShop(ownerId);
 			
 			if(shop != null){
-				Log.info(gson.toJson(shop));
-				return gson.toJson(shop);
+				return generateSuccessResponse(gson.toJson(shop));
 			}else{
 				return generateFailedResponse("This user has no shops registered.");
 			}

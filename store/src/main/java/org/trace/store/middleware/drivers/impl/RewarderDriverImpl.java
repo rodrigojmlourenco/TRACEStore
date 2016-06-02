@@ -212,28 +212,23 @@ public class RewarderDriverImpl implements RewarderDriver {
 
 			stmt.setInt(1, ownerId);
 
-			Log.info("stmt.executeQuery");
 			ResultSet result = stmt.executeQuery();
 
 			if (result.next()) {
-				Log.info("inside if");
 
 				int id = result.getInt(1);
 				String name = result.getString(3);
 				String branding = result.getString(4);
 				double latitude = result.getDouble(5);
 				double longitude = result.getDouble(6);
-				
-				Log.info("before creating shop");
 
 				shop = new Shop(id, ownerId, name, branding, latitude, longitude);
 			}
-
 			stmt.close();
 			return shop;
 
 		} catch (SQLException e) {
-			Log.error("SQLException:" + e.getMessage());
+			Log.error("SQLException: " + e.getMessage());
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
