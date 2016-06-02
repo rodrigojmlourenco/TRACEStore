@@ -39,6 +39,7 @@ import org.trace.store.services.api.RewardingPolicy;
 import org.trace.store.services.api.UserRegistryRequest;
 import org.trace.store.services.api.data.DistanceBasedRewardRequest;
 import org.trace.store.services.api.data.RegisterShopRequest;
+import org.trace.store.services.api.data.Shop;
 import org.trace.store.services.api.data.TraceReward;
 
 import com.google.gson.Gson;
@@ -427,6 +428,8 @@ public class RewardSetterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String registerShop(RegisterShopRequest request, @Context SecurityContext context){
 		
+//		TODO: add if user doesn't have a shop, but update in case he already has one.
+		
 		String user = context.getUserPrincipal().getName();
 		
 		try {
@@ -444,6 +447,33 @@ public class RewardSetterService {
 			
 			return generateSuccessResponse("shop");
 			
+		} catch (UnknownUserException e){
+			return generateFailedResponse(2, e.getMessage());
+		}catch (UnableToPerformOperation e) {
+			return generateFailedResponse(3, e.getMessage());
+		}
+	}
+	
+	@GET
+	@Path("/get/shop")
+	@Secured(Role.rewarder)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getShop(@Context SecurityContext context){
+		
+		String user = context.getUserPrincipal().getName();
+		Shop shop = null;
+		
+		Gson gson = new Gson();
+		try {
+			int ownerId = uDriver.getUserID(user);
+			shop = rDriver.getShop(ownerId);
+			
+			if(shop != null){
+				return gson.toJson(shop);
+			}else{
+				return generateFailedResponse("This user has no shops registered.");
+			}
+
 		} catch (UnknownUserException e){
 			return generateFailedResponse(2, e.getMessage());
 		}catch (UnableToPerformOperation e) {
