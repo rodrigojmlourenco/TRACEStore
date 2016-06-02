@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.log4j.Logger;
+import org.apache.tinkerpop.shaded.minlog.Log;
 import org.trace.store.filters.Role;
 import org.trace.store.filters.Secured;
 import org.trace.store.middleware.backend.GraphDB;
@@ -461,11 +462,15 @@ public class RewardSetterService {
 	public String getShop(@Context SecurityContext context){
 		
 		String user = context.getUserPrincipal().getName();
+		Log.info("user: " + user);
+		
 		Shop shop = null;
 		
 		Gson gson = new Gson();
 		try {
 			int ownerId = uDriver.getUserID(user);
+			Log.info("ownerId: " + ownerId);
+
 			shop = rDriver.getShop(ownerId);
 			
 			if(shop != null){
