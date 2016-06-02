@@ -474,6 +474,7 @@ public class RewardSetterService {
 			shop = rDriver.getShop(ownerId);
 			
 			if(shop != null){
+				Log.info(gson.toJson(shop));
 				return gson.toJson(shop);
 			}else{
 				return generateFailedResponse("This user has no shops registered.");
