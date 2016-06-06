@@ -194,8 +194,8 @@ public class RewardSetterService {
 		String user = context.getUserPrincipal().getName();
 		
 		try {
-			int ownerId = uDriver.getUserID(user);
-			int shopId = rDriver.getUserShop(ownerId);
+			int userId = uDriver.getUserID(user);
+			int shopId = rDriver.getShopId(userId);
 			
 			if(!hasRewarderRole(user)){
 				LOG.error(user+" is not a rewarder");
@@ -219,20 +219,21 @@ public class RewardSetterService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getRegisteredRewards(@Context SecurityContext context){
 		
-		int ownerId;
+		int userId, shopId;
 		String user = context.getUserPrincipal().getName();
 		
 		LOG.info("@getRegisteredRewards: Rewarder<"+user+">?");
 		
 		try {
-			ownerId = uDriver.getUserID(user);
+			userId = uDriver.getUserID(user);
+			shopId = rDriver.getShopId(userId);
 						
 			if(!hasRewarderRole(user)){
 				LOG.error(user+" is not a rewarder");
 				return generateFailedResponse(1, "The user is not a rewarder");
 			}
 						
-			List<TraceReward> rewards = rDriver.getAllOwnerRewards(ownerId);
+			List<TraceReward> rewards = rDriver.getAllShopRewards(shopId);
 			
 			Gson gson = new Gson();
 			JsonArray payload = new JsonArray();

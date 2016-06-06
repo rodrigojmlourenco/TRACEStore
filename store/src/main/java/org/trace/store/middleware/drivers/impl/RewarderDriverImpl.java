@@ -108,12 +108,12 @@ public class RewarderDriverImpl implements RewarderDriver {
 	}
 
 	@Override
-	public List<TraceReward> getAllOwnerRewards(int ownerId) throws UnableToPerformOperation {
+	public List<TraceReward> getAllShopRewards(int shopId) throws UnableToPerformOperation {
 		PreparedStatement stmt;
 		List<TraceReward> rewards = new ArrayList<>();
 		try {
-			stmt = conn.prepareStatement("SELECT Id, Conditions, Reward FROM rewards WHERE OwnerId=?");
-			stmt.setInt(1, ownerId);
+			stmt = conn.prepareStatement("SELECT Id, Conditions, Reward FROM challenges WHERE shopId=?");
+			stmt.setInt(1, shopId);
 			ResultSet result = stmt.executeQuery();
 
 			while (result.next()) {
@@ -257,7 +257,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 	}
 
 	@Override
-	public int getUserShop(int userId) throws UnableToPerformOperation {
+	public int getShopId(int userId) throws UnableToPerformOperation {
 		PreparedStatement stmt;
 		boolean owns = false;
 
@@ -280,7 +280,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 	}
 
 	@Override
-	public List<Integer> getUserShops(int userId) throws UnableToPerformOperation {
+	public List<Integer> getShopsIds(int userId) throws UnableToPerformOperation {
 		throw new UnsupportedOperationException();
 	}
 }
