@@ -1,11 +1,22 @@
 package org.trace.DBAPI;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Result;
+import org.apache.tinkerpop.gremlin.driver.ser.GryoMessageSerializerV1d0;
+import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONIo;
+import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONMapper;
+import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONWriter;
+import org.trace.store.services.api.data.Shop;
+
+import com.google.api.client.json.Json;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class DBRewardAPI extends DBAPI{
 	
@@ -121,38 +132,89 @@ public class DBRewardAPI extends DBAPI{
 		return true;
 	}
 	
-	public boolean setShop(int shopId, int ownerId, String name, String branding, double latitude, double longitude){
+	public boolean setShop(int shopId, int ownerId, double latitude, double longitude){
 		Map<String,Object> params = new HashMap<>();
 		params.put("shopId",shopId);
 		params.put("ownerId",ownerId);
-		params.put("name", name);
-		params.put("branding", branding);
 		params.put("latitude",latitude);
 		params.put("longitude",longitude); 
 
 		//Check if position 
 		
-		query("graph.addVertex(label,'shop','shopId', shopId, 'ownerId', ownerId,'name', name, 'branding', branding, 'location', Geoshape.point(latitude,longitude))"
+		query("graph.addVertex(label,'shop','shopId', shopId, 'ownerId', ownerId, 'location', Geoshape.point(latitude,longitude))"
 				+ "",params);
 		return true;
 	}
 	
-	public boolean updateShop(int shopId, String name, String branding, double latitude, double longitude){
+	public boolean updateShop(int shopId, double latitude, double longitude){
 		Map<String,Object> params = new HashMap<>();
 		params.put("shopId",shopId);
-		params.put("name", name);
-		params.put("branding", branding);
 		params.put("latitude",latitude);
 		params.put("longitude",longitude); 
 
 		//Check if position 
 		
 		query("g.V().hasLabel('shop').has('shopId', shopId)"
-				+ ".property('name', name)"
-				+ ".property('branding',branding)"
 				+ ".property('location',Geoshape.point(latitude,longitude));"
 				+ "",params);
 		
 		return true;
+	}
+	
+	public List<String> getShopsIds(double latitude, double longitude, double radius){
+		List<String> shopsId = new ArrayList<>();
+		List<Result> results = null;
+		Map<String,Object> params = new HashMap<>();
+		params.put("latitude",latitude);
+		params.put("longitude",longitude); 
+		params.put("radius",radius); 
+
+		results = query("g.V().hasLabel('shop')"
+				+ ".has('location', geoWithin(Geoshape.circle(latitude, longitude, radius)))"
+				+ ".values('shopId');"
+				+ "",params);
+		
+		for(Result result : results){
+			shopsId.add(result.getString());
+		}
+		return shopsId;
+	}
+	
+	public List<String> getShopsOwnerIds(double latitude, double longitude, double radius){
+		List<String> ownerIds = new ArrayList<>();
+		List<Result> results = null;
+		Map<String,Object> params = new HashMap<>();
+		params.put("latitude",latitude);
+		params.put("longitude",longitude); 
+		params.put("radius",radius); 
+
+		results = query("g.V().hasLabel('shop')"
+				+ ".has('location', geoWithin(Geoshape.circle(latitude, longitude, radius)))"
+				+ ".values('ownerId').dedup();"
+				+ "",params);
+		
+		for(Result result : results){
+			ownerIds.add(result.getString());
+		}
+		return ownerIds;
+	}
+	
+	public List<String> getShops(double latitude, double longitude, double radius){
+		List<String> ownerIds = new ArrayList<>();
+		List<Result> results = null;
+		Map<String,Object> params = new HashMap<>();
+		params.put("latitude",latitude);
+		params.put("longitude",longitude); 
+		params.put("radius",radius); 
+
+		results = query("g.V().hasLabel('shop')"
+				+ ".has('location', geoWithin(Geoshape.circle(latitude, longitude, radius)))"
+				+ ".valueMap();"
+				+ "",params);
+		
+		for(Result result : results){
+			ownerIds.add(result.getString());
+		}
+		return ownerIds;
 	}
 }

@@ -85,15 +85,15 @@ public class RewarderDriverImpl implements RewarderDriver {
 	}
 
 	@Override
-	public boolean registerDistanceBasedReward(int userId, double distance, String reward)
+	public boolean registerDistanceBasedReward(int shopId, double distance, String reward)
 			throws UnableToPerformOperation {
 
 		PreparedStatement stmt;
 
 		try {
-			stmt = conn.prepareStatement("INSERT INTO rewards (OwnerId, Conditions, Reward) VALUES (?,?,?)");
+			stmt = conn.prepareStatement("INSERT INTO challenges (shopId, Conditions, Reward) VALUES (?,?,?)");
 
-			stmt.setInt(1, userId);
+			stmt.setInt(1, shopId);
 			stmt.setString(2, createDistanceCondition(distance));
 			stmt.setString(3, reward);
 
@@ -254,6 +254,33 @@ public class RewarderDriverImpl implements RewarderDriver {
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
+	}
 
+	@Override
+	public int getUserShop(int userId) throws UnableToPerformOperation {
+		PreparedStatement stmt;
+		boolean owns = false;
+
+		try {
+			stmt = conn.prepareStatement("SELECT shopId FROM challenges WHERE ownerId=?");
+			stmt.setInt(1, userId);
+			ResultSet result = stmt.executeQuery();
+
+			owns = result.next();
+			stmt.close();
+			
+			if(owns){
+				return result.getInt(1);
+			}else{
+				return -1;
+			}
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<Integer> getUserShops(int userId) throws UnableToPerformOperation {
+		throw new UnsupportedOperationException();
 	}
 }

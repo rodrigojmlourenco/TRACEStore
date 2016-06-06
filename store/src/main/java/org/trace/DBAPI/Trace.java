@@ -980,6 +980,26 @@ public class Trace {
 //			String test = apiTracking.testingThis();
 //			System.out.println("Test: " + test);
 			
+			List<String> ids = apiReward.getShopsIds(38.73650042661486, -9.140659826807678, 5);
+			List<String> ownerIds = apiReward.getShopsOwnerIds(38.73650042661486, -9.140659826807678, 5);
+			List<String> values = apiReward.getShops(38.73650042661486, -9.140659826807678, 5);
+
+			System.out.println("Ids:");
+			for(String id : ids){
+				System.out.println(id);
+			}
+			System.out.println("++++++");
+			System.out.println("ownerIds:");
+			for(String ownerId : ownerIds){
+				System.out.println(ownerId);
+			}
+			System.out.println("++++++");
+			System.out.println("valueMap:");
+			for(String value : values){
+				System.out.println(value);
+			}
+			System.out.println("++++++");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

@@ -81,7 +81,6 @@ public class RewardSetterService {
 		return gson.toJson(response);
 	}
 	private String generateFailedResponse(int code, String msg){
-
 		JsonObject response = new JsonObject();
 		response.addProperty("code", code);
 		response.addProperty("success", false);
@@ -196,13 +195,14 @@ public class RewardSetterService {
 		
 		try {
 			int ownerId = uDriver.getUserID(user);
+			int shopId = rDriver.getUserShop(ownerId);
 			
 			if(!hasRewarderRole(user)){
 				LOG.error(user+" is not a rewarder");
 				return generateFailedResponse(1, "The user is not a rewarder");
 			}
 			
-			rDriver.registerDistanceBasedReward(ownerId, request.getTravelledDistance(), request.getReward());
+			rDriver.registerDistanceBasedReward(shopId, request.getTravelledDistance(), request.getReward());
 			
 			return generateSuccessResponse("");
 			
@@ -218,8 +218,6 @@ public class RewardSetterService {
 	@Path("/get/rewards")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getRegisteredRewards(@Context SecurityContext context){
-		
-		
 		
 		int ownerId;
 		String user = context.getUserPrincipal().getName();
@@ -447,14 +445,14 @@ public class RewardSetterService {
 			//register
 			if(shop == null){
 				int shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
-				conn.getRewardAPI().setShop(shopId, ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
+				conn.getRewardAPI().setShop(shopId, ownerId, request.getLatitude(), request.getLongitude());
 				
 			}else{ //update
 				rDriver.updateShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
-				conn.getRewardAPI().updateShop(shop.getId(), request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
+				conn.getRewardAPI().updateShop(shop.getId(), request.getLatitude(), request.getLongitude());
 			}
 			
-			return generateSuccessResponse("shop");
+			return generateSuccessResponse("" + shop.getId());
 			
 		} catch (UnknownUserException e){
 			return generateFailedResponse(2, e.getMessage());
