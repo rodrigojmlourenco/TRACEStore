@@ -262,7 +262,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 		boolean owns = false;
 
 		try {
-			stmt = conn.prepareStatement("SELECT shopId FROM challenges WHERE ownerId=?");
+			stmt = conn.prepareStatement("SELECT shopId FROM challenges WHERE shopId=?");
 			stmt.setInt(1, userId);
 			ResultSet result = stmt.executeQuery();
 
