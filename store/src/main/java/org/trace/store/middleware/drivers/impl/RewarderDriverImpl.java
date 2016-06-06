@@ -135,7 +135,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 		boolean owns = false;
 
 		try {
-			stmt = conn.prepareStatement("SELECT * FROM rewards WHERE OwnerId=? AND Id=?");
+			stmt = conn.prepareStatement("SELECT * FROM shops join challenges on shops.id = challenges.shopId where ownerId=? and challenges.id=?");
 			stmt.setInt(1, ownerId);
 			stmt.setInt(2, rewardId);
 			ResultSet result = stmt.executeQuery();
@@ -153,7 +153,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 	public boolean unregisterReward(int rewardId) throws UnableToPerformOperation {
 		PreparedStatement stmt;
 		try {
-			stmt = conn.prepareStatement("DELETE FROM rewards WHERE Id=?");
+			stmt = conn.prepareStatement("DELETE FROM challenges WHERE Id=?");
 			stmt.setInt(1, rewardId);
 			int result = stmt.executeUpdate();
 			stmt.close();
