@@ -451,6 +451,7 @@ public class RewardSetterService {
 				
 			}else{ //update
 				rDriver.updateShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
+				conn.getRewardAPI().updateShop(shop.getId(), request.getName(), request.getBranding(), request.getLatitude(), request.getLongitude());
 			}
 			
 			return generateSuccessResponse("shop");

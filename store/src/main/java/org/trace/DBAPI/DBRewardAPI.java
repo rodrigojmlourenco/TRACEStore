@@ -134,6 +134,24 @@ public class DBRewardAPI extends DBAPI{
 		
 		query("graph.addVertex(label,'shop','shopId', shopId, 'ownerId', ownerId,'name', name, 'branding', branding, 'location', Geoshape.point(latitude,longitude))"
 				+ "",params);
+		return true;
+	}
+	
+	public boolean updateShop(int shopId, String name, String branding, double latitude, double longitude){
+		Map<String,Object> params = new HashMap<>();
+		params.put("shopId",shopId);
+		params.put("name", name);
+		params.put("branding", branding);
+		params.put("latitude",latitude);
+		params.put("longitude",longitude); 
+
+		//Check if position 
+		
+		query("g.V().hasLabel('shop').has('shopId', shopId)"
+				+ ".property('name', name)"
+				+ ".property('branding',branding)"
+				+ ".property('location',Geoshape.point(latitude,longitude));"
+				+ "",params);
 		
 		return true;
 	}
