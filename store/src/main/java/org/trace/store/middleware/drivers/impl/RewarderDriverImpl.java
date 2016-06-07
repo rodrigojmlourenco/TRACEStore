@@ -376,8 +376,6 @@ public class RewarderDriverImpl implements RewarderDriver {
 					+ "FROM shops JOIN challenges ON shops.Id = challenges.Id " + "WHERE shops.Id IN ("
 					+ builder + ") " + "ORDER BY shops.Id";
 			
-			System.out.println(query);
-			
 			stmt = conn.prepareStatement(query);
 
 			int index = 1;
@@ -397,6 +395,8 @@ public class RewarderDriverImpl implements RewarderDriver {
 
 				shopId = resultSet.getInt("shopId");
 
+				System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>> ShopId: "+shopId);
+				
 				if (shopId != auxShopId) { // New Shop
 
 					// Step 1 - Create the shop
