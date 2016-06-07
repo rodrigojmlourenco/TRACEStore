@@ -257,7 +257,7 @@ public class RewardSetterService {
 	}
 	
 	@GET
-	@Path("/rewards/{lat, lon, radius}")
+	@Path("/rewards/{lat}&{lon}&{radius}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getShopRewards(@PathParam("lat") double latitude, @PathParam("lon") double longitude, @PathParam("radius") double radius){
 		
