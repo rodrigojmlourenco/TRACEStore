@@ -49,11 +49,13 @@ public class TraceDB {
 	public boolean initialize(String config){
 		try {
 			
-			if(config == "local"){
-				_cluster = Cluster.open("./src/main/resources/local.yaml");
-			}else{
-				_cluster = Cluster.open("./src/main/resources/remote.yaml");
-			}
+			_cluster = Cluster.open("./src/main/resources/" + config + ".yaml");
+			
+//			if(config == "local"){
+//				_cluster = Cluster.open("./src/main/resources/local.yaml");
+//			}else{
+//				_cluster = Cluster.open("./src/main/resources/remote.yaml");
+//			}
 			_client = _cluster.connect();
 		}catch(Exception e){
 			e.printStackTrace();

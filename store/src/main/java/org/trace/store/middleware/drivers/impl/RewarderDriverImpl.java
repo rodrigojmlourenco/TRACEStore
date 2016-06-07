@@ -283,4 +283,44 @@ public class RewarderDriverImpl implements RewarderDriver {
 	public List<Integer> getShopsIds(int userId) throws UnableToPerformOperation {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public Shop getShopDetails(int shopId) throws UnableToPerformOperation {
+		PreparedStatement stmt;
+		boolean exists = false;
+		Shop shop = null;
+
+		try {
+			stmt = conn.prepareStatement("SELECT ownerId, name, branding, latitude, longitude FROM shops WHERE id=?");
+			stmt.setInt(1, shopId);
+			ResultSet result = stmt.executeQuery();
+
+			exists = result.next();
+			stmt.close();
+			
+			if(exists){
+				int ownerId = result.getInt(1);
+				String name = result.getString(2);
+				String branding = result.getString(3);
+				double latitude = result.getDouble(4);
+				double longitude = result.getDouble(5);
+				
+				shop = new Shop(shopId, ownerId, name, branding, latitude, longitude);
+				return shop;
+			}
+			throw new UnableToPerformOperation("Shop doesn't exit. (shopId: " + shopId + ")");
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<Shop> getShopsDetails(List<Integer> shopsIds) throws UnableToPerformOperation {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<TraceReward> getRewardDetails(int shopId) throws UnableToPerformOperation {
+		throw new UnsupportedOperationException();
+	}
 }

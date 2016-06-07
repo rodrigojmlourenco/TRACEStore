@@ -48,8 +48,9 @@ public class DBAPI {
 //			System.out.println("-----------");
 //			System.out.println("Results (" + time + "ms):");
 //			for (Result result : results) {
-//				System.out.println(result.getString());
+//				System.out.println("" + result);
 //			}
+			System.out.println("results: " + results.toString());
 //			System.out.println("-----------");
 
 
