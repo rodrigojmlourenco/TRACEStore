@@ -369,7 +369,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 
 		for (String id : shopIds)
 			builder.append("?,");
-		builder.deleteCharAt(builder.length());
+		builder.deleteCharAt(builder.length()-1);
 
 		try {
 			stmt = conn.prepareStatement(
