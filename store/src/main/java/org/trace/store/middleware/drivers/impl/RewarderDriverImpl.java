@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.Size;
+
 import org.apache.log4j.Logger;
 import org.apache.tinkerpop.shaded.minlog.Log;
 import org.trace.store.middleware.drivers.RewarderDriver;
@@ -314,9 +316,40 @@ public class RewarderDriverImpl implements RewarderDriver {
 		}
 	}
 
+	//returns a list of Shop objects, with their corresponding details, based on the given list of shops ids.
 	@Override
 	public List<Shop> getShopsDetails(List<Integer> shopsIds) throws UnableToPerformOperation {
-		throw new UnsupportedOperationException();
+		PreparedStatement stmt;
+		boolean exists = false;
+		List<Shop> shops = new ArrayList<>();
+		
+		//cancel in case the list is empty
+		if(shopsIds == null || shopsIds.isEmpty()){
+			throw new UnableToPerformOperation("shopsIds list is empty!");
+		}
+		
+		String ids = "";
+		
+		for(int count = 0; count < shopsIds.size()-1; count++){
+			ids += "id = " + shopsIds.get(count) + " or ";
+			
+		}
+		ids += "id = " + shopsIds.get(shopsIds.size()-1);
+		
+		try {
+			stmt = conn.prepareStatement("SELECT id, ownerId, name, branding, latitude, longitude FROM shops WHERE " + ids);
+			ResultSet result = stmt.executeQuery();
+
+			stmt.close();
+			
+			while(result.next()){
+				shops.add(new Shop(result.getInt(1), result.getInt(2), result.getString(3), result.getString(4), result.getDouble(5), result.getDouble(6)));
+			}
+			return shops;
+			
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
 	}
 
 	@Override
