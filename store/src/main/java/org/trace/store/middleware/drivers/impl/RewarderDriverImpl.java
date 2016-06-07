@@ -372,9 +372,11 @@ public class RewarderDriverImpl implements RewarderDriver {
 		builder.deleteCharAt(builder.length()-1);
 
 		try {
-			String query = "Select shops.Id as shopId, challenges.Id as rewardId, Name, Branding, Latitude, Longitude, conditions, reward "
-					+ "FROM shops JOIN challenges ON shops.Id = challenges.ShopId " + "WHERE shops.Id IN ("
-					+ builder + ") " + "ORDER BY shops.Id";
+			String query = 
+					"Select shops.Id as shopId, challenges.Id as rewardId, Name, Branding, Latitude, Longitude, conditions, reward "
+					+ "FROM shops JOIN challenges ON shops.Id = challenges.ShopId " 
+					+ "WHERE shops.Id IN ("+ builder + ") "
+					+ "ORDER BY shops.Id";
 			
 			stmt = conn.prepareStatement(query);
 
@@ -394,8 +396,6 @@ public class RewarderDriverImpl implements RewarderDriver {
 			while (resultSet.next()) {
 
 				shopId = resultSet.getInt("shopId");
-
-				System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>> ShopId: "+shopId);
 				
 				if (shopId != auxShopId) { // New Shop
 
