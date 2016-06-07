@@ -373,7 +373,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 
 		try {
 			String query = "Select shops.Id as shopId, challenges.Id as rewardId, Name, Branding, Latitude, Longitude, conditions, reward "
-					+ "FROM shops JOIN challenges ON shops.Id = challenges.Id " + "WHERE shops.Id IN ("
+					+ "FROM shops JOIN challenges ON shops.Id = challenges.ShopId " + "WHERE shops.Id IN ("
 					+ builder + ") " + "ORDER BY shops.Id";
 			
 			stmt = conn.prepareStatement(query);
