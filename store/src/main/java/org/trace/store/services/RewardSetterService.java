@@ -280,6 +280,9 @@ public class RewardSetterService {
 		} catch (UnableToPerformOperation e) {
 			e.printStackTrace();
 			return generateFailedResponse(1, e.getMessage());
+		}catch (Exception e){
+			e.printStackTrace();
+			return generateFailedResponse(1, e.getMessage());
 		}
 	}
 	
