@@ -259,7 +259,7 @@ public class RewardSetterService {
 	@GET
 	@Path("/rewards")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getShopRewards(@FormParam("lat") double latitude, @FormParam("lon") double longitude, @FormParam("radius") double radius){
+	public String getShopRewards(@QueryParam("lat") double latitude, @QueryParam("lon") double longitude, @QueryParam("radius") double radius){
 		
 		GraphDB conn = GraphDB.getConnection();
 		List<String> shopIds = conn.getRewardAPI().getShopsIds(latitude, longitude, radius);
