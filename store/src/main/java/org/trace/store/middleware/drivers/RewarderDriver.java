@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.services.api.data.Shop;
+import org.trace.store.services.api.data.ShopDetailed;
 import org.trace.store.services.api.data.TraceReward;
 
 public interface RewarderDriver {
@@ -41,5 +42,7 @@ public interface RewarderDriver {
 	public List<Shop> getShopsDetails(List<Integer> shopsIds) throws UnableToPerformOperation;
 
 	public List<TraceReward> getRewardDetails(int shopId) throws UnableToPerformOperation;
+	
+	public List<ShopDetailed> getDetailedShops(List<String> shopIds) throws UnableToPerformOperation;
 
 }

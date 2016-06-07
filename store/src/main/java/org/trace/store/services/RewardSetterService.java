@@ -41,6 +41,7 @@ import org.trace.store.services.api.UserRegistryRequest;
 import org.trace.store.services.api.data.DistanceBasedRewardRequest;
 import org.trace.store.services.api.data.RegisterShopRequest;
 import org.trace.store.services.api.data.Shop;
+import org.trace.store.services.api.data.ShopDetailed;
 import org.trace.store.services.api.data.TraceReward;
 
 import com.google.gson.Gson;
@@ -255,6 +256,31 @@ public class RewardSetterService {
 		}catch( UnableToPerformOperation e) {
 			LOG.error(e.getMessage());
 			return generateFailedResponse(3, e.getMessage());
+		}
+	}
+	
+	@GET
+	@Path("/rewards")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getShopRewards(@FormParam("lat") double latitude, @FormParam("lon") double longitude, @FormParam("radius") double radius){
+		
+		GraphDB conn = GraphDB.getConnection();
+		List<String> shopIds = conn.getRewardAPI().getShopsIds(latitude, longitude, radius);
+		
+		JsonArray result = new JsonArray();
+		
+		try {
+			List<ShopDetailed> shopsWithRewards = rDriver.getDetailedShops(shopIds);
+			
+			for (ShopDetailed shop : shopsWithRewards) {
+				result.add(shop.toJson());
+			}
+			
+			return generateSuccessResponse(result.toString());
+			
+		} catch (UnableToPerformOperation e) {
+			e.printStackTrace();
+			return generateFailedResponse(1, e.getMessage());
 		}
 	}
 	

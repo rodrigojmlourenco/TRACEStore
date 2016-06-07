@@ -12,7 +12,9 @@ import org.apache.log4j.Logger;
 import org.apache.tinkerpop.shaded.minlog.Log;
 import org.trace.store.middleware.drivers.RewarderDriver;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.services.api.data.Reward;
 import org.trace.store.services.api.data.Shop;
+import org.trace.store.services.api.data.ShopDetailed;
 import org.trace.store.services.api.data.TraceReward;
 
 import com.google.gson.JsonObject;
@@ -135,7 +137,8 @@ public class RewarderDriverImpl implements RewarderDriver {
 		boolean owns = false;
 
 		try {
-			stmt = conn.prepareStatement("SELECT * FROM shops join challenges on shops.id = challenges.shopId where ownerId=? and challenges.id=?");
+			stmt = conn.prepareStatement(
+					"SELECT * FROM shops join challenges on shops.id = challenges.shopId where ownerId=? and challenges.id=?");
 			stmt.setInt(1, ownerId);
 			stmt.setInt(2, rewardId);
 			ResultSet result = stmt.executeQuery();
@@ -268,10 +271,10 @@ public class RewarderDriverImpl implements RewarderDriver {
 
 			owns = result.next();
 			stmt.close();
-			
-			if(owns){
+
+			if (owns) {
 				return result.getInt(1);
-			}else{
+			} else {
 				return -1;
 			}
 		} catch (SQLException e) {
@@ -297,14 +300,14 @@ public class RewarderDriverImpl implements RewarderDriver {
 
 			exists = result.next();
 			stmt.close();
-			
-			if(exists){
+
+			if (exists) {
 				int ownerId = result.getInt(1);
 				String name = result.getString(2);
 				String branding = result.getString(3);
 				double latitude = result.getDouble(4);
 				double longitude = result.getDouble(5);
-				
+
 				shop = new Shop(shopId, ownerId, name, branding, latitude, longitude);
 				return shop;
 			}
@@ -322,5 +325,80 @@ public class RewarderDriverImpl implements RewarderDriver {
 	@Override
 	public List<TraceReward> getRewardDetails(int shopId) throws UnableToPerformOperation {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<ShopDetailed> getDetailedShops(List<String> shopIds) throws UnableToPerformOperation {
+
+		PreparedStatement stmt;
+		StringBuilder builder = new StringBuilder();
+		List<ShopDetailed> detailedShops = new ArrayList<ShopDetailed>();
+
+		for (String id : shopIds)
+			builder.append("?,");
+		builder.deleteCharAt(builder.length());
+
+		try {
+			stmt = conn.prepareStatement(
+					"Select shops.Id as shopId, challenges.Id as rewardId, Name, Branding, Latitude, Longitude, conditions, reward "
+							+ "FROM shops JOIN challenges ON shops.Id = challenges.Id " + "WHERE shops.Id IN ("
+							+ builder + ") " + "ORDER BY shops.Id");
+
+			int index = 1;
+			for (String id : shopIds) {
+				stmt.setInt(index, Integer.valueOf(id));
+				index++;
+			}
+
+			ResultSet resultSet = stmt.executeQuery();
+
+			ShopDetailed auxShopDetailed = null;
+			int auxShopId = -1, shopId, rewardId;
+			double latitude, longitude;
+			String name, branding, conditions, reward;
+
+			while (resultSet.next()) {
+
+				shopId = resultSet.getInt("shopId");
+
+				if (shopId != auxShopId) { // New Shop
+
+					// Step 1 - Create the shop
+					rewardId = resultSet.getInt("rewardId");
+					name = resultSet.getString("Name");
+					branding = resultSet.getString("Branding");
+					latitude = resultSet.getDouble("Latitude");
+					longitude = resultSet.getDouble("Longitude");
+					conditions = resultSet.getString("conditions");
+					reward = resultSet.getString("reward");
+					auxShopDetailed = new ShopDetailed(shopId, name, branding, latitude, longitude);
+
+					// Step 2 - Add the current reward
+					auxShopDetailed.addReward(new Reward(rewardId, conditions, reward));
+
+					// Step 3 - Add the new shop to the shop list
+					detailedShops.add(auxShopDetailed);
+
+					// Step 4 - Update the shop auxiliar id (that identifies new
+					// shop)
+					auxShopId = shopId;
+
+				} else { // The shop is not new, then just add the reward to the
+							// current shop
+
+					rewardId = resultSet.getInt("rewardId");
+					conditions = resultSet.getString("conditions");
+					reward = resultSet.getString("reward");
+
+					auxShopDetailed.addReward(new Reward(rewardId, conditions, reward));
+				}
+			}
+
+			return detailedShops;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new UnableToPerformOperation(e.getMessage());
+		}
 	}
 }
