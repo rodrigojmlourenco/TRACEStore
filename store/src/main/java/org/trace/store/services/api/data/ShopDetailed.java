@@ -21,6 +21,7 @@ public class ShopDetailed{
 	}
 	
 	public ShopDetailed(int shopId, String name, String branding, double latitude, double longitude) {
+		this.shopId = shopId;
 		this.rewards = new ArrayList<>();
 		this.name = name;
 		this.branding = branding;
