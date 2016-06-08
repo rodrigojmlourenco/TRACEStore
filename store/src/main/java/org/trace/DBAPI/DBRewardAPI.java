@@ -209,7 +209,7 @@ public class DBRewardAPI extends DBAPI{
 
 		results = query("g.V().hasLabel('shop')"
 				+ ".has('location', geoWithin(Geoshape.circle(latitude, longitude, radius)))"
-				+ ".valueMap();"
+				+ ";"
 				+ "",params);
 		
 		for(Result result : results){

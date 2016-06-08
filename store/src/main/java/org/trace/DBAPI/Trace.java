@@ -23,7 +23,7 @@ public class Trace {
 		TraceDB db = new TraceDB();
 		
 		//Initialize the db connection
-		if(!db.initialize("remote")){
+		if(!db.initialize("remote2")){
 			return;
 		}
 		
@@ -34,6 +34,8 @@ public class Trace {
 			DBTrackingAPI apiTracking = new DBTrackingAPI(db.getClient());
 			DBRewardAPI apiReward = new DBRewardAPI(db.getClient());
 			DBPlannerAPI apiPlanner = new DBPlannerAPI(db.getClient());
+			
+//			db.getCluster().build()
 			
 //			//Clear DB of any data
 //			if(!api.clearDB()){

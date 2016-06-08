@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import org.apache.tinkerpop.gremlin.driver.Client;
 import org.apache.tinkerpop.gremlin.driver.Result;
 import org.apache.tinkerpop.gremlin.driver.ResultSet;
+import org.apache.tinkerpop.gremlin.driver.MessageSerializer;
 
 public class DBAPI {
 	
@@ -50,7 +51,8 @@ public class DBAPI {
 //			for (Result result : results) {
 //				System.out.println("" + result);
 //			}
-			System.out.println("results: " + results.toString());
+//			System.out.println("resultSet: " + resultSet.toString());
+//			System.out.println("complete: " + complete.toString());
 //			System.out.println("-----------");
 
 
