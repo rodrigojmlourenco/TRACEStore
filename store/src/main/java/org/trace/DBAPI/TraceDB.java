@@ -18,7 +18,7 @@ public class TraceDB {
 
 	public boolean initialize(){
 		try {
-			_cluster = Cluster.open("./src/main/resources/remote.yaml");
+			_cluster = Cluster.open("./src/main/resources/remote2.yaml");
 			_client = _cluster.connect();
 		}catch(Exception e){
 			e.printStackTrace();
@@ -93,6 +93,10 @@ public class TraceDB {
 
 	public Client getClient() {
 		return _client;
+	}
+	
+	public Cluster getCluster() {
+		return _cluster;
 	}
 	
 }
