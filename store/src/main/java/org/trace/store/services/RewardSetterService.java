@@ -266,10 +266,10 @@ public class RewardSetterService {
 		GraphDB conn = GraphDB.getConnection();
 		List<String> shopIds = conn.getRewardAPI().getShopsIds(latitude, longitude, radius);
 		
-		System.out.println("++++++++++++++++SHOPSIDS+++++++++++");
-		for(String shopId : shopIds){
-			System.out.println("shopId: " + shopId);
-		}
+//		System.out.println("++++++++++++++++SHOPSIDS+++++++++++");
+//		for(String shopId : shopIds){
+//			System.out.println("shopId: " + shopId);
+//		}
 		
 		JsonArray result = new JsonArray();
 		
