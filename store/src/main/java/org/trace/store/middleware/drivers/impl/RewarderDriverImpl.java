@@ -397,6 +397,8 @@ public class RewarderDriverImpl implements RewarderDriver {
 
 				shopId = resultSet.getInt("shopId");
 				
+				System.out.println("+++------+++++++shopId: " + shopId);
+				
 				if (shopId != auxShopId) { // New Shop
 
 					// Step 1 - Create the shop
