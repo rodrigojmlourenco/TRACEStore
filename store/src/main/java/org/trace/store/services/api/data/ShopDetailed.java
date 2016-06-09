@@ -6,20 +6,20 @@ import java.util.List;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class ShopDetailed{
+public class ShopDetailed {
 
 	private int shopId;
 	private String name, branding;
 	private double latitude, longitude;
 	private String avatarURL, mapURL;
-	
-	//Rewards List
+
+	// Rewards List
 	private List<Reward> rewards;
-	
+
 	public ShopDetailed() {
 		this.rewards = new ArrayList<>();
 	}
-	
+
 	public ShopDetailed(int shopId, String name, String branding, double latitude, double longitude) {
 		this.shopId = shopId;
 		this.rewards = new ArrayList<>();
@@ -27,8 +27,20 @@ public class ShopDetailed{
 		this.branding = branding;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.mapURL = "";
 		this.avatarURL = "";
+		this.mapURL = "";
+	}
+
+	public ShopDetailed(int shopId, String name, String branding, double latitude, double longitude, String avatarURL,
+			String mapURL) {
+		this.shopId = shopId;
+		this.rewards = new ArrayList<>();
+		this.name = name;
+		this.branding = branding;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.avatarURL = avatarURL;
+		this.mapURL = mapURL;
 	}
 
 	public int getShopId() {
@@ -86,19 +98,19 @@ public class ShopDetailed{
 	public void setMapURL(String mapURL) {
 		this.mapURL = mapURL;
 	}
-	
-	public void addReward(Reward reward){
+
+	public void addReward(Reward reward) {
 		this.rewards.add(reward);
 	}
-	
-	public JsonObject toJson(){
-		
+
+	public JsonObject toJson() {
+
 		JsonArray jsonRewardsList = new JsonArray();
 		JsonObject jsonShopDetailed = new JsonObject();
-		
-		for(Reward r : this.rewards)
+
+		for (Reward r : this.rewards)
 			jsonRewardsList.add(r.toJson());
-		
+
 		jsonShopDetailed.addProperty("id", shopId);
 		jsonShopDetailed.addProperty("name", name);
 		jsonShopDetailed.addProperty("branding", branding);
@@ -107,11 +119,11 @@ public class ShopDetailed{
 		jsonShopDetailed.addProperty("avatarURL", avatarURL);
 		jsonShopDetailed.addProperty("mapURL", mapURL);
 		jsonShopDetailed.add("rewards", jsonRewardsList);
-		
+
 		return jsonShopDetailed;
-		
+
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.toJson().toString();

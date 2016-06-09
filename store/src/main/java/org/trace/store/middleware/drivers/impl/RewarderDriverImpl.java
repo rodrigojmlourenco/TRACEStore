@@ -319,37 +319,40 @@ public class RewarderDriverImpl implements RewarderDriver {
 		}
 	}
 
-	//returns a list of Shop objects, with their corresponding details, based on the given list of shops ids.
+	// returns a list of Shop objects, with their corresponding details, based
+	// on the given list of shops ids.
 	@Override
 	public List<Shop> getShopsDetails(List<Integer> shopsIds) throws UnableToPerformOperation {
 		PreparedStatement stmt;
 		boolean exists = false;
 		List<Shop> shops = new ArrayList<>();
-		
-		//cancel in case the list is empty
-		if(shopsIds == null || shopsIds.isEmpty()){
+
+		// cancel in case the list is empty
+		if (shopsIds == null || shopsIds.isEmpty()) {
 			throw new UnableToPerformOperation("shopsIds list is empty!");
 		}
-		
+
 		String ids = "";
-		
-		for(int count = 0; count < shopsIds.size()-1; count++){
+
+		for (int count = 0; count < shopsIds.size() - 1; count++) {
 			ids += "id = " + shopsIds.get(count) + " or ";
-			
+
 		}
-		ids += "id = " + shopsIds.get(shopsIds.size()-1);
-		
+		ids += "id = " + shopsIds.get(shopsIds.size() - 1);
+
 		try {
-			stmt = conn.prepareStatement("SELECT id, ownerId, name, branding, latitude, longitude FROM shops WHERE " + ids);
+			stmt = conn.prepareStatement(
+					"SELECT id, ownerId, name, branding, latitude, longitude FROM shops WHERE " + ids);
 			ResultSet result = stmt.executeQuery();
 
 			stmt.close();
-			
-			while(result.next()){
-				shops.add(new Shop(result.getInt(1), result.getInt(2), result.getString(3), result.getString(4), result.getDouble(5), result.getDouble(6)));
+
+			while (result.next()) {
+				shops.add(new Shop(result.getInt(1), result.getInt(2), result.getString(3), result.getString(4),
+						result.getDouble(5), result.getDouble(6)));
 			}
 			return shops;
-			
+
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
@@ -369,15 +372,13 @@ public class RewarderDriverImpl implements RewarderDriver {
 
 		for (String id : shopIds)
 			builder.append("?,");
-		builder.deleteCharAt(builder.length()-1);
+		builder.deleteCharAt(builder.length() - 1);
 
 		try {
-			String query = 
-					"Select shops.Id as shopId, challenges.Id as rewardId, Name, Branding, Latitude, Longitude, conditions, reward "
-					+ "FROM shops JOIN challenges ON shops.Id = challenges.ShopId " 
-					+ "WHERE shops.Id IN ("+ builder + ") "
-					+ "ORDER BY shops.Id";
-			
+			String query = "Select shops.Id as shopId, challenges.Id as rewardId, Name, Branding, Latitude, Longitude, conditions, reward, shops.LogoUrl as logoUrl, shops.MapUrl as mapUrl "
+					+ "FROM shops JOIN challenges ON shops.Id = challenges.ShopId " + "WHERE shops.Id IN (" + builder
+					+ ") " + "ORDER BY shops.Id";
+
 			stmt = conn.prepareStatement(query);
 
 			int index = 1;
@@ -391,14 +392,14 @@ public class RewarderDriverImpl implements RewarderDriver {
 			ShopDetailed auxShopDetailed = null;
 			int auxShopId = -1, shopId, rewardId;
 			double latitude, longitude;
-			String name, branding, conditions, reward;
+			String name, branding, conditions, reward, logoUrl, mapUrl;
 
 			while (resultSet.next()) {
 
 				shopId = resultSet.getInt("shopId");
-				
-//				System.out.println("+++------+++++++shopId: " + shopId);
-				
+
+				// System.out.println("+++------+++++++shopId: " + shopId);
+
 				if (shopId != auxShopId) { // New Shop
 
 					// Step 1 - Create the shop
@@ -409,7 +410,11 @@ public class RewarderDriverImpl implements RewarderDriver {
 					longitude = resultSet.getDouble("Longitude");
 					conditions = resultSet.getString("conditions");
 					reward = resultSet.getString("reward");
-					auxShopDetailed = new ShopDetailed(shopId, name, branding, latitude, longitude);
+					logoUrl = resultSet.getString("logoUrl");
+					mapUrl = resultSet.getString("mapUrl");
+					
+					
+					auxShopDetailed = new ShopDetailed(shopId, name, branding, latitude, longitude, logoUrl, mapUrl);
 
 					// Step 2 - Add the current reward
 					auxShopDetailed.addReward(new Reward(rewardId, conditions, reward));
