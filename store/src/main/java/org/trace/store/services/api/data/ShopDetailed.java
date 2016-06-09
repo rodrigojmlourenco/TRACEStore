@@ -121,7 +121,6 @@ public class ShopDetailed {
 		jsonShopDetailed.add("rewards", jsonRewardsList);
 
 		return jsonShopDetailed;
-
 	}
 
 	@Override
