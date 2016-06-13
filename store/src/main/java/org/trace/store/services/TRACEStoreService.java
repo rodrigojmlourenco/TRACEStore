@@ -579,8 +579,11 @@ public class TRACEStoreService {
 		TraceState s = new TraceState((String[]) names.toArray(), (Date[]) timeStamps.toArray());
 		
 		Gson gson = new Gson();
+		String toReturn =  gson.toJson(s);
+		
+		System.out.println(" ++++++ s.getNamesSize()" + s.getNamesSize());
 				
-		System.out.println(" +++++++++++++++++  s: " + gson.toJson(s));
+		System.out.println(" +++++++++++++++++  s: " + toReturn);
 		
 		return "Testing state: "; 
 	}
