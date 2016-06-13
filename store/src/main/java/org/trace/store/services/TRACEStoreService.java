@@ -564,7 +564,7 @@ public class TRACEStoreService {
 	@Path("/put/state/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String putState(String state, @Context SecurityContext context) {
+	public String putState(TraceState state, @Context SecurityContext context) {
 		
 		
 		List<String> names = new ArrayList<>();
