@@ -566,25 +566,29 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String putState(TraceState state, @Context SecurityContext context) {
 		
-		System.out.println("abc");
-		
-		List<String> names = new ArrayList<>();
-		names.add("abc");
-		names.add("qwerty");
-		
-		List<Date> timeStamps = new ArrayList<>();
-		timeStamps.add(new Date());
-		timeStamps.add(new Date());
+		try{
+			System.out.println("abc");
+			
+			List<String> names = new ArrayList<>();
+			names.add("abc");
+			names.add("qwerty");
+			
+			List<Date> timeStamps = new ArrayList<>();
+			timeStamps.add(new Date());
+			timeStamps.add(new Date());
 
-		TraceState s = new TraceState((String[]) names.toArray(), (Date[]) timeStamps.toArray());
-		
-		Gson gson = new Gson();
-		String toReturn =  gson.toJson(s);
-		
-		System.out.println(" ++++++ s.getNamesSize()" + s.getNamesSize());
-				
-		System.out.println(" +++++++++++++++++  s: " + toReturn);
-		
+			TraceState s = new TraceState((String[]) names.toArray(), (Date[]) timeStamps.toArray());
+			
+			Gson gson = new Gson();
+			String toReturn =  gson.toJson(s);
+			
+			System.out.println(" ++++++ s.getNamesSize()" + s.getNamesSize());
+					
+			System.out.println(" +++++++++++++++++  s: " + toReturn);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		return "Testing state: "; 
 	}
 //		Thread thread = new Thread(new Runnable() {
