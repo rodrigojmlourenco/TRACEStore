@@ -564,11 +564,11 @@ public class TRACEStoreService {
 	@Path("/put/state/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String putState(TraceState state, @Context SecurityContext context) {
+	public String putState(String state, @Context SecurityContext context) {
 		
-		System.out.println(" +++++++++++++++++  putState");
+		System.out.println(" +++++++++++++++++  putState: " + state);
 		
-		return "Testing state name: " + state.getName() + " timestamp: " + state.getTimeStamp(); 
+		return "Testing state name: " + state; 
 	}
 //		Thread thread = new Thread(new Runnable() {
 //
