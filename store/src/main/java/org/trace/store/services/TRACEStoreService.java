@@ -566,7 +566,20 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String putState(TraceState state, @Context SecurityContext context) {
 		
-		System.out.println(" +++++++++++++++++  putState: " + state.toString());
+		
+		List<String> names = new ArrayList<>();
+		names.add("abc");
+		names.add("qwerty");
+		
+		List<Date> timeStamps = new ArrayList<>();
+		timeStamps.add(new Date());
+		timeStamps.add(new Date());
+
+		TraceState s = new TraceState((String[]) names.toArray(), (Date[]) timeStamps.toArray());
+		
+		Gson gson = new Gson();
+				
+		System.out.println(" +++++++++++++++++  s: " + gson.toJson(s));
 		
 		return "Testing state: " + state.getNamesSize(); 
 	}
