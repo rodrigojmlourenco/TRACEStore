@@ -566,6 +566,8 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String putState(TraceState state, @Context SecurityContext context) {
 		
+		System.out.println("abc");
+		
 		List<String> names = new ArrayList<>();
 		names.add("abc");
 		names.add("qwerty");
