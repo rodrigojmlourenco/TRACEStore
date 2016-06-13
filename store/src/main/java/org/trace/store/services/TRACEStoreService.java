@@ -567,24 +567,27 @@ public class TRACEStoreService {
 	public String putState(TraceState state, @Context SecurityContext context) {
 		
 		try{
-			System.out.println("abc");
+//			System.out.println("abc");
+//			
+//			String names[] = {"abc","qwerty"};
+//			Date timeStamps[] = {new Date(),new Date()};
+//
+//			TraceState s = new TraceState(names, timeStamps);
+//			
+//			Gson gson = new Gson();
+//			String toReturn =  gson.toJson(s);
+//			
+//			System.out.println(" ++++++ s.getNamesSize()" + s.getNamesSize());
+//					
+//			System.out.println(" +++++++++++++++++  s: " + toReturn);
 			
-			String names[] = {"abc","qwerty"};
-			Date timeStamps[] = {new Date(),new Date()};
-
-			TraceState s = new TraceState(names, timeStamps);
-			
-			Gson gson = new Gson();
-			String toReturn =  gson.toJson(s);
-			
-			System.out.println(" ++++++ s.getNamesSize()" + s.getNamesSize());
-					
-			System.out.println(" +++++++++++++++++  s: " + toReturn);
+			return "Testing state size: " + state.getNamesSize(); 
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		return "Testing state: "; 
+		
+		return "fail"; 
 	}
 //		Thread thread = new Thread(new Runnable() {
 //
