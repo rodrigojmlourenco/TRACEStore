@@ -568,7 +568,7 @@ public class TRACEStoreService {
 		
 		System.out.println(" +++++++++++++++++  putState");
 		
-		return "Testing";
+		return "Testing state name: " + state.getName() + " timestamp: " + state.getTimeStamp(); 
 	}
 //		Thread thread = new Thread(new Runnable() {
 //
