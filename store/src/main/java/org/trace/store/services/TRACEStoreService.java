@@ -569,15 +569,10 @@ public class TRACEStoreService {
 		try{
 			System.out.println("abc");
 			
-			List<String> names = new ArrayList<>();
-			names.add("abc");
-			names.add("qwerty");
-			
-			List<Date> timeStamps = new ArrayList<>();
-			timeStamps.add(new Date());
-			timeStamps.add(new Date());
+			String names[] = {"abc","qwerty"};
+			Date timeStamps[] = {new Date(),new Date()};
 
-			TraceState s = new TraceState((String[]) names.toArray(), (Date[]) timeStamps.toArray());
+			TraceState s = new TraceState(names, timeStamps);
 			
 			Gson gson = new Gson();
 			String toReturn =  gson.toJson(s);
