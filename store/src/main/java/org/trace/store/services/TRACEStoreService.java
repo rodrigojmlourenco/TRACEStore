@@ -581,7 +581,7 @@ public class TRACEStoreService {
 				
 		System.out.println(" +++++++++++++++++  s: " + gson.toJson(s));
 		
-		return "Testing state: " + state.getNamesSize(); 
+		return "Testing state: "; 
 	}
 //		Thread thread = new Thread(new Runnable() {
 //
