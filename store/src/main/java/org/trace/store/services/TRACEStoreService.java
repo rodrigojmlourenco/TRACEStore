@@ -558,12 +558,16 @@ public class TRACEStoreService {
 		return gson.toJson(mDriver.getAllSessions());
 	}
 
+	
+//	@Secured
 	@POST
-	@Secured
 	@Path("/put/state/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String putState(TraceState state, @Context SecurityContext context) {
+	public String putState(TraceState[] state, @Context SecurityContext context) {
+		
+		System.out.println(" +++++++++++++++++  putState");
+		
 		throw new UnsupportedOperationException();
 	}
 //		Thread thread = new Thread(new Runnable() {

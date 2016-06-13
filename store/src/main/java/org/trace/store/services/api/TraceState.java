@@ -17,42 +17,21 @@ import com.google.gson.JsonObject;
 @XmlRootElement
 public class TraceState {
 	
-	private String[] name;
-	private Date[] timeStamp;
+	private String name;
+	private Date timeStamp;
 	
 	public TraceState(){}
 	
-	public TraceState(String[] name, Date[] timeStamp){
+	public TraceState(String name, Date timeStamp){
 		this.name = name;
 		this.timeStamp = timeStamp;
 	}
 
-//	public Location[] getTrack() {
-//		return track;
-//	}
-//
-//	public void setTrack(Location[] track) {
-//		this.track = track;
-//	}
-//	
-//	public List<Location> getTrackAsList(){
-//		return Arrays.asList(getTrack());
-//	}
-//	
-//	public JsonObject getJsonLocation(int index){
-//		
-//		if(index > track.length) return null;
-//		
-//		return track[index].getLocationAsJsonObject();
-//	}
-//	
-//	public Location getLocation(int index){
-//		if(index > track.length) return null;
-//		
-//		return track[index];
-//	}
-//	
-//	public int getTrackSize(){
-//		return track.length;
-//	}
+	public String getName() {
+		return name;
+	}
+	
+	public Date getTimeStamp() {
+		return timeStamp;
+	}
 }
