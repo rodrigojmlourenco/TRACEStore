@@ -569,12 +569,10 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String putStates(TraceStates states, @Context SecurityContext context) {
 		try {
-			LOG.debug("TRACEStoreService.java - putStates");
-			LOG.debug("TRACEStoreService.java - putStates names: " + states.getNames());
-			LOG.debug("TRACEStoreService.java - putStates timeStamps: " + states.getTimeStamps());
+//			LOG.debug("TRACEStoreService.java - putStates");
 
-//			String username = context.getUserPrincipal().getName();
-			String username = "kostah50@gmail.com";
+			String username = context.getUserPrincipal().getName();
+//			String username = "kostah50@gmail.com";
 			return generateSuccessResponse( gson.toJson(mDriver.putStates(username, states)));
 		} catch (UnableToPerformOperation e) {
 			return generateFailedResponse(1, e.getMessage());
