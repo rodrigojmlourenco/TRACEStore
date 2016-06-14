@@ -574,8 +574,7 @@ public class TRACEStoreService {
 			String username = "kostah50@gmail.com";
 			return gson.toJson(mDriver.putStates(username, states));
 		} catch (UnableToPerformOperation e) {
-			e.printStackTrace();
-			return generateFailedResponse(1, e.toString());
+			return generateFailedResponse(1, e.getMessage());
 		}
 	}
 	
