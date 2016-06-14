@@ -571,7 +571,7 @@ public class TRACEStoreService {
 		try {
 			LOG.debug("putStates");
 //			String username = context.getUserPrincipal().getName();
-			String username = "Miguel Costa";
+			String username = "kostah50@gmail.com";
 			return gson.toJson(mDriver.putStates(username, states));
 		} catch (UnableToPerformOperation e) {
 			e.printStackTrace();
