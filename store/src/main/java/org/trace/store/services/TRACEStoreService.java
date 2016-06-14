@@ -570,7 +570,9 @@ public class TRACEStoreService {
 	public String putStates(TraceStates states, @Context SecurityContext context) {
 		try {
 			LOG.debug("TRACEStoreService.java - putStates");
-			LOG.debug("TRACEStoreService.java - putStates: " + states.toString());
+			LOG.debug("TRACEStoreService.java - putStates names: " + states.getNames());
+			LOG.debug("TRACEStoreService.java - putStates timeStamps: " + states.getTimeStamps());
+
 //			String username = context.getUserPrincipal().getName();
 			String username = "kostah50@gmail.com";
 			return generateSuccessResponse( gson.toJson(mDriver.putStates(username, states)));
