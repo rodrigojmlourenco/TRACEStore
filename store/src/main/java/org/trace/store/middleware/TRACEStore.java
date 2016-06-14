@@ -276,6 +276,11 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch(Exception e){
+			LOG.debug("TRACEStore.java - putStates5");
+
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return false;
