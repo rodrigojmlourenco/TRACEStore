@@ -2,8 +2,11 @@ package org.trace.store.middleware.drivers;
 
 import java.util.Date;
 
+import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.services.api.TRACEQuery;
 import org.trace.store.services.api.TRACEResultSet;
+import org.trace.store.services.api.TraceActivities;
+import org.trace.store.services.api.TraceStates;
 import org.trace.store.services.api.TraceTrack;
 import org.trace.store.services.api.data.Attributes;
 import org.trace.store.services.api.data.Beacon;
@@ -146,4 +149,8 @@ public interface TRACETrackingDriver {
 	 * @return List of sessions as a Json array.
 	 */
 	public JsonArray getAllSessions();
+	
+	public boolean putStates(String username, TraceStates states) throws UnableToPerformOperation;
+	
+	public boolean putActivities(String username, TraceActivities activities) throws UnableToPerformOperation;
 }

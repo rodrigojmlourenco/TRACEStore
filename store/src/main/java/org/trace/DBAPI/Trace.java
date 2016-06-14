@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.trace.DBAPI.data.TraceSession;
 import org.trace.DBAPI.data.TraceVertex;
+import org.trace.store.services.TRACEStoreService;
 
 public class Trace {
 

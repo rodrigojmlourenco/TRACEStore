@@ -45,7 +45,8 @@ import org.trace.store.services.api.GeoLocation;
 import org.trace.store.services.api.Location;
 import org.trace.store.services.api.PrivacyPolicies;
 import org.trace.store.services.api.TRACEQuery;
-import org.trace.store.services.api.TraceState;
+import org.trace.store.services.api.TraceActivities;
+import org.trace.store.services.api.TraceStates;
 import org.trace.store.services.api.TraceTrack;
 import org.trace.store.services.api.UserRegistryRequest;
 
@@ -559,91 +560,35 @@ public class TRACEStoreService {
 	}
 
 	
-//	@Secured
+//	return generateFailedResponse(1, "Unknown session '" + session + "'.");
+
 	@POST
-	@Path("/put/state/")
+	@Secured
+	@Path("/put/states/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String putState(TraceState state, @Context SecurityContext context) {
-		
-		try{
-//			System.out.println("abc");
-//			
-//			String names[] = {"abc","qwerty"};
-//			Date timeStamps[] = {new Date(),new Date()};
-//
-//			TraceState s = new TraceState(names, timeStamps);
-//			
-//			Gson gson = new Gson();
-//			String toReturn =  gson.toJson(s);
-//			
-//			System.out.println(" ++++++ s.getNamesSize()" + s.getNamesSize());
-//					
-//			System.out.println(" +++++++++++++++++  s: " + toReturn);
-			
-			return "Testing state size: " + state.getNamesSize(); 
-			
-		}catch(Exception e){
+	public String putStates(TraceStates states, @Context SecurityContext context) {
+		try {
+			String username = context.getUserPrincipal().getName();
+			return gson.toJson(mDriver.putStates(username, states));
+		} catch (UnableToPerformOperation e) {
 			e.printStackTrace();
+			return generateFailedResponse(1, e.toString());
 		}
-		
-		return "fail"; 
 	}
-//		Thread thread = new Thread(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//
-//				double success;
-//				Location location;
-//				TraceVertex v;
-//				List<TraceVertex> route = new ArrayList<>();
-//				GraphDB conn = GraphDB.getConnection();
-//
-//				for (int i = 0; i < track.getTrackSize(); i++) {
-//					location = track.getLocation(i);
-//
-//					if (location != null) {
-//
-//						v = new TraceVertex(location.getLatitude(), location.getLongitude(),
-//								extractLocationAttributes(location));
-//						v.setDate(new Date(location.getTimestamp()));
-//						route.add(v);
-//
-//					}
-//				}
-//				success = conn.getTrackingAPI().submitRoute(session, route);
-//
-//				if (success == -1) {
-//					LOG.error("Failed to insert route");
-//					try {
-//						sDriver.reopenTrackingSession(session);
-//						LOG.info("Session {" + session + "} was reopened.");
-//					} catch (UnableToPerformOperation e) {
-//						LOG.error(e);
-//					}
-//				} else {
-//					try {
-//						sDriver.updateSessionDistance(session, success);
-//						LOG.info("Session {" + session + "} had its total distance updated.");
-//					} catch (UnableToPerformOperation e) {
-//						LOG.error("Failed to submit route " + e);
-//						// return generateFailedResponse(5, "Failed to close the
-//						// tracking session because "+e.getMessage());
-//					}
-//				}
-//			}
-//		});
-//
-//		thread.start();
-//
-//		// TODO: Correct this so that we can get a better response, i.e., know
-//		// if the insertion really got done.
-//		// Right now it always says it has been done correctly.
-//		// if(failedInserts == 0)
-//		return generateSuccessResponse();
-//		// else
-//		// return generateFailedResponse("Failed to insert "+failedInserts+" out
-//		// of "+track.getTrackSize()+" locations");
-//	}
+	
+	@POST
+	@Secured
+	@Path("/put/activities/")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String putActivities(TraceActivities activities, @Context SecurityContext context) {
+		try {
+			String username = context.getUserPrincipal().getName();
+			return gson.toJson(mDriver.putActivities(username, activities));
+		} catch (UnableToPerformOperation e) {
+			e.printStackTrace();
+			return generateFailedResponse(1, e.toString());
+		}
+	}
 }

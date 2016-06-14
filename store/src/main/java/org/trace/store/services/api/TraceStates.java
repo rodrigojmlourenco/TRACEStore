@@ -15,14 +15,14 @@ import com.google.gson.JsonObject;
  *  may contain, for instance, means of transportation, velocity, among others.
  */
 @XmlRootElement
-public class TraceState {
+public class TraceStates {
 	
 	private String[] names;
 	private Date[] timeStamps;
 	
-	public TraceState(){}
+	public TraceStates(){}
 	
-	public TraceState(String[] name, Date[] timeStamp){
+	public TraceStates(String[] name, Date[] timeStamp){
 		this.names = name;
 		this.timeStamps = timeStamp;
 	}
@@ -51,13 +51,6 @@ public class TraceState {
 		return Arrays.asList(getTimeStamps());
 	}
 	
-//	public JsonObject getJsonLocation(int index){
-//		
-//		if(index > track.length) return null;
-//		
-//		return track[index].getLocationAsJsonObject();
-//	}
-//	
 	public String getName(int index){
 		if(index > names.length) return null;
 		
@@ -70,11 +63,7 @@ public class TraceState {
 		return timeStamps[index];
 	}
 	
-	public int getNamesSize(){
+	public int getSize(){
 		return names.length;
-	}
-	
-	public int getTimeStampsSize(){
-		return timeStamps.length;
 	}
 }

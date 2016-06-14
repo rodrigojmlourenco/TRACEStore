@@ -139,7 +139,7 @@ public class MariaDBDriver {
 		DRIVER.reconnectForInvalidConnection();
 	}
 	
-	protected static Connection getMariaConnection(){
+	public static Connection getMariaConnection(){
 		return DRIVER.getConnection();
 	}
 	
