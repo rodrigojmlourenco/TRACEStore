@@ -563,7 +563,7 @@ public class TRACEStoreService {
 //	return generateFailedResponse(1, "Unknown session '" + session + "'.");
 
 	@POST
-	@Secured
+//	@Secured
 	@Path("/put/states")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
