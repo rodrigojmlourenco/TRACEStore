@@ -564,7 +564,7 @@ public class TRACEStoreService {
 
 	@POST
 	@Secured
-	@Path("/put/states/")
+	@Path("/put/states")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String putStates(TraceStates states, @Context SecurityContext context) {
@@ -579,7 +579,7 @@ public class TRACEStoreService {
 	
 	@POST
 	@Secured
-	@Path("/put/activities/")
+	@Path("/put/activities")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String putActivities(TraceActivities activities, @Context SecurityContext context) {
