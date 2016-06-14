@@ -572,7 +572,7 @@ public class TRACEStoreService {
 			LOG.debug("TRACEStoreService.java - putStates");
 //			String username = context.getUserPrincipal().getName();
 			String username = "kostah50@gmail.com";
-			return gson.toJson(mDriver.putStates(username, states));
+			return generateSuccessResponse( gson.toJson(mDriver.putStates(username, states)));
 		} catch (UnableToPerformOperation e) {
 			return generateFailedResponse(1, e.getMessage());
 		}
