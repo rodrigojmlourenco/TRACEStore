@@ -242,6 +242,9 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 
 		PreparedStatement stmt;
 		int userId;
+		
+		LOG.debug("TRACEStore.java - putStates1");
+
 
 		try {
 			userId = userDriver.getUserID(username);
@@ -260,11 +263,17 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 			return true;
 
 		} catch (SQLException e) {
+			LOG.debug("TRACEStore.java - putStates2");
+
 			throw new UnableToPerformOperation(e.getMessage());
 		} catch (UnknownUserException e) {
+			LOG.debug("TRACEStore.java - putStates3");
+
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnableToPerformOperation e) {
+			LOG.debug("TRACEStore.java - putStates4");
+
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

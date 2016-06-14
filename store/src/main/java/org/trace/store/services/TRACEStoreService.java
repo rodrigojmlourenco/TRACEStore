@@ -569,7 +569,7 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String putStates(TraceStates states, @Context SecurityContext context) {
 		try {
-			LOG.debug("putStates");
+			LOG.debug("TRACEStoreService.java - putStates");
 //			String username = context.getUserPrincipal().getName();
 			String username = "kostah50@gmail.com";
 			return gson.toJson(mDriver.putStates(username, states));
@@ -585,7 +585,7 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String putActivities(TraceActivities activities, @Context SecurityContext context) {
 		try {
-			LOG.debug("putActivities");
+			LOG.debug("TRACEStoreService.java - putActivities");
 			String username = context.getUserPrincipal().getName();
 			return gson.toJson(mDriver.putActivities(username, activities));
 		} catch (UnableToPerformOperation e) {
