@@ -121,11 +121,12 @@ public class RewarderDriverImpl implements RewarderDriver {
 		PreparedStatement stmt;
 
 		try {
-			stmt = conn.prepareStatement("INSERT INTO challenges (shopId, Conditions, Reward) VALUES (?,?,?)");
+			stmt = conn.prepareStatement("INSERT INTO challenges (shopId, Conditions, Reward, Type) VALUES (?,?,?,?)");
 
 			stmt.setInt(1, shopId);
 			stmt.setString(2, createCycleToShopCondition());
 			stmt.setString(3, reward);
+			stmt.setString(3, "Cycle To Shop");
 
 			ResultSet set = stmt.executeQuery();
 			stmt.close();
