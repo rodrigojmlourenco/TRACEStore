@@ -242,7 +242,7 @@ public class RewardSetterService {
 			for (TraceReward r : rewards) {
 				JsonObject aux = r.toJson();
 
-				if(r.getMinimumDistance() == 0){
+				if(r.getType().equals("Cycle To Shop")){
 					aux.addProperty("winners", "-");
 				}else{
 					// TODO: mais tarde fazer isto de forma inteligente

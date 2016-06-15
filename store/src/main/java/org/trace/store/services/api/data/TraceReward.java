@@ -6,8 +6,7 @@ import com.google.gson.JsonParser;
 public class TraceReward {
 
 	private int identifier;
-	private String condition;
-	private String reward;
+	private String condition, reward, type;
 	
 	public TraceReward(){}
 	
@@ -15,6 +14,13 @@ public class TraceReward {
 		this.identifier = identifier;
 		this.condition = condition;
 		this.reward = reward;
+	}
+	
+	public TraceReward(int identifier, String condition, String reward, String type){
+		this.identifier = identifier;
+		this.condition = condition;
+		this.reward = reward;
+		this.type = type;
 	}
 
 	public int getIdentifier() {
@@ -40,6 +46,14 @@ public class TraceReward {
 	public void setCondition(String condition) {
 		this.condition = condition;
 	}
+	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 
 	public JsonObject toJson(){
 		JsonParser parser = new JsonParser();
@@ -47,6 +61,7 @@ public class TraceReward {
 		json.addProperty("identifier", getIdentifier());
 		json.add("conditions", parser.parse(getCondition()));
 		json.addProperty("reward", getReward());
+		json.addProperty("type", getType());
 		return json;
 	}
 	
