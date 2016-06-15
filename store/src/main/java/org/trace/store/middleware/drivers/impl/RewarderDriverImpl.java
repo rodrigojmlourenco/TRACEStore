@@ -126,7 +126,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 			stmt.setInt(1, shopId);
 			stmt.setString(2, createCycleToShopCondition());
 			stmt.setString(3, reward);
-			stmt.setString(3, "Cycle To Shop");
+			stmt.setString(4, "Cycle To Shop");
 
 			ResultSet set = stmt.executeQuery();
 			stmt.close();
