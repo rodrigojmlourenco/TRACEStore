@@ -261,6 +261,9 @@ public class RewardSetterService {
 		} catch (UnableToPerformOperation e) {
 			LOG.error(e.getMessage());
 			return generateFailedResponse(3, e.getMessage());
+		} catch (Exception e){
+			e.printStackTrace();
+			return generateFailedResponse(3, e.getMessage());
 		}
 	}
 	
