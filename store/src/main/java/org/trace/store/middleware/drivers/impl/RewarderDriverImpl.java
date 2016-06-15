@@ -142,15 +142,16 @@ public class RewarderDriverImpl implements RewarderDriver {
 		PreparedStatement stmt;
 		List<TraceReward> rewards = new ArrayList<>();
 		try {
-			stmt = conn.prepareStatement("SELECT Id, Conditions, Reward FROM challenges WHERE shopId=?");
+			stmt = conn.prepareStatement("SELECT Id, Conditions, Reward, Type FROM challenges WHERE shopId=?");
 			stmt.setInt(1, shopId);
 			ResultSet result = stmt.executeQuery();
 
 			while (result.next()) {
-				int id = result.getInt(1);
-				String conditions = result.getString(2);
-				String reward = result.getString(3);
-				rewards.add(new TraceReward(id, conditions, reward));
+				int id = result.getInt("Id");
+				String conditions = result.getString("Conditions");
+				String reward = result.getString("Reward");
+				String type = result.getString("Type");
+				rewards.add(new TraceReward(id, conditions, reward,type));
 			}
 			stmt.close();
 			return rewards;
