@@ -85,7 +85,11 @@ public class RewarderDriverImpl implements RewarderDriver {
 		JsonObject condition = new JsonObject();
 		condition.addProperty("distance", distance);
 		return condition.toString();
-
+	}
+	
+	private String createCycleToShopCondition() {
+		JsonObject condition = new JsonObject();
+		return condition.toString();
 	}
 
 	@Override
@@ -99,6 +103,28 @@ public class RewarderDriverImpl implements RewarderDriver {
 
 			stmt.setInt(1, shopId);
 			stmt.setString(2, createDistanceCondition(distance));
+			stmt.setString(3, reward);
+
+			ResultSet set = stmt.executeQuery();
+			stmt.close();
+
+			return true;
+
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
+	
+	@Override
+	public boolean registerCycleToShopReward(int shopId, String reward) throws UnableToPerformOperation {
+
+		PreparedStatement stmt;
+
+		try {
+			stmt = conn.prepareStatement("INSERT INTO challenges (shopId, Conditions, Reward) VALUES (?,?,?)");
+
+			stmt.setInt(1, shopId);
+			stmt.setString(2, createCycleToShopCondition());
 			stmt.setString(3, reward);
 
 			ResultSet set = stmt.executeQuery();

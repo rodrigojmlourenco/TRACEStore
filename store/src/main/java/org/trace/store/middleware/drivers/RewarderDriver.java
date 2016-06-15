@@ -45,4 +45,6 @@ public interface RewarderDriver {
 	
 	public List<ShopDetailed> getDetailedShops(List<String> shopIds) throws UnableToPerformOperation;
 
+	public boolean registerCycleToShopReward(int shopId, String reward) throws UnableToPerformOperation;
+
 }

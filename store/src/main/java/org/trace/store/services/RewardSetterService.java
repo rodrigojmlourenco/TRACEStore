@@ -200,7 +200,11 @@ public class RewardSetterService {
 				return generateFailedResponse(1, "The user is not a rewarder");
 			}
 
-			rDriver.registerDistanceBasedReward(shopId, request.getTravelledDistance(), request.getReward());
+			if(request.getTravelledDistance() == 0){
+				rDriver.registerCycleToShopReward(shopId, request.getReward());
+			}else{
+				rDriver.registerDistanceBasedReward(shopId, request.getTravelledDistance(), request.getReward());
+			}
 
 			return generateSuccessResponse("");
 
