@@ -256,6 +256,7 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 				
 				Date date = states.getTimeStamp(i);
 				java.sql.Date sqlDate = new java.sql.Date(states.getTimeStamp(i).getTime());
+				sqlDate.setTime(date.getTime());
 				
 				stmt.setDate(3, new java.sql.Date(states.getTimeStamp(i).getTime()));
 				
