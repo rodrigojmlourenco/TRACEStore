@@ -20,7 +20,10 @@ public class TraceStates {
 	private String[] names;
 	private Date[] timeStamps;
 	
-	public TraceStates(){}
+	public TraceStates(){
+		names = null;
+		timeStamps = null;
+	}
 	
 	public TraceStates(String[] name, Date[] timeStamp){
 		this.names = name;
@@ -65,5 +68,9 @@ public class TraceStates {
 	
 	public int getSize(){
 		return names.length;
+	}
+	
+	public boolean isEmpty(){
+		return (names == null && timeStamps == null);
 	}
 }
