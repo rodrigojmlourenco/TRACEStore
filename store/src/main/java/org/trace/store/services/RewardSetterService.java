@@ -240,11 +240,15 @@ public class RewardSetterService {
 			Gson gson = new Gson();
 			JsonArray payload = new JsonArray();
 			for (TraceReward r : rewards) {
-
-				// TODO: mais tarde fazer isto de forma inteligente
-				int userCount = rDriver.getUsersWithDistance(r.getMinimumDistance()).size();
 				JsonObject aux = r.toJson();
-				aux.addProperty("winners", userCount);
+
+				if(r.getMinimumDistance() == 0){
+					aux.addProperty("winners", "-");
+				}else{
+					// TODO: mais tarde fazer isto de forma inteligente
+					int userCount = rDriver.getUsersWithDistance(r.getMinimumDistance()).size();
+					aux.addProperty("winners", userCount);
+				}
 				payload.add(aux);
 			}
 
