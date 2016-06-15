@@ -569,10 +569,10 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String putStates(TraceStates states, @Context SecurityContext context) {
 		try {
-			LOG.debug("TRACEStoreService.java - putStates");
-			LOG.debug("TRACEStoreService.java - states:" + states.isEmpty());
-			LOG.debug("TRACEStoreService.java - states - names:" + states.getNames().length);
-			LOG.debug("TRACEStoreService.java - states - timeStamps:" + states.getTimeStamps().length);
+//			LOG.debug("TRACEStoreService.java - putStates");
+//			LOG.debug("TRACEStoreService.java - states:" + states.isEmpty());
+//			LOG.debug("TRACEStoreService.java - states - names:" + states.getNames().length);
+//			LOG.debug("TRACEStoreService.java - states - timeStamps:" + states.getTimeStamps().length);
 
 			String username = context.getUserPrincipal().getName();
 //			String username = "kostah50@gmail.com";
