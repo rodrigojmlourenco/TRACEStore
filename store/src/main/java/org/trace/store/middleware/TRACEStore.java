@@ -255,8 +255,8 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 				stmt.setString(2, states.getName(i));
 				stmt.setDate(3, new java.sql.Date(states.getTimeStamp(i).getTime()));
 				
-				LOG.debug("TRACEStore.java - putStates - states.getTimeStamp(" + i + ").getTime():" + states.getTimeStamp(i).getTime());
-				LOG.debug("TRACEStore.java - putStates - new sql ..." + i + ":" + new java.sql.Date(states.getTimeStamp(i).getTime()));
+				LOG.debug("TRACEStore.java - putStates - states.getTimeStamp(" + i + ").getTime():" + states.getTimeStamp(i).toString());
+				LOG.debug("TRACEStore.java - putStates - new sql ..." + i + ":" + new java.sql.Date(states.getTimeStamp(i).getTime()).toString());
 
 				ResultSet set = stmt.executeQuery();
 				stmt.close();
