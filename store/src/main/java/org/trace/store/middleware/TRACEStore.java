@@ -262,6 +262,9 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 				
 				LOG.debug("TRACEStore.java - putStates - states.getTimeStamp(" + i + ").getTime(): " + date.toString());
 				LOG.debug("TRACEStore.java - putStates - new sql (" + i + ") : " + sqlDate.toString());
+				LOG.debug("TRACEStore.java - putStates - new sql (" + i + ") h: " + sqlDate.getHours());
+				LOG.debug("TRACEStore.java - putStates - new sql (" + i + ") m: " + sqlDate.getMinutes());
+				LOG.debug("TRACEStore.java - putStates - new sql (" + i + ") s: " + sqlDate.getSeconds());
 
 				LOG.debug("TRACEStore.java - putStates - new date (" + i + ") : " + new Date(date.getTime()).toString());
 
