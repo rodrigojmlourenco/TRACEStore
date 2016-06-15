@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -255,18 +256,13 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 				stmt.setString(2, states.getName(i));
 				
 				Date date = states.getTimeStamp(i);
-				java.sql.Date sqlDate = new java.sql.Date(states.getTimeStamp(i).getTime());
-				sqlDate.setTime(date.getTime());
+				java.sql.Timestamp sqlTimeStamp = new java.sql.Timestamp(date.getTime());
 				
+				stmt.setTimestamp(3, sqlTimeStamp);
 				stmt.setDate(3, new java.sql.Date(states.getTimeStamp(i).getTime()));
 				
 				LOG.debug("TRACEStore.java - putStates - states.getTimeStamp(" + i + ").getTime(): " + date.toString());
-				LOG.debug("TRACEStore.java - putStates - new sql (" + i + ") : " + sqlDate.toString());
-				LOG.debug("TRACEStore.java - putStates - new sql (" + i + ") h: " + sqlDate.getHours());
-				LOG.debug("TRACEStore.java - putStates - new sql (" + i + ") m: " + sqlDate.getMinutes());
-				LOG.debug("TRACEStore.java - putStates - new sql (" + i + ") s: " + sqlDate.getSeconds());
-
-				LOG.debug("TRACEStore.java - putStates - new date (" + i + ") : " + new Date(date.getTime()).toString());
+				LOG.debug("TRACEStore.java - putStates - new sql (" + i + ") : " + sqlTimeStamp.toString());
 
 				ResultSet set = stmt.executeQuery();
 				stmt.close();
