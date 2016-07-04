@@ -97,6 +97,20 @@ user_sessions	+= "FOREIGN KEY(UserId) REFERENCES users(Id) ON DELETE CASCADE, "
 user_sessions	+= "IsClosed BOOLEAN DEFAULT false, "
 user_sessions	+= "CreatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)"
 
+sessions_details  = "CREATE TABLE IF NOT EXISTS sessions_details ("
+sessions_details += "session VARCHAR(255) NOT NULL UNIQUE, "
+sessions_details += "PRIMARY KEY(session), "
+sessions_details += "FOREIGN KEY(session) REFERENCES sessions(Session) ON DELETE CASCADE, "
+sessions_details += "startedAt TIMESTAMP NOT NULL DEFAULT 0, "
+sessions_details += "endedAt TIMESTAMP NOT NULL DEFAULT 0, "
+sessions_details += "elapsedTime INT NOT NULL DEFAULT 0, "
+sessions_details += "elapsedDistance INT NOT NULL DEFAULT 0, "
+sessions_details += "avgSpeed DOUBLE NOT NULL DEFAULT 0, "
+sessions_details += "topSpeed DOUBLE NOT NULL DEFAULT 0, "
+sessions_details += "points INT NOT NULL DEFAULT 0, "
+sessions_details += "modality INT NOT NULL DEFAULT -1)"
+
+print sessions_details
 
 print "... creating all the users tables ..."
 cursor.execute(users)
@@ -104,6 +118,7 @@ cursor.execute(user_details)
 cursor.execute(user_roles)
 cursor.execute(activation)
 cursor.execute(user_sessions)
+cursor.execute(sessions_details)
 
 mariadb_connection.commit()
 mariadb_connection.close()
