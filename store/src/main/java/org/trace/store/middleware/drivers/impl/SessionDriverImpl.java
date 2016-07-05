@@ -311,7 +311,7 @@ public class SessionDriverImpl implements SessionDriver{
 							+ "startedAt, endedAt, "
 							+ "elapsedTime, elapsedDistance, "
 							+ "avgSpeed, topSpeed, "
-							+ "point, "
+							+ "points, "
 							+ "modality) VALUES (?,?,?,?,?,?,?,?,?)");
 			
 			stmt.setString(1, summary.getSession());
