@@ -648,19 +648,14 @@ public class TRACEStoreService {
 			return generateFailedResponse(e.getMessage());
 		}
 
-		//Step 2 - Register the newly created session
-		try {
-			sDriver.openTrackingSession(uDriver.getUserID(username), session);
-		} catch (UnableToPerformOperation | UnknownUserException e) {
-			return generateFailedResponse(e.getMessage());
-		}
 		
-		// Step 3 - Register the session details
+		// Step 2 - Register the session details
 		try {
+			int userId = uDriver.getUserID(username);
 			trackSummary.setSession(session);
-			sDriver.registerTrackSummary(trackSummary);
+			sDriver.registerTrackSummary(userId, trackSummary);
 			return generateSuccessResponse(session);
-		} catch (UnableToPerformOperation e) {
+		} catch (UnableToPerformOperation | UnknownUserException e) {
 			return generateFailedResponse(e.getMessage());
 		}
 	}

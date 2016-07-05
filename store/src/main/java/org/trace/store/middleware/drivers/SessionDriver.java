@@ -95,7 +95,7 @@ public interface SessionDriver {
 	/*
 	 * VERSION 2.0 - New Ijsberg functions
 	 */
-	public void registerTrackSummary(TrackSummary summary) throws UnableToPerformOperation;
+	public void registerTrackSummary(int userId, TrackSummary summary) throws UnableToPerformOperation;
 	
 	public TrackSummary getTrackSummary(String session) throws UnableToPerformOperation;
 	

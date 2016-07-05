@@ -3,6 +3,7 @@ package org.trace.store.middleware.drivers.impl;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -298,46 +299,89 @@ public class SessionDriverImpl implements SessionDriver{
 		stmt.executeQuery("DELETE FROM sessions");
 		stmt.close();
 	}
-	
+
+	/*
+	 * VERSION 2.0 - New Ijsberg functions
+	 */
 	@Override
-	public void registerTrackSummary(TrackSummary summary) throws UnableToPerformOperation {
+	public void registerTrackSummary(int userId, TrackSummary summary) throws UnableToPerformOperation {
 		
-		try {
-			
-			PreparedStatement stmt = 
-					conn.prepareStatement(
-							"INSERT INTO sessions_details ("
-							+ "session, "
-							+ "startedAt, endedAt, "
-							+ "elapsedTime, elapsedDistance, "
-							+ "avgSpeed, topSpeed, "
-							+ "points, "
-							+ "modality) VALUES (?,?,?,?,?,?,?,?,?)");
-			
-			stmt.setString(1, summary.getSession());
-			stmt.setLong(2, summary.getStartedAt());
-			stmt.setLong(3, summary.getEndedAt());
-			stmt.setInt(4, summary.getElapsedTime());
-			stmt.setInt(5, summary.getElapsedDistance());
-			stmt.setFloat(6, summary.getAvgSpeed());
-			stmt.setFloat(7, summary.getTopSpeed());
-			stmt.setInt(8, summary.getPoints());
-			stmt.setInt(9, summary.getModality());
+		String create_session = "INSERT INTO sessions (UserID, Session) VALUES (?,?)";
+		String create_summary = 
+				"INSERT INTO sessions_details ("
+					+ "session, "
+					+ "startedAt, endedAt, "
+					+ "elapsedTime, elapsedDistance, "
+					+ "avgSpeed, topSpeed, "
+					+ "points, "
+					+ "modality) VALUES (?,?,?,?,?,?,?,?,?)";
+					
+		PreparedStatement stmtSession = null;
+		PreparedStatement stmtSummary = null;
 		
-			stmt.execute();
+		LOG.debug("Registering the track : "+summary.toString());
+		
+		try{
+			conn.setAutoCommit(false);
 			
-			stmt.close();
+			stmtSession = conn.prepareStatement(create_session);
+			stmtSession = conn.prepareStatement(create_summary);
 			
-		} catch (SQLException e) {
-			throw new UnableToPerformOperation(e.getMessage());
+			//Phase 1 - Register the session
+			stmtSession.setInt(1, userId);
+			stmtSession.setString(2, summary.getSession());
+			stmtSession.executeUpdate();
+			
+			//Phase 2 - Register the Track Summary 
+			stmtSummary.setString(1, summary.getSession());
+			stmtSummary.setLong(2, summary.getStartedAt());
+			stmtSummary.setLong(3, summary.getEndedAt());
+			stmtSummary.setInt(4, summary.getElapsedTime());
+			stmtSummary.setInt(5, summary.getElapsedDistance());
+			stmtSummary.setFloat(6, summary.getAvgSpeed());
+			stmtSummary.setFloat(7, summary.getTopSpeed());
+			stmtSummary.setInt(8, summary.getPoints());
+			stmtSummary.setInt(9, summary.getModality());
+			stmtSummary.executeUpdate();
+			
+			//Phase 3 - Commit the transactions
+			conn.commit();
+			
+		}catch(SQLException e){
+			
+			try{
+			if(conn != null){
+				LOG.warn("Transaction is being rollbacked : registerTrackSummary@SessionDriver");
+				conn.rollback();
+			}
+			
+				throw new UnableToPerformOperation(e.getMessage());
+				
+			}catch(SQLException e1){
+				LOG.error(e1.getMessage());
+				
+			}
+			
+			
+		} finally {
+			
+			try{
+				if(stmtSession!=null)
+					stmtSession.close();
+				
+				if(stmtSummary!=null)
+					stmtSummary.close();
+				
+				conn.setAutoCommit(true);
+			
+			}catch(SQLException e){
+				e.printStackTrace();
+			}
 		}
 		
 	}
 	
-	
-	/*
-	 * VERSION 2.0 - New Ijsberg functions
-	 */
+
 	@Override
 	public TrackSummary getTrackSummary(String session) throws UnableToPerformOperation {
 		
