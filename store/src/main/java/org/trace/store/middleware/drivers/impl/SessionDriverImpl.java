@@ -3,7 +3,6 @@ package org.trace.store.middleware.drivers.impl;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -386,7 +385,7 @@ public class SessionDriverImpl implements SessionDriver{
 	@Override
 	public TrackSummary getTrackSummary(String session) throws UnableToPerformOperation {
 		
-		TrackSummary summary = new TrackSummary();
+		TrackSummary summary = null;;
 		
 		try {
 			PreparedStatement stmt = 
@@ -403,6 +402,7 @@ public class SessionDriverImpl implements SessionDriver{
 			ResultSet set = stmt.executeQuery();
 					
 			if(set.next()){
+				summary = new TrackSummary();
 				summary.setSession(set.getString(1));
 				summary.setStartedAt(set.getTimestamp(2).getTime());
 				summary.setEndedAt(set.getTimestamp(3).getTime());
@@ -411,6 +411,8 @@ public class SessionDriverImpl implements SessionDriver{
 				summary.setAvgSpeed(set.getFloat(6));
 				summary.setPoints(set.getInt(7));
 				summary.setModality(set.getInt(8));
+			}else{
+				throw new UnableToPerformOperation("Session '"+session+"' does not exist.");
 			}
 			
 			stmt.close();
