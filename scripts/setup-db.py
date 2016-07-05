@@ -108,7 +108,16 @@ sessions_details += "elapsedDistance INT NOT NULL DEFAULT 0, "
 sessions_details += "avgSpeed DOUBLE NOT NULL DEFAULT 0, "
 sessions_details += "topSpeed DOUBLE NOT NULL DEFAULT 0, "
 sessions_details += "points INT NOT NULL DEFAULT 0, "
+sessions_details += "from VARCHAR(255) NOT NULL DEFAULT 'unknown', "
+sessions_details += "to VARCHAR(255) NOT NULL DEFAULT 'unknown', "
 sessions_details += "modality INT NOT NULL DEFAULT -1)"
+
+sessions_traces  = "CREATE TABLE IF NOT EXISTS sessions_traces ("
+sessions_traces += "session VARCHAR(255) NOT NULL UNIQUE, "
+sessions_traces += "PRIMARY KEY(session), "
+sessions_traces += "FOREIGN KEY(session) REFERENCES sessions(Session) ON DELETE CASCADE, "
+sessions_traces += "timestamp TIMESTAMP NOT NULL, "
+sessions_traces += "location VARCHAR(512) NOT NULL)"
 
 print sessions_details
 
@@ -119,6 +128,7 @@ cursor.execute(user_roles)
 cursor.execute(activation)
 cursor.execute(user_sessions)
 cursor.execute(sessions_details)
+cursor.execute(sessions_traces)
 
 mariadb_connection.commit()
 mariadb_connection.close()

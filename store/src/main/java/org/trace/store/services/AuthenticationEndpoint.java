@@ -237,6 +237,7 @@ public class AuthenticationEndpoint {
 		}
 	}
 
+	@Deprecated
 	@POST
 	@Secured
 	@Path("/session/open")

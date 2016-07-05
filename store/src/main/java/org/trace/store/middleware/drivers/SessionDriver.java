@@ -6,6 +6,8 @@ import java.util.List;
 import org.trace.DBAPI.data.SimpleSession;
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.services.api.Location;
+import org.trace.store.services.api.data.TrackSummary;
 
 public interface SessionDriver {
 	
@@ -90,4 +92,20 @@ public interface SessionDriver {
 
 	void updateSessionDistance(String sessionToken, double distance) throws UnableToPerformOperation;
 
+	/*
+	 * VERSION 2.0 - New Ijsberg functions
+	 */
+	public void registerTrackSummary(TrackSummary summary) throws UnableToPerformOperation;
+	
+	public TrackSummary getTrackSummary(String session) throws UnableToPerformOperation;
+	
+	public List<TrackSummary> getUsersTrackSummaries(int userId) throws UnableToPerformOperation;
+	
+	public void deleteTrackSummary(String session) throws UnableToPerformOperation;
+	
+	public void deleteUserTrackSummaries(int userId) throws UnableToPerformOperation;
+	
+	public void addTrackTraceBatch(String session, List<Location> trace) throws UnableToPerformOperation;
+	
+	public List<Location> getTrackTrace() throws UnableToPerformOperation;
 }

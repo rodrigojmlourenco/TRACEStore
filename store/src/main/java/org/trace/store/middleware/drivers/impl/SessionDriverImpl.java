@@ -14,6 +14,8 @@ import org.trace.DBAPI.data.SimpleSession;
 import org.trace.store.middleware.drivers.SessionDriver;
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
+import org.trace.store.services.api.Location;
+import org.trace.store.services.api.data.TrackSummary;
 
 public class SessionDriverImpl implements SessionDriver{
 
@@ -296,6 +298,190 @@ public class SessionDriverImpl implements SessionDriver{
 		stmt.executeQuery("DELETE FROM sessions");
 		stmt.close();
 	}
+	
+	@Override
+	public void registerTrackSummary(TrackSummary summary) throws UnableToPerformOperation {
+		
+		try {
+			
+			PreparedStatement stmt = 
+					conn.prepareStatement(
+							"INSERT INTO session_details ("
+							+ "session, "
+							+ "startedAt, endedAt, "
+							+ "elapsedTime, elapsedDistance, "
+							+ "avgSpeed, topSpeed, "
+							+ "point, "
+							+ "modality) VALUES (?,?,?,?,?,?,?,?,?)");
+			
+			stmt.setString(1, summary.getSession());
+			stmt.setLong(2, summary.getStartedAt());
+			stmt.setLong(3, summary.getEndedAt());
+			stmt.setInt(4, summary.getElapsedTime());
+			stmt.setInt(5, summary.getElapsedDistance());
+			stmt.setFloat(6, summary.getAvgSpeed());
+			stmt.setFloat(7, summary.getTopSpeed());
+			stmt.setInt(8, summary.getPoints());
+			stmt.setInt(9, summary.getModality());
+		
+			stmt.execute();
+			
+			stmt.close();
+			
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+		
+	}
+	
+	
+	/*
+	 * VERSION 2.0 - New Ijsberg functions
+	 */
+	@Override
+	public TrackSummary getTrackSummary(String session) throws UnableToPerformOperation {
+		
+		TrackSummary summary = new TrackSummary();
+		
+		try {
+			PreparedStatement stmt = 
+					conn.prepareStatement("SELECT "
+							+ "session, startedAt, endedAt, "
+							+ "elapsedTime, elapsedDistance, "
+							+ "avgSpeed, topSpeed, "
+							+ "points, "
+							+ "modality "
+							+ "FROM sessions_details WHERE session = ?");
+			
+			stmt.setString(1, session);
+			
+			ResultSet set = stmt.executeQuery();
+					
+			if(set.next()){
+				summary.setSession(set.getString(1));
+				summary.setStartedAt(set.getLong(2));
+				summary.setEndedAt(set.getLong(3));
+				summary.setElapsedTime(set.getInt(4));
+				summary.setElapsedTime(set.getInt(5));
+				summary.setAvgSpeed(set.getFloat(6));
+				summary.setPoints(set.getInt(7));
+				summary.setModality(set.getInt(8));
+			}
+			
+			stmt.close();
+			
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+		
+		return summary;
+	}
+	
+	@Override
+	public List<TrackSummary> getUsersTrackSummaries(int userId) throws UnableToPerformOperation {
+		
+		List<TrackSummary> summaries = new ArrayList<>();
+		
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT Sessions.Session, startedAt, endedAt, elapsedTime, elapsedDistance, avgSpeed, topSpeed, points, modality ");
+		query.append("FROM sessions JOIN sessions_details ON sessions.Session = sessions_details.session ");
+		query.append("WHERE sessions.UserId = ?");
+		
+		try {
+			
+			PreparedStatement stmt = conn.prepareStatement(query.toString());
+			stmt.setInt(1, userId);
+			
+			ResultSet set = stmt.executeQuery();
+			
+			TrackSummary aux;
+			while(set.next()){
+				aux = new TrackSummary();
+				
+				aux.setSession(set.getString(1));
+				aux.setStartedAt(set.getLong(2));
+				aux.setEndedAt(set.getLong(3));
+				aux.setElapsedTime(set.getInt(4));
+				aux.setElapsedDistance(set.getInt(5));
+				aux.setAvgSpeed(set.getFloat(6));
+				aux.setTopSpeed(set.getFloat(7));
+				aux.setPoints(set.getInt(8));
+				aux.setModality(set.getInt(9));
+				
+				summaries.add(aux);
+			}
+			
+			
+			stmt.close();
+			
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+		
+		return summaries;
+	}
+
+	@Override
+	public void deleteTrackSummary(String session) throws UnableToPerformOperation {
+		
+		StringBuilder query = new StringBuilder();
+		query.append("DELETE FROM sessions_details WHERE session = ?");
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement("");
+			stmt.setString(1, session);
+			
+			int affected = stmt.executeUpdate();
+			
+			if(affected <= 0){
+				throw new UnableToPerformOperation("No session with session identifier "+session+" was found : deleteTrackSummary@SessionDriverImpl");
+			}
+			
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+		
+		
+	}
+
+	@Override
+	public void deleteUserTrackSummaries(int userId) throws UnableToPerformOperation {
+		
+		StringBuilder query = new StringBuilder();
+		query.append("DELETE FROM sessions_details WHERE session IN ( ");
+		query.append("SELECT sessions.Session as session FROM sessions WHERE UserId = ?)" );
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement(query.toString());
+			stmt.setInt(1, userId);
+			
+			int affected = stmt.executeUpdate();
+			
+			if(affected <= 0){
+				throw new UnableToPerformOperation("No sessions for user "+userId+" were found : deleteUserTrackSummaries@SessionDriverImpl");
+			}
+			
+			
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage()); 
+		}
+		
+		
+	}
+
+	@Override
+	public void addTrackTraceBatch(String session, List<Location> trace) throws UnableToPerformOperation {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<Location> getTrackTrace() throws UnableToPerformOperation {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
 
 	public static void main(String[] args){
 		SessionDriverImpl driver = (SessionDriverImpl) SessionDriverImpl.getDriver();
@@ -322,6 +508,4 @@ public class SessionDriverImpl implements SessionDriver{
 		}
 		
 	}
-
-	
 }

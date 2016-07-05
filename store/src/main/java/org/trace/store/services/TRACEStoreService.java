@@ -14,6 +14,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -36,10 +37,12 @@ import org.trace.store.middleware.drivers.exceptions.NonMatchingPasswordsExcepti
 import org.trace.store.middleware.drivers.exceptions.SessionNotFoundException;
 import org.trace.store.middleware.drivers.exceptions.UnableToPerformOperation;
 import org.trace.store.middleware.drivers.exceptions.UnableToRegisterUserException;
+import org.trace.store.middleware.drivers.exceptions.UnknownUserException;
 import org.trace.store.middleware.drivers.exceptions.UsernameAlreadyRegisteredException;
 import org.trace.store.middleware.drivers.impl.SessionDriverImpl;
 import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.drivers.utils.FormFieldValidator;
+import org.trace.store.middleware.drivers.utils.SecurityUtils;
 import org.trace.store.services.api.BeaconLocation;
 import org.trace.store.services.api.GeoLocation;
 import org.trace.store.services.api.Location;
@@ -49,6 +52,7 @@ import org.trace.store.services.api.TraceActivities;
 import org.trace.store.services.api.TraceStates;
 import org.trace.store.services.api.TraceTrack;
 import org.trace.store.services.api.UserRegistryRequest;
+import org.trace.store.services.api.data.TrackSummary;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -596,5 +600,102 @@ public class TRACEStoreService {
 			e.printStackTrace();
 			return generateFailedResponse(1, e.toString());
 		}
+	}
+	
+	/*
+	 * VERSION 2.0 - New Ijsberg functions
+	 */
+	private final int MAX_TRIES = 30;
+	
+	private String getNewUniqueSession() throws UnableToPerformOperation{
+		
+		String session = null;
+		
+		int tries = 0;
+		
+		do{
+			session = SecurityUtils.generateSecureActivationToken(32);
+			tries++;
+
+			if (tries > MAX_TRIES) 
+				throw new UnableToPerformOperation("Can no longer generate unique session code");
+
+		}while(sDriver.trackingSessionExists(session));		
+		
+		
+		return session;
+	}
+	
+	@POST
+	@Secured
+	@Path("/put/track")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String submitTrackSummary(TrackSummary trackSummary, @Context SecurityContext context){
+		
+		//TODO: this must be refactored
+		//Step 1 - Create a new session
+		String session;
+		String username = context.getUserPrincipal().getName();
+
+		
+		if(!trackSummary.getSession().isEmpty())
+			return generateFailedResponse("TODO: maybe already registered");
+		
+		try {
+			session = getNewUniqueSession();
+		} catch (UnableToPerformOperation e) {
+			return generateFailedResponse(e.getMessage());
+		}
+
+		//Step 2 - Register the newly created session
+		try {
+			sDriver.openTrackingSession(uDriver.getUserID(username), session);
+		} catch (UnableToPerformOperation | UnknownUserException e) {
+			return generateFailedResponse(e.getMessage());
+		}
+		
+		// Step 3 - Register the session details
+		try {
+			trackSummary.setSession(session);
+			sDriver.registerTrackSummary(trackSummary);
+			return generateSuccessResponse(session);
+		} catch (UnableToPerformOperation e) {
+			return generateFailedResponse(e.getMessage());
+		}
+	}
+	
+	@GET
+	@Secured
+	@Path("/get/track")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getTrackSummary(@QueryParam("session") String session){
+		
+		try{
+			TrackSummary summary = sDriver.getTrackSummary(session);
+			return generateSuccessResponse(summary.toString());
+		}catch(UnableToPerformOperation e){
+			return generateFailedResponse(e.getMessage());
+		}
+		
+	}
+	
+	@GET
+	@Path("/sample/track/summary")
+	@Produces(MediaType.APPLICATION_JSON)
+	public TrackSummary sampleTrackSummary(){
+		TrackSummary summary = new TrackSummary();
+
+		summary.setSession("fakeSession");
+		summary.setStartedAt(System.currentTimeMillis());
+		summary.setEndedAt(System.currentTimeMillis()+5000);
+		summary.setElapsedDistance(500);
+		summary.setElapsedTime(4);
+		summary.setPoints(0);
+		summary.setAvgSpeed(3.5f);
+		summary.setTopSpeed(4f);
+		summary.setModality(3);
+		
+		return summary;
 	}
 }
