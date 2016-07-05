@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -325,7 +326,7 @@ public class SessionDriverImpl implements SessionDriver{
 			conn.setAutoCommit(false);
 			
 			stmtSession = conn.prepareStatement(create_session);
-			stmtSession = conn.prepareStatement(create_summary);
+			stmtSummary = conn.prepareStatement(create_summary);
 			
 			//Phase 1 - Register the session
 			stmtSession.setInt(1, userId);
@@ -334,8 +335,8 @@ public class SessionDriverImpl implements SessionDriver{
 			
 			//Phase 2 - Register the Track Summary 
 			stmtSummary.setString(1, summary.getSession());
-			stmtSummary.setLong(2, summary.getStartedAt());
-			stmtSummary.setLong(3, summary.getEndedAt());
+			stmtSummary.setTimestamp(2, new Timestamp(summary.getStartedAt()));
+			stmtSummary.setTimestamp(3, new Timestamp(summary.getEndedAt()));
 			stmtSummary.setInt(4, summary.getElapsedTime());
 			stmtSummary.setInt(5, summary.getElapsedDistance());
 			stmtSummary.setFloat(6, summary.getAvgSpeed());
@@ -403,8 +404,8 @@ public class SessionDriverImpl implements SessionDriver{
 					
 			if(set.next()){
 				summary.setSession(set.getString(1));
-				summary.setStartedAt(set.getLong(2));
-				summary.setEndedAt(set.getLong(3));
+				summary.setStartedAt(set.getTimestamp(2).getTime());
+				summary.setEndedAt(set.getTimestamp(3).getTime());
 				summary.setElapsedTime(set.getInt(4));
 				summary.setElapsedTime(set.getInt(5));
 				summary.setAvgSpeed(set.getFloat(6));
