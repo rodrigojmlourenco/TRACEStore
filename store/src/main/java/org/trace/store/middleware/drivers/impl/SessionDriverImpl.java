@@ -306,7 +306,7 @@ public class SessionDriverImpl implements SessionDriver{
 			
 			PreparedStatement stmt = 
 					conn.prepareStatement(
-							"INSERT INTO session_details ("
+							"INSERT INTO sessions_details ("
 							+ "session, "
 							+ "startedAt, endedAt, "
 							+ "elapsedTime, elapsedDistance, "
