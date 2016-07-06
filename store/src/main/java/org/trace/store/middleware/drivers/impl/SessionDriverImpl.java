@@ -337,7 +337,7 @@ public class SessionDriverImpl implements SessionDriver{
 			stmtSummary.setTimestamp(2, new Timestamp(summary.getStartedAt()));
 			stmtSummary.setTimestamp(3, new Timestamp(summary.getEndedAt()));
 			stmtSummary.setInt(4, summary.getElapsedTime());
-			stmtSummary.setInt(5, summary.getElapsedDistance());
+			stmtSummary.setDouble(5, summary.getElapsedDistance());
 			stmtSummary.setFloat(6, summary.getAvgSpeed());
 			stmtSummary.setFloat(7, summary.getTopSpeed());
 			stmtSummary.setInt(8, summary.getPoints());
@@ -407,7 +407,7 @@ public class SessionDriverImpl implements SessionDriver{
 				summary.setStartedAt(set.getTimestamp(2).getTime());
 				summary.setEndedAt(set.getTimestamp(3).getTime());
 				summary.setElapsedTime(set.getInt(4));
-				summary.setElapsedTime(set.getInt(5));
+				summary.setElapsedDistance(set.getDouble(5));
 				summary.setAvgSpeed(set.getFloat(6));
 				summary.setPoints(set.getInt(7));
 				summary.setModality(set.getInt(8));

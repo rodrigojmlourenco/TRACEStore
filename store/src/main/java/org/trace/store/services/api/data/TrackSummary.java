@@ -21,7 +21,8 @@ public class TrackSummary {
 	private int elapsedTime;
 	
 	/** Distance traveled in meters */
-	private int elapsedDistance;
+	private double elapsedDistance;
+	/*          elapsedDistance*/
 	
 	/** Average measured speed in meters per second */
 	private float avgSpeed;
@@ -69,11 +70,11 @@ public class TrackSummary {
 		this.elapsedTime = elapsedTime;
 	}
 
-	public int getElapsedDistance() {
+	public double getElapsedDistance() {
 		return elapsedDistance;
 	}
 
-	public void setElapsedDistance(int elapsedDistance) {
+	public void setElapsedDistance(double elapsedDistance) {
 		this.elapsedDistance = elapsedDistance;
 	}
 
