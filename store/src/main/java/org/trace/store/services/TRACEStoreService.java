@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.print.attribute.standard.Media;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -57,6 +58,8 @@ import org.trace.store.services.api.data.TrackSummary;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import flexjson.JSON;
 
 /**
  * In order for higher-level information to be acquired, the data acquired by
@@ -672,6 +675,17 @@ public class TRACEStoreService {
 		}catch(UnableToPerformOperation e){
 			return generateFailedResponse(e.getMessage());
 		}
+		
+	}
+	
+	@POST
+	@Secured
+	@Path("/put/track/trace")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String postTraceBatch(@QueryParam("session")String session, String data, @Context SecurityContext context){
+		System.out.println(data);
+		return data;
 		
 	}
 	
