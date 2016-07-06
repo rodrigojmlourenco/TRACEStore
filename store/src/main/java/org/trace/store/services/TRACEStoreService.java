@@ -681,7 +681,12 @@ public class TRACEStoreService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String postTraceBatch(@QueryParam("session")String session, Location[] trace, @Context SecurityContext context){
 		
-		return generateSuccessResponse();
+		try {
+			sDriver.addTrackTraceBatch(session, trace);
+			return generateSuccessResponse();
+		} catch (UnableToPerformOperation e) {
+			return generateFailedResponse(e.getMessage());
+		}
 		
 	}
 	

@@ -517,8 +517,52 @@ public class SessionDriverImpl implements SessionDriver{
 	}
 
 	@Override
-	public void addTrackTraceBatch(String session, List<Location> trace) throws UnableToPerformOperation {
-		// TODO Auto-generated method stub
+	public void addTrackTraceBatch(String session, Location[] trace) throws UnableToPerformOperation {
+		StringBuilder query = new StringBuilder();
+		query.append("INSERT INTO sessions_traces (session, timestamp, latitude, longitude, attributes) ");
+		query.append("VALUES (?,?,?,?,?)");
+		
+		try{
+			conn.setAutoCommit(false);
+			
+			for(Location location : trace){
+				PreparedStatement stmt = conn.prepareStatement(query.toString());
+				stmt.setString(1, session);
+				stmt.setTimestamp(2, new Timestamp(location.getTimestamp()));
+				stmt.setDouble(3, location.getLatitude());
+				stmt.setDouble(4, location.getLongitude());
+				stmt.setString(5, location.getAttributes());
+				stmt.executeUpdate();
+				
+				stmt.close();
+			}
+			
+			conn.commit();
+			
+		}catch(SQLException e){
+			
+			try{
+			if(conn != null){
+				LOG.warn("Transaction is being rollbacked : registerTrackSummary@SessionDriver");
+				conn.rollback();
+			}
+			
+				throw new UnableToPerformOperation(e.getMessage());
+				
+			}catch(SQLException e1){
+				LOG.error(e1.getMessage());
+				
+			}
+			
+			
+		} finally {
+			
+			try{
+				conn.setAutoCommit(true);
+			}catch(SQLException e){
+				e.printStackTrace();
+			}
+		}
 		
 	}
 

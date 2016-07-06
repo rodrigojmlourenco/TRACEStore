@@ -105,7 +105,7 @@ public interface SessionDriver {
 	
 	public void deleteUserTrackSummaries(int userId) throws UnableToPerformOperation;
 	
-	public void addTrackTraceBatch(String session, List<Location> trace) throws UnableToPerformOperation;
+	public void addTrackTraceBatch(String session, Location[] trace) throws UnableToPerformOperation;
 	
 	public List<Location> getTrackTrace() throws UnableToPerformOperation;
 }
