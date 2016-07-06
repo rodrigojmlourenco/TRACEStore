@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.print.attribute.standard.Media;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -45,7 +44,6 @@ import org.trace.store.middleware.drivers.impl.UserDriverImpl;
 import org.trace.store.middleware.drivers.utils.FormFieldValidator;
 import org.trace.store.middleware.drivers.utils.SecurityUtils;
 import org.trace.store.services.api.BeaconLocation;
-import org.trace.store.services.api.GeoLocation;
 import org.trace.store.services.api.Location;
 import org.trace.store.services.api.PrivacyPolicies;
 import org.trace.store.services.api.TRACEQuery;
@@ -58,8 +56,6 @@ import org.trace.store.services.api.data.TrackSummary;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import flexjson.JSON;
 
 /**
  * In order for higher-level information to be acquired, the data acquired by
@@ -683,9 +679,9 @@ public class TRACEStoreService {
 	@Path("/put/track/trace")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String postTraceBatch(@QueryParam("session")String session, String data, @Context SecurityContext context){
-		System.out.println(data);
-		return data;
+	public String postTraceBatch(@QueryParam("session")String session, Location[] trace, @Context SecurityContext context){
+		
+		return generateSuccessResponse();
 		
 	}
 	
