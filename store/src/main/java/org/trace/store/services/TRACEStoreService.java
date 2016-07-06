@@ -654,7 +654,7 @@ public class TRACEStoreService {
 			int userId = uDriver.getUserID(username);
 			trackSummary.setSession(session);
 			sDriver.registerTrackSummary(userId, trackSummary);
-			return generateSuccessResponse(session);
+			return generateSuccessResponse(trackSummary.toString());
 		} catch (UnableToPerformOperation | UnknownUserException e) {
 			return generateFailedResponse(e.getMessage());
 		}
