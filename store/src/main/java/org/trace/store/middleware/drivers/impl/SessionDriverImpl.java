@@ -572,7 +572,7 @@ public class SessionDriverImpl implements SessionDriver{
 		List<Location> trace = new ArrayList<>();
 		
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT timestamp, latitude, longitude FROM sessions_details WHERE session = ?");
+		query.append("SELECT timestamp, latitude, longitude FROM sessions_traces WHERE session = ?");
 		
 		try {
 			PreparedStatement stmt = conn.prepareStatement(query.toString());
@@ -591,6 +591,7 @@ public class SessionDriverImpl implements SessionDriver{
 			return trace;
 			
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
