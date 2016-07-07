@@ -674,6 +674,20 @@ public class TRACEStoreService {
 		
 	}
 	
+	@GET
+	//@Secured
+	@Path("/get/track/trace")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Location> getRouteTrace(@QueryParam("session") String session){
+		
+		try {
+			return sDriver.getTrackTrace(session);
+		} catch (UnableToPerformOperation e) {
+			return null;
+		}
+		
+	}
+	
 	@POST
 	@Secured
 	@Path("/put/track/trace")

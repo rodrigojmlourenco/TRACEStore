@@ -567,9 +567,32 @@ public class SessionDriverImpl implements SessionDriver{
 	}
 
 	@Override
-	public List<Location> getTrackTrace() throws UnableToPerformOperation {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Location> getTrackTrace(String session) throws UnableToPerformOperation {
+		
+		List<Location> trace = new ArrayList<>();
+		
+		StringBuilder query = new StringBuilder();
+		query.append("SELECT timestamp, latitude, longitude FROM sessions_details WHERE session = ?");
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement(query.toString());
+			stmt.setString(1, session);
+			
+			ResultSet results = stmt.executeQuery();
+			
+			while(results.next()){
+				Location location = new Location();
+				location.setTimestamp(results.getTimestamp(1).getTime());
+				location.setLatitude(results.getDouble(2));
+				location.setLongitude(results.getDouble(3));
+				trace.add(location);
+			}
+			
+			return trace;
+			
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
 	}
 	
 	
