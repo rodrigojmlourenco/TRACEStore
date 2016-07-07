@@ -54,6 +54,7 @@ import org.trace.store.services.api.UserRegistryRequest;
 import org.trace.store.services.api.data.TrackSummary;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -678,12 +679,21 @@ public class TRACEStoreService {
 	//@Secured
 	@Path("/get/track/trace")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Location> getRouteTrace(@QueryParam("session") String session){
+	public String getRouteTrace(@QueryParam("session") String session){
 		
 		try {
-			return sDriver.getTrackTrace(session);
+			
+			List<Location> trace = sDriver.getTrackTrace(session);
+			
+			JsonArray payload = new JsonArray();
+			for(Location location : trace)
+				payload.add(location.getLocationAsJsonObject());
+			
+			return generateSuccessResponse(payload.toString());
+			
 		} catch (UnableToPerformOperation e) {
-			return null;
+			e.printStackTrace();
+			return generateFailedResponse(e.getMessage());
 		}
 		
 	}
