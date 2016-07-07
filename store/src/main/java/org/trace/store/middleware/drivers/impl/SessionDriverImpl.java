@@ -585,6 +585,7 @@ public class SessionDriverImpl implements SessionDriver{
 				location.setTimestamp(results.getTimestamp(1).getTime());
 				location.setLatitude(results.getDouble(2));
 				location.setLongitude(results.getDouble(3));
+				location.setAttributes("");
 				trace.add(location);
 			}
 			
