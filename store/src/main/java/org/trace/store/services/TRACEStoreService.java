@@ -676,7 +676,7 @@ public class TRACEStoreService {
 	}
 	
 	@GET
-	//@Secured
+	@Secured
 	@Path("/get/track/trace")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getRouteTrace(@QueryParam("session") String session){
@@ -713,6 +713,35 @@ public class TRACEStoreService {
 		}
 		
 	}
+	
+	@GET
+	@Secured
+	@Path("/get/track/digest")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getUserRoutes(@Context SecurityContext context){
+		
+		String username = context.getUserPrincipal().getName();
+		
+		try {
+			JsonObject payload = new JsonObject();
+			
+			int userID = uDriver.getUserID(username);
+			List<TrackSummary> sessions = sDriver.getUsersTrackSummaries(userID);
+			
+			JsonArray jSessions = new JsonArray();
+			for(TrackSummary summary : sessions)
+				jSessions.add(summary.getSession());
+			
+			payload.addProperty("count", sessions.size());
+			payload.add("sessions", jSessions);
+			
+			return generateSuccessResponse(payload.toString());
+			
+		} catch (UnknownUserException | UnableToPerformOperation e) {
+			return generateFailedResponse(e.getMessage());
+		}	
+	}
+	
 	
 	@GET
 	@Path("/sample/track/summary")
