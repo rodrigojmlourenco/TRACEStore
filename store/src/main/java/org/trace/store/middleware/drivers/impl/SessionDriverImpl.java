@@ -446,8 +446,8 @@ public class SessionDriverImpl implements SessionDriver{
 				aux = new TrackSummary();
 				
 				aux.setSession(set.getString(1));
-				aux.setStartedAt(set.getLong(2));
-				aux.setEndedAt(set.getLong(3));
+				aux.setStartedAt(set.getTimestamp(2).getTime());
+				aux.setEndedAt(set.getTimestamp(3).getTime());
 				aux.setElapsedTime(set.getInt(4));
 				aux.setElapsedDistance(set.getInt(5));
 				aux.setAvgSpeed(set.getFloat(6));
