@@ -430,9 +430,21 @@ public class SessionDriverImpl implements SessionDriver{
 		List<TrackSummary> summaries = new ArrayList<>();
 		
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT sessions.Session, startedAt, endedAt, elapsedTime, elapsedDistance, avgSpeed, topSpeed, points, modality ");
-		query.append("FROM sessions JOIN sessions_details ON sessions.Session = sessions_details.session ");
-		query.append("WHERE sessions.UserId = ?");
+		StringBuilder countQuery = new StringBuilder();
+		StringBuilder completeSessionsQuery = new StringBuilder();
+		//query.append("SELECT sessions.Session, startedAt, endedAt, elapsedTime, elapsedDistance, avgSpeed, topSpeed, points, modality ");
+		//query.append("FROM sessions JOIN sessions_details ON sessions.Session = sessions_details.session ");
+		//query.append("WHERE sessions.UserId = ?");
+		
+		countQuery.append("SELECT session AS id, count(*) as ActualPoints FROM sessions_traces GROUP BY session");
+		
+		completeSessionsQuery.append("SELECT A.* ");
+		completeSessionsQuery.append("FROM sessions_details AS A left join ("+countQuery+") AS B ");
+		completeSessionsQuery.append("ON A.session = B.id ");
+		completeSessionsQuery.append("WHERE A.points = B.ActualPoints");
+		
+		query.append("select C.* from ("+completeSessionsQuery+") AS C JOIN sessions AS S ON C.session = S.Session WHERE S.UserId=?");
+		
 		
 		try {
 			
