@@ -723,7 +723,6 @@ public class TRACEStoreService {
 		String username = context.getUserPrincipal().getName();
 		
 		try {
-			JsonObject payload = new JsonObject();
 			
 			int userID = uDriver.getUserID(username);
 			List<TrackSummary> sessions = sDriver.getUsersTrackSummaries(userID);
@@ -732,10 +731,7 @@ public class TRACEStoreService {
 			for(TrackSummary summary : sessions)
 				jSessions.add(summary.getSession());
 			
-			payload.addProperty("count", sessions.size());
-			payload.add("sessions", jSessions);
-			
-			return generateSuccessResponse(payload.toString());
+			return generateSuccessResponse(jSessions.toString());
 			
 		} catch (UnknownUserException | UnableToPerformOperation e) {
 			return generateFailedResponse(e.getMessage());
