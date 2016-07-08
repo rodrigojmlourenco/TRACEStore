@@ -430,7 +430,7 @@ public class SessionDriverImpl implements SessionDriver{
 		List<TrackSummary> summaries = new ArrayList<>();
 		
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT Sessions.Session, startedAt, endedAt, elapsedTime, elapsedDistance, avgSpeed, topSpeed, points, modality ");
+		query.append("SELECT sessions.Session, startedAt, endedAt, elapsedTime, elapsedDistance, avgSpeed, topSpeed, points, modality ");
 		query.append("FROM sessions JOIN sessions_details ON sessions.Session = sessions_details.session ");
 		query.append("WHERE sessions.UserId = ?");
 		
