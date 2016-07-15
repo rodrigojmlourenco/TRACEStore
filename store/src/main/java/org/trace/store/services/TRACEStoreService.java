@@ -816,6 +816,7 @@ public class TRACEStoreService {
 				LOG.error("Failed to insert route");
 			} else {
 				try {
+					sDriver.closeTrackingSession(session);
 					sDriver.updateSessionDistance(session, success);
 					LOG.info("Session {" + session + "} had its total distance updated.");
 				} catch (UnableToPerformOperation e) {
