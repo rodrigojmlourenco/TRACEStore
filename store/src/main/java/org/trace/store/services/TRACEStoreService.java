@@ -397,6 +397,7 @@ public class TRACEStoreService {
 	 * 
 	 * @see BeaconLocation
 	 */
+	@Deprecated
 	@POST
 	@Secured
 	@Path("/put/beacon")
@@ -707,7 +708,12 @@ public class TRACEStoreService {
 		
 		try {
 			sDriver.addTrackTraceBatch(session, trace);
+			
+			if(sDriver.isCompleteRoute(session))
+				new Thread(new TraceToGraphRunnable(session)).start();
+			
 			return generateSuccessResponse();
+			
 		} catch (UnableToPerformOperation e) {
 			return generateFailedResponse(e.getMessage());
 		}
@@ -756,5 +762,66 @@ public class TRACEStoreService {
 		summary.setModality(3);
 		
 		return summary;
+	}
+	
+	/* Helpers
+	 **************************************************************************
+	 **************************************************************************
+	 **************************************************************************
+	 */
+	
+	private class TraceToGraphRunnable implements Runnable {
+		
+		private final String session;
+		
+		public TraceToGraphRunnable(String session) {
+			this.session = session;
+		}
+		
+		@Override
+		public void run() {
+
+			double success;
+			TraceVertex v;
+			List<TraceVertex> route = new ArrayList<>();
+			GraphDB conn = GraphDB.getConnection();
+
+			List<Location> routeTrace;
+			try {
+				routeTrace = sDriver.getTrackTrace(session);
+				
+				for(Location waypoint : routeTrace){
+					if (waypoint != null) {
+
+						v = new TraceVertex(
+									waypoint.getLatitude(),
+									waypoint.getLongitude(),
+									extractLocationAttributes(waypoint));
+						
+						v.setDate(new Date(waypoint.getTimestamp()));
+						
+						route.add(v);
+					}
+				}
+				
+				success = conn.getTrackingAPI().submitRoute(session, route);
+			} catch (UnableToPerformOperation e1) {
+				LOG.error(e1.getMessage());
+				success = -1;
+			}
+			
+			
+
+			if (success == -1) {
+				LOG.error("Failed to insert route");
+			} else {
+				try {
+					sDriver.updateSessionDistance(session, success);
+					LOG.info("Session {" + session + "} had its total distance updated.");
+				} catch (UnableToPerformOperation e) {
+					LOG.error("Failed to submit route " + e);
+				}
+			}
+		}
 	}
 }

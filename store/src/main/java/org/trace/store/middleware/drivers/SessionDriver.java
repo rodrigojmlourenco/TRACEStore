@@ -108,4 +108,6 @@ public interface SessionDriver {
 	public void addTrackTraceBatch(String session, Location[] trace) throws UnableToPerformOperation;
 	
 	public List<Location> getTrackTrace(String session) throws UnableToPerformOperation;
+	
+	public boolean isCompleteRoute(String session) throws UnableToPerformOperation;
 }

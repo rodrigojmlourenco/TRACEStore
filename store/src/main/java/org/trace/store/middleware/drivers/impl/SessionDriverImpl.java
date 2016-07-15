@@ -609,6 +609,30 @@ public class SessionDriverImpl implements SessionDriver{
 		}
 	}
 	
+	@Override
+	public boolean isCompleteRoute(String session) throws UnableToPerformOperation {
+
+		
+		StringBuilder query = new StringBuilder();
+		StringBuilder countQuery = new StringBuilder();
+		StringBuilder secondOrderQuery = new StringBuilder();
+		
+		countQuery.append("select session, count(*) AS rPoints from sessions_traces group by session");
+		secondOrderQuery.append("select A.session, A.points, B.rPoints from sessions_details AS A join ("+countQuery+") AS B on A.session = B.session");
+		query.append("select session from ("+secondOrderQuery+") AS N WHERE session = ?");
+		
+		try{
+			PreparedStatement stmt = conn.prepareStatement(query.toString());
+			stmt.setString(1, session);
+			
+			ResultSet results = stmt.executeQuery();
+			
+			return results.next();
+			
+		}catch(SQLException e){
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
 	
 
 	public static void main(String[] args){
@@ -636,4 +660,6 @@ public class SessionDriverImpl implements SessionDriver{
 		}
 		
 	}
+	
+	
 }
