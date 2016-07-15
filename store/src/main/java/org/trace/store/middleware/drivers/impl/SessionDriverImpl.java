@@ -584,7 +584,7 @@ public class SessionDriverImpl implements SessionDriver{
 		List<Location> trace = new ArrayList<>();
 		
 		StringBuilder query = new StringBuilder();
-		query.append("SELECT timestamp, latitude, longitude FROM sessions_traces WHERE session = ?");
+		query.append("SELECT timestamp, latitude, longitude, attributes FROM sessions_traces WHERE session = ?");
 		
 		try {
 			PreparedStatement stmt = conn.prepareStatement(query.toString());
@@ -597,7 +597,7 @@ public class SessionDriverImpl implements SessionDriver{
 				location.setTimestamp(results.getTimestamp(1).getTime());
 				location.setLatitude(results.getDouble(2));
 				location.setLongitude(results.getDouble(3));
-				location.setAttributes("");
+				location.setAttributes(results.getString(4));
 				trace.add(location);
 			}
 			
