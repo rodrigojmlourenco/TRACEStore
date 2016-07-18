@@ -699,6 +699,8 @@ public class TRACEStoreService {
 		
 	}
 	
+	
+	
 	@POST
 	@Secured
 	@Path("/put/track/trace")
@@ -824,5 +826,32 @@ public class TRACEStoreService {
 				}
 			}
 		}
+	}
+	
+	/* TESTING - Please remove before release
+	 **************************************************************************
+	 **************************************************************************
+	 **************************************************************************
+	 */
+	@GET
+	@Path("/test/get/track/trace")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String testGetRouteTrace(@QueryParam("session") String session){
+		
+		try {
+			
+			List<Location> trace = sDriver.getTrackTrace(session);
+			
+			JsonArray payload = new JsonArray();
+			for(Location location : trace)
+				payload.add(location.getLocationAsJsonObject());
+			
+			return generateSuccessResponse(payload.toString());
+			
+		} catch (UnableToPerformOperation e) {
+			e.printStackTrace();
+			return generateFailedResponse(e.getMessage());
+		}
+		
 	}
 }
