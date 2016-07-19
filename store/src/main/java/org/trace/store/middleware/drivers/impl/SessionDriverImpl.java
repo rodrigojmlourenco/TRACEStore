@@ -530,6 +530,9 @@ public class SessionDriverImpl implements SessionDriver{
 
 	@Override
 	public void addTrackTraceBatch(String session, Location[] trace) throws UnableToPerformOperation {
+		
+		UnableToPerformOperation exception = null;
+		
 		StringBuilder query = new StringBuilder();
 		query.append("INSERT INTO sessions_traces (session, timestamp, latitude, longitude, attributes) ");
 		query.append("VALUES (?,?,?,?,?)");
@@ -554,16 +557,15 @@ public class SessionDriverImpl implements SessionDriver{
 		}catch(SQLException e){
 			
 			try{
-			if(conn != null){
-				LOG.warn("Transaction is being rollbacked : registerTrackSummary@SessionDriver");
-				conn.rollback();
-			}
-			
-				throw new UnableToPerformOperation(e.getMessage());
+				if(conn != null){
+					LOG.warn("Transaction is being rollbacked : registerTrackSummary@SessionDriver");
+					conn.rollback();
+				}
+				
+				exception = new UnableToPerformOperation(e.getMessage());
 				
 			}catch(SQLException e1){
 				LOG.error(e1.getMessage());
-				
 			}
 			
 			
@@ -576,6 +578,7 @@ public class SessionDriverImpl implements SessionDriver{
 			}
 		}
 		
+		if(exception!=null) throw exception;
 	}
 
 	@Override
