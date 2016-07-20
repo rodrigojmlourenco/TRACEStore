@@ -409,8 +409,9 @@ public class SessionDriverImpl implements SessionDriver{
 				summary.setElapsedTime(set.getInt(4));
 				summary.setElapsedDistance(set.getDouble(5));
 				summary.setAvgSpeed(set.getFloat(6));
-				summary.setPoints(set.getInt(7));
-				summary.setModality(set.getInt(8));
+				summary.setTopSpeed(set.getFloat(7));
+				summary.setPoints(set.getInt(8));
+				summary.setModality(set.getInt(9));
 			}else{
 				throw new UnableToPerformOperation("Session '"+session+"' does not exist.");
 			}
