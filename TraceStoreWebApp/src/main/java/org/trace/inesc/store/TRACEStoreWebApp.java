@@ -1,26 +1,22 @@
-package org.trace.store;
+package org.trace.inesc.store;
 
 import javax.ws.rs.ApplicationPath;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
-import org.trace.store.filters.AuthenticationFilter;
-import org.trace.store.filters.CORSResponseFilter;
-import org.trace.store.middleware.TRACESecurityManager;
-import org.trace.store.middleware.TRACEStore;
+import org.trace.inesc.filters.AuthenticationFilter;
+import org.trace.inesc.filters.CORSResponseFilter;
 
 @ApplicationPath("/")
-public class TraceStoreApp extends ResourceConfig{
-
+public class TRACEStoreWebApp extends ResourceConfig {
 	
-	/*
-	public TraceStoreApp(){
+	public TRACEStoreWebApp(){
 		
 		//Force eager initialization of the middleware
-		TRACEStore.getTRACEStore();
-		TRACESecurityManager.getManager();
-		packages("org.trace.store.services");
+		//TRACEStore.getTRACEStore();
+		//TRACESecurityManager.getManager();
+		packages("org.trace.inesc.services");
 		
 		//Incomming Filters
 		 // Register resources and providers using package-scanning.
@@ -29,10 +25,6 @@ public class TraceStoreApp extends ResourceConfig{
         register(AuthenticationFilter.class); 
         //register(AuthorizationFilter.class);  
         
-        
-        // Register an instance of LoggingFilter.
-        //register(new LoggingFilter(LOGGER, true));
- 
         //Outgoing Filters
         register(CORSResponseFilter.class);
         
@@ -41,6 +33,5 @@ public class TraceStoreApp extends ResourceConfig{
         
         PropertyConfigurator.configure(System.getenv("LOG4J_CONFIG"));
 	}
-	*/
-	
+
 }

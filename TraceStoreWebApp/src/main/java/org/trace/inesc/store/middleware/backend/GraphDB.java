@@ -1,22 +1,13 @@
-package org.trace.store.middleware.backend;
+package org.trace.inesc.store.middleware.backend;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.opentripplanner.graph_builder.GraphBuilder;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.standalone.CommandLineParameters;
-import org.trace.DBAPI.DBMapAPI;
-import org.trace.DBAPI.DBRewardAPI;
-import org.trace.DBAPI.DBTrackingAPI;
-import org.trace.DBAPI.TraceDB;
-import org.trace.DBAPI.data.TraceEdge;
-import org.trace.DBAPI.data.TraceVertex;
-import org.trace.store.middleware.backend.exceptions.UnableToGenerateGraphException;
+import org.trace.inesc.store.middleware.exceptions.UnableToGenerateGraphException;
+import org.trace.inesc.store.storage.graph.DBMapAPI;
+import org.trace.inesc.store.storage.graph.DBRewardAPI;
+import org.trace.inesc.store.storage.graph.DBTrackingAPI;
+import org.trace.inesc.store.storage.graph.TraceDB;
 
 public class GraphDB {
 
@@ -78,8 +69,8 @@ public class GraphDB {
 		}
 
 		
-		List<TraceVertex> vertices = new ArrayList<>();
-		List<TraceEdge> edges = new ArrayList<>();
+		List<TraceVertex> vertices = new ArrayList<TraceVertex>();
+		List<TraceEdge> edges = new ArrayList<TraceEdge>();
 		//Step 2 - Given the OTP graph add all vertices to the graph DB
 		String id;
 		for(Vertex v : graph.getVertices()){
@@ -98,7 +89,7 @@ public class GraphDB {
 		
 		LOG.info("All vertices and edges successfully added to the graph database.");
 		*/
-		LOG.warn("Unable to populate because of problems resolving pom dependencies");
+		LOG.error("Unable to populate graph - problems resolving the dependencies for the war!");
 	}
 
 	/**
