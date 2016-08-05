@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +35,8 @@ public class MariaDBDriver {
 	private MariaDBDriver(){
 		String user="error", password="error", database="error";
 
-		String configFile = System.getenv("HOME")+"/trace/config.xml";
+		
+		String configFile = System.getenv("TRACE_CONFIG");
 
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
@@ -66,8 +68,9 @@ public class MariaDBDriver {
 			}
 
 			try {
-				Class.forName("com.mysql.jdbc.Driver");
+				Class.forName("org.mariadb.jdbc.Driver");
 			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
 				throw new RuntimeException(e.getMessage());
 			}
 			

@@ -66,7 +66,7 @@ public class TRACESecurityManager{
 	private ConcurrentHashMap<String, String> userTokens;
 	
 	private final String SECRET;
-	private final String SECRET_FILE = System.getenv("TRACE_DIR")+"/.secret/key";
+	private final String SECRET_FILE = System.getenv("TRACE_SECRET")+"/key";
 	
 	
 	private String loadSecretFromFile() throws IOException{

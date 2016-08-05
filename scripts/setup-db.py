@@ -1,8 +1,10 @@
 import sys
+import os
 import mysql.connector as mariadb
 import xml.etree.ElementTree as ET
 
-config_path = "./config.xml"
+
+config_path = os.environ['TRACE_CONFIG']
 
 config = ET.parse(config_path).getroot()
 
