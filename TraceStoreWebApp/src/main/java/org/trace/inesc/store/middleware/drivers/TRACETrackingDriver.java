@@ -133,15 +133,6 @@ public interface TRACETrackingDriver {
 	 */
 	public JsonArray getUserSessions(String username);
 	
-	/**
-	 * Fetches the list of tracking sessions that are associated with the
-	 * specified user as well as their dates and time.
-	 * 
-	 * @param username The user's username.
-	 * 
-	 * @return List of sessions and dates as a Json array.
-	 */
-	public JsonArray getUserSessionsAndDates(String username);
 	
 	/**
 	 * Fetches the list of all tracking sessions.

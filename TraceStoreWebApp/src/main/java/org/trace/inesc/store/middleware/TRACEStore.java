@@ -201,26 +201,6 @@ public class TRACEStore implements TRACETrackingDriver, TRACERewardDriver, TRACE
 	}
 
 	@Override
-	public JsonArray getUserSessionsAndDates(String username) {
-
-		JsonArray results = new JsonArray();
-
-		int userId;
-		try {
-			userId = userDriver.getUserID(username);
-			List<SimpleSession> sessions = sessionDriver.getAllUserTrackingSessions(userId);
-
-			for (SimpleSession session : sessions)
-				results.add(session.toString());
-
-		} catch (UnknownUserException | UnableToPerformOperation e) {
-			LOG.error(e);
-		}
-
-		return results;
-	}
-
-	@Override
 	public JsonArray getAllSessions() {
 		JsonArray results = new JsonArray();
 
