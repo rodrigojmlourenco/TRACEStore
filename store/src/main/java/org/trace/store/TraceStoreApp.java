@@ -14,7 +14,6 @@ import org.trace.store.middleware.TRACEStore;
 public class TraceStoreApp extends ResourceConfig{
 
 	
-	/*
 	public TraceStoreApp(){
 		
 		//Force eager initialization of the middleware
@@ -41,6 +40,5 @@ public class TraceStoreApp extends ResourceConfig{
         
         PropertyConfigurator.configure(System.getenv("LOG4J_CONFIG"));
 	}
-	*/
 	
 }
