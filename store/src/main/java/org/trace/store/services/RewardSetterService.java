@@ -538,4 +538,42 @@ public class RewardSetterService {
 			return generateFailedResponse(3, e.getMessage());
 		}
 	}
+	
+	
+	@GET
+	@Path("/get/shops")
+	@Secured(Role.rewarder)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getShops(@Context SecurityContext context) {
+
+		String user = context.getUserPrincipal().getName();
+
+		List<Shop> shops = null;
+
+		try {
+			int ownerId = uDriver.getUserID(user);
+
+			shops = rDriver.getShops(ownerId);
+			
+			Gson gson = new Gson();
+			JsonArray payload = new JsonArray();
+			for (Shop s : shops) {
+				JsonObject aux = s.toJson();
+				payload.add(aux);
+			}
+
+			LOG.info("Fetched " + shops.size() + " shops associated with " + user);
+			return generateSuccessResponse(gson.toJson(payload));
+
+		} catch (UnknownUserException e) {
+			LOG.error(e.getMessage());
+			return generateFailedResponse(2, e.getMessage());
+		} catch (UnableToPerformOperation e) {
+			LOG.error(e.getMessage());
+			return generateFailedResponse(3, e.getMessage());
+		} catch (Exception e){
+			e.printStackTrace();
+			return generateFailedResponse(3, e.getMessage());
+		}
+	}
 }

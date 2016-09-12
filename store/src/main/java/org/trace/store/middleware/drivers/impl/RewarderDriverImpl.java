@@ -472,4 +472,35 @@ public class RewarderDriverImpl implements RewarderDriver {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
+	
+	@Override
+	public List<Shop> getShops(int ownerId) throws UnableToPerformOperation {
+		PreparedStatement stmt;
+		List<Shop> shops = new ArrayList();
+
+		try {
+			stmt = conn.prepareStatement("SELECT * FROM TRACE.shops where OwnerId=?;");
+
+			stmt.setInt(1, ownerId);
+
+			ResultSet result = stmt.executeQuery();
+
+			while (result.next()) {
+
+				int id = result.getInt(1);
+				String name = result.getString(3);
+				String branding = result.getString(4);
+				double latitude = result.getDouble(5);
+				double longitude = result.getDouble(6);
+
+				shops.add(new Shop(id, ownerId, name, branding, latitude, longitude));
+			}
+			stmt.close();
+			return shops;
+
+		} catch (SQLException e) {
+			Log.error("SQLException: " + e.getMessage());
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
 }

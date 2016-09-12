@@ -35,6 +35,8 @@ public interface RewarderDriver {
 
 	public Shop getShop(int ownerId) throws UnableToPerformOperation;
 	
+	public List<Shop> getShops(int ownerId) throws UnableToPerformOperation;
+	
 	public boolean updateShop(int ownerId, String name, String branding, double latitude, double longitude) throws UnableToPerformOperation;
 
 	public Shop getShopDetails(int shopId) throws UnableToPerformOperation;
