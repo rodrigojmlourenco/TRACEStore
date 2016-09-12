@@ -488,21 +488,21 @@ public class RewardSetterService {
 
 			GraphDB conn = GraphDB.getConnection();
 
-			Shop shop = rDriver.getShop(ownerId);
-			
 //			LOG.debug("request.getType(): " + request.getType());
+			int shopId;
 			
 			// new registry
 			if(request.getType().equals("new")){
 //				LOG.debug("inside new");
-				int shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(),
+				shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(),
 						request.getLatitude(), request.getLongitude());
 				conn.getRewardAPI().setShop(shopId, ownerId, request.getLatitude(), request.getLongitude());
 			}else{ // update
 //				LOG.debug("inside update");
 				rDriver.updateShop(request.getId(), request.getName(), request.getBranding(), request.getLatitude(),
 						request.getLongitude());
-				conn.getRewardAPI().updateShop(shop.getId(), request.getLatitude(), request.getLongitude());
+				conn.getRewardAPI().updateShop(request.getId(), request.getLatitude(), request.getLongitude());
+				shopId = request.getId();
 			}
 
 //			// register
@@ -517,7 +517,7 @@ public class RewardSetterService {
 //				conn.getRewardAPI().updateShop(shop.getId(), request.getLatitude(), request.getLongitude());
 //			}
 
-			return generateSuccessResponse("" + shop.getId());
+			return generateSuccessResponse("" + shopId);
 
 		} catch (UnknownUserException e) {
 			return generateFailedResponse(2, e.getMessage());
@@ -588,6 +588,35 @@ public class RewardSetterService {
 			return generateFailedResponse(3, e.getMessage());
 		} catch (Exception e){
 			e.printStackTrace();
+			return generateFailedResponse(3, e.getMessage());
+		}
+	}
+	
+	@POST
+	@Path("/delete/shop")
+	@Secured(Role.rewarder)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String deleteShop(RegisterShopRequest request, @Context SecurityContext context) {
+
+		String user = context.getUserPrincipal().getName();
+
+		try {
+			int ownerId = uDriver.getUserID(user);
+			if (!hasRewarderRole(user)) {
+				LOG.error(user + " is not a rewarder");
+				return generateFailedResponse(1, "The user is not a rewarder");
+			}
+			GraphDB conn = GraphDB.getConnection();
+
+			rDriver.deleteShop(ownerId,request.getId());
+			conn.getRewardAPI().deleteShop(request.getId());
+
+			return generateSuccessResponse("deleted");
+
+		} catch (UnknownUserException e) {
+			return generateFailedResponse(2, e.getMessage());
+		} catch (UnableToPerformOperation e) {
 			return generateFailedResponse(3, e.getMessage());
 		}
 	}

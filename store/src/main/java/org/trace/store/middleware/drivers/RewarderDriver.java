@@ -37,7 +37,7 @@ public interface RewarderDriver {
 	
 	public List<Shop> getShops(int ownerId) throws UnableToPerformOperation;
 	
-	public boolean updateShop(int ownerId, String name, String branding, double latitude, double longitude) throws UnableToPerformOperation;
+	public boolean updateShop(int id, String name, String branding, double latitude, double longitude) throws UnableToPerformOperation;
 
 	public Shop getShopDetails(int shopId) throws UnableToPerformOperation;
 	
@@ -48,5 +48,6 @@ public interface RewarderDriver {
 	public List<ShopDetailed> getDetailedShops(List<String> shopIds) throws UnableToPerformOperation;
 
 	public boolean registerCycleToShopReward(int shopId, String reward) throws UnableToPerformOperation;
-
+	
+	public boolean deleteShop(int ownerId, int id) throws UnableToPerformOperation;
 }

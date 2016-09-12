@@ -161,6 +161,16 @@ public class DBRewardAPI extends DBAPI{
 		return true;
 	}
 	
+	public boolean deleteShop(int shopId){
+		Map<String,Object> params = new HashMap<>();
+		params.put("shopId",shopId);
+		
+		query("g.V().hasLabel('shop').has('shopId', shopId).drop()"
+				+ "",params);
+		
+		return true;
+	}
+	
 	public List<String> getShopsIds(double latitude, double longitude, double radius){
 		List<String> shopsId = new ArrayList<>();
 		List<Result> results = null;

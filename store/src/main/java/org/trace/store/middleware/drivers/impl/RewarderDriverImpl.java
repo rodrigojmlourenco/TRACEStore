@@ -289,6 +289,28 @@ public class RewarderDriverImpl implements RewarderDriver {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
+	
+	@Override
+	public boolean deleteShop(int ownerId, int id)
+			throws UnableToPerformOperation {
+		PreparedStatement stmt;
+
+//		.prepareStatement("UPDATE shops SET Name=?, Branding=?, Latitude=?, Longitude=? where OwnerId=?;");
+		try {
+			stmt = conn
+					.prepareStatement("DELETE FROM shops WHERE ownerId=? AND id=?;");
+			stmt.setInt(1, ownerId);
+			stmt.setInt(2, id);
+
+			int result = stmt.executeUpdate();
+			stmt.close();
+
+			return result >= 1;
+
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
 
 	@Override
 	public int getShopId(int userId) throws UnableToPerformOperation {
