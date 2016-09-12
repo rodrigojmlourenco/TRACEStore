@@ -7,6 +7,7 @@ public class DistanceBasedRewardRequest {
 	
 	private double travelledDistance;
 	private String reward;
+	private int shopId;
 	
 	public DistanceBasedRewardRequest(){}
 	
@@ -30,4 +31,13 @@ public class DistanceBasedRewardRequest {
 	public void setReward(String reward) {
 		this.reward = reward;
 	}
+
+	public int getShopId() {
+		return shopId;
+	}
+
+	public void setShopId(int shopId) {
+		this.shopId = shopId;
+	}
+	
 }

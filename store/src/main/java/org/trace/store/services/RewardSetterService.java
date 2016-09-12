@@ -193,7 +193,6 @@ public class RewardSetterService {
 
 		try {
 			int userId = uDriver.getUserID(user);
-			int shopId = rDriver.getShopId(userId);
 
 			if (!hasRewarderRole(user)) {
 				LOG.error(user + " is not a rewarder");
@@ -201,9 +200,9 @@ public class RewardSetterService {
 			}
 
 			if(request.getTravelledDistance() == 0){
-				rDriver.registerCycleToShopReward(shopId, request.getReward());
+				rDriver.registerCycleToShopReward(request.getShopId(), request.getReward());
 			}else{
-				rDriver.registerDistanceBasedReward(shopId, request.getTravelledDistance(), request.getReward());
+				rDriver.registerDistanceBasedReward(request.getShopId(), request.getTravelledDistance(), request.getReward());
 			}
 
 			return generateSuccessResponse("");
