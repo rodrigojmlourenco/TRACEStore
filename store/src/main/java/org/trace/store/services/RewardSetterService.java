@@ -500,7 +500,7 @@ public class RewardSetterService {
 				conn.getRewardAPI().setShop(shopId, ownerId, request.getLatitude(), request.getLongitude());
 			}else{ // update
 //				LOG.debug("inside update");
-				rDriver.updateShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(),
+				rDriver.updateShop(request.getId(), request.getName(), request.getBranding(), request.getLatitude(),
 						request.getLongitude());
 				conn.getRewardAPI().updateShop(shop.getId(), request.getLatitude(), request.getLongitude());
 			}

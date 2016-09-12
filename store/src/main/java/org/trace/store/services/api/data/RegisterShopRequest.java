@@ -7,6 +7,7 @@ public class RegisterShopRequest {
 	
 	private String name, branding, type;
 	private double latitude,longitude;
+	private int id;
 	
 	public RegisterShopRequest(){}
 	
@@ -23,6 +24,15 @@ public class RegisterShopRequest {
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.type = type;
+	}
+	
+	public RegisterShopRequest(String name, String branding, double latitude, double longitude, String type, int id){
+		this.name = name;
+		this.branding = name;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.type = type;
+		this.id = id;
 	}
 
 	public String getName() {
@@ -63,5 +73,13 @@ public class RegisterShopRequest {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

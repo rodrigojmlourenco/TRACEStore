@@ -266,18 +266,19 @@ public class RewarderDriverImpl implements RewarderDriver {
 	}
 
 	@Override
-	public boolean updateShop(int ownerId, String name, String branding, double latitude, double longitude)
+	public boolean updateShop(int id, String name, String branding, double latitude, double longitude)
 			throws UnableToPerformOperation {
 		PreparedStatement stmt;
 
+//		.prepareStatement("UPDATE shops SET Name=?, Branding=?, Latitude=?, Longitude=? where OwnerId=?;");
 		try {
 			stmt = conn
-					.prepareStatement("UPDATE shops SET Name=?, Branding=?, Latitude=?, Longitude=? where OwnerId=?;");
+					.prepareStatement("UPDATE shops SET Name=?, Branding=?, Latitude=?, Longitude=? where Id=?;");
 			stmt.setString(1, name);
 			stmt.setString(2, branding);
 			stmt.setDouble(3, latitude);
 			stmt.setDouble(4, longitude);
-			stmt.setInt(5, ownerId);
+			stmt.setInt(5, id);
 
 			int result = stmt.executeUpdate();
 			stmt.close();
