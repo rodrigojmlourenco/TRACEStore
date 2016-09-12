@@ -490,8 +490,8 @@ public class RewardSetterService {
 
 			Shop shop = rDriver.getShop(ownerId);
 			
-			// register
-			if(request.getType() == "register"){
+			// new registry
+			if(request.getType() == "new"){
 				int shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(),
 						request.getLatitude(), request.getLongitude());
 				conn.getRewardAPI().setShop(shopId, ownerId, request.getLatitude(), request.getLongitude());
