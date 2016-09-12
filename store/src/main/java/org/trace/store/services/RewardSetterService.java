@@ -489,18 +489,29 @@ public class RewardSetterService {
 			GraphDB conn = GraphDB.getConnection();
 
 			Shop shop = rDriver.getShop(ownerId);
-
+			
 			// register
-			if (shop == null) {
+			if(request.getType() == "register"){
 				int shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(),
 						request.getLatitude(), request.getLongitude());
 				conn.getRewardAPI().setShop(shopId, ownerId, request.getLatitude(), request.getLongitude());
-
-			} else { // update
+			}else{ // update
 				rDriver.updateShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(),
 						request.getLongitude());
 				conn.getRewardAPI().updateShop(shop.getId(), request.getLatitude(), request.getLongitude());
 			}
+
+//			// register
+//			if (shop == null) {
+//				int shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(),
+//						request.getLatitude(), request.getLongitude());
+//				conn.getRewardAPI().setShop(shopId, ownerId, request.getLatitude(), request.getLongitude());
+//
+//			} else { // update
+//				rDriver.updateShop(ownerId, request.getName(), request.getBranding(), request.getLatitude(),
+//						request.getLongitude());
+//				conn.getRewardAPI().updateShop(shop.getId(), request.getLatitude(), request.getLongitude());
+//			}
 
 			return generateSuccessResponse("" + shop.getId());
 
