@@ -526,4 +526,38 @@ public class RewarderDriverImpl implements RewarderDriver {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
+	
+	@Override
+	public List<TraceReward> getAllOwnerRewards(int ownerId) throws UnableToPerformOperation {
+		PreparedStatement stmt;
+		List<TraceReward> rewards = new ArrayList<>();
+		try {
+			
+			stmt = conn.prepareStatement("SELECT challenges.id, challenges.conditions, challenges.reward, challenges.type, "
+										+ "challenges.shopId, shops.name "
+					+ "FROM challenges "
+					+ "INNER JOIN shops	"
+					+ "ON challenges.shopId=shops.Id "
+					+ "WHERE shops.OwnerId=?");
+			
+//			stmt = conn.prepareStatement("SELECT Id, Conditions, Reward, Type FROM challenges WHERE shopId=?");
+			stmt.setInt(1, ownerId);
+			ResultSet result = stmt.executeQuery();
+
+			while (result.next()) {
+				int id = result.getInt("id");
+				String conditions = result.getString("conditions");
+				String reward = result.getString("reward");
+				String type = result.getString("type");
+				int shopId = result.getInt("shopId");
+				String shopName = result.getString("name");
+
+				rewards.add(new TraceReward(id, conditions, reward, type, shopId, shopName));
+			}
+			stmt.close();
+			return rewards;
+		} catch (SQLException e) {
+			throw new UnableToPerformOperation(e.getMessage());
+		}
+	}
 }

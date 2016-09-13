@@ -267,6 +267,57 @@ public class RewardSetterService {
 	}
 	
 	@GET
+	@Secured
+	@Path("/get/ownerRewards")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getRegisteredOwnerRewards(@Context SecurityContext context) {
+
+		int userId, shopId;
+		String user = context.getUserPrincipal().getName();
+
+		LOG.info("@getRegisteredRewards: Rewarder<" + user + ">?");
+
+		try {
+			userId = uDriver.getUserID(user);
+
+			if (!hasRewarderRole(user)) {
+				LOG.error(user + " is not a rewarder");
+				return generateFailedResponse(1, "The user is not a rewarder");
+			}
+
+			List<TraceReward> rewards = rDriver.getAllOwnerRewards(userId);
+
+			Gson gson = new Gson();
+			JsonArray payload = new JsonArray();
+			for (TraceReward r : rewards) {
+				JsonObject aux = r.toJson();
+
+				if(r.getType().equals("Cycle To Shop")){
+					aux.addProperty("winners", "-");
+				}else{
+					// TODO: mais tarde fazer isto de forma inteligente
+					int userCount = rDriver.getUsersWithDistance(r.getMinimumDistance()).size();
+					aux.addProperty("winners", userCount);
+				}
+				payload.add(aux);
+			}
+
+			LOG.info("Fetched " + rewards.size() + " associated with " + user);
+			return generateSuccessResponse(gson.toJson(payload));
+
+		} catch (UnknownUserException e) {
+			LOG.error(e.getMessage());
+			return generateFailedResponse(2, e.getMessage());
+		} catch (UnableToPerformOperation e) {
+			LOG.error(e.getMessage());
+			return generateFailedResponse(3, e.getMessage());
+		} catch (Exception e){
+			e.printStackTrace();
+			return generateFailedResponse(3, e.getMessage());
+		}
+	}
+	
+	@GET
 	@Path("/rewards")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getShopRewards(@QueryParam("lat") double latitude, @QueryParam("lon") double longitude, @QueryParam("radius") double radius){

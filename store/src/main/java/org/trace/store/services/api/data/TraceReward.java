@@ -5,8 +5,8 @@ import com.google.gson.JsonParser;
 
 public class TraceReward {
 
-	private int identifier;
-	private String condition, reward, type;
+	private int identifier, shopId;
+	private String condition, reward, type, shopName;
 	
 	public TraceReward(){}
 	
@@ -21,6 +21,15 @@ public class TraceReward {
 		this.condition = condition;
 		this.reward = reward;
 		this.type = type;
+	}
+	
+	public TraceReward(int identifier, String condition, String reward, String type, int shopId, String shopName){
+		this.identifier = identifier;
+		this.condition = condition;
+		this.reward = reward;
+		this.type = type;
+		this.shopId = shopId;
+		this.shopName = shopName;
 	}
 
 	public int getIdentifier() {
@@ -62,11 +71,29 @@ public class TraceReward {
 		json.add("conditions", parser.parse(getCondition()));
 		json.addProperty("reward", getReward());
 		json.addProperty("type", getType());
+		json.addProperty("shopId", getShopId());
+		json.addProperty("shopName", getShopName());
 		return json;
 	}
-	
+
 	public double getMinimumDistance(){ //TODO: temporary
 		JsonObject c = this.toJson().getAsJsonObject("conditions");
 		return c.has("distance") ? c.get("distance").getAsDouble() : 0;
+	}
+
+	public int getShopId() {
+		return shopId;
+	}
+
+	public void setShopId(int shopId) {
+		this.shopId = shopId;
+	}
+
+	public String getShopName() {
+		return shopName;
+	}
+
+	public void setShopName(String shopName) {
+		this.shopName = shopName;
 	}	
 }
