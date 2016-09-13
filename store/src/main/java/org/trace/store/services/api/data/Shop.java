@@ -6,7 +6,7 @@ import com.google.gson.JsonParser;
 public class Shop {
 
 	private int id,ownerId;
-	private String name, branding;
+	private String name, branding, url;
 	private double latitude, longitude;
 	
 	public Shop(){}
@@ -18,6 +18,16 @@ public class Shop {
 		this.branding = branding;
 		this.latitude = latitude;
 		this.longitude = longitude;
+	}
+	
+	public Shop(int id, int ownerId, String name, String branding, double latitude, double longitude, String url){
+		this.id = id;
+		this.ownerId = ownerId;
+		this.name = name;
+		this.branding = branding;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.url = url;
 	}
 
 	public int getId() {
@@ -77,7 +87,16 @@ public class Shop {
 		json.addProperty("branding", getBranding());
 		json.addProperty("latitude", getLatitude());
 		json.addProperty("longitude", getLongitude());
+		json.addProperty("url", getUrl());
 		return json;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 	
 }

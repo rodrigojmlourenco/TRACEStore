@@ -542,8 +542,9 @@ public class RewarderDriverImpl implements RewarderDriver {
 				String branding = result.getString(4);
 				double latitude = result.getDouble(5);
 				double longitude = result.getDouble(6);
+				String url = result.getString(7);
 
-				shops.add(new Shop(id, ownerId, name, branding, latitude, longitude));
+				shops.add(new Shop(id, ownerId, name, branding, latitude, longitude,url));
 			}
 			stmt.close();
 			return shops;
