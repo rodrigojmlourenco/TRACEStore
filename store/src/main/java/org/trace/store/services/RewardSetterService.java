@@ -544,12 +544,16 @@ public class RewardSetterService {
 			// new registry
 			if(request.getType().equals("new")){
 //				LOG.debug("inside new");
-				shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(),
+//				shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(),
+//						request.getLatitude(), request.getLongitude());
+				shopId = rDriver.registerShop(ownerId, request.getName(), request.getBranding(), request.getUrl(),
 						request.getLatitude(), request.getLongitude());
 				conn.getRewardAPI().setShop(shopId, ownerId, request.getLatitude(), request.getLongitude());
 			}else{ // update
 //				LOG.debug("inside update");
-				rDriver.updateShop(request.getId(), request.getName(), request.getBranding(),
+//				rDriver.updateShop(request.getId(), request.getName(), request.getBranding(),
+//						request.getLatitude(), request.getLongitude());
+				rDriver.updateShop(request.getId(), request.getName(), request.getBranding(), request.getUrl(),
 						request.getLatitude(), request.getLongitude());
 				conn.getRewardAPI().updateShop(request.getId(), request.getLatitude(), request.getLongitude());
 				shopId = request.getId();
