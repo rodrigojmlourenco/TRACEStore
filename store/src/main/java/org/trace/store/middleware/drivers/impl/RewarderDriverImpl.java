@@ -197,21 +197,35 @@ public class RewarderDriverImpl implements RewarderDriver {
 	}
 
 	@Override
-	public int registerShop(int ownerId, String name, String branding, double latitude, double longitude)
+	public int registerShop(int ownerId, String name, String branding, String url, double latitude, double longitude)
 			throws UnableToPerformOperation {
 
 		PreparedStatement stmt;
 
 		try {
-			stmt = conn.prepareStatement(
-					"INSERT INTO shops (OwnerId, Name, Branding, Latitude, Longitude) VALUES (?,?,?,?,?)",
-					java.sql.Statement.RETURN_GENERATED_KEYS);
+			
+			if(url.equals("")){
+				stmt = conn.prepareStatement(
+						"INSERT INTO shops (OwnerId, Name, Branding, Latitude, Longitude) VALUES (?,?,?,?,?)",
+						java.sql.Statement.RETURN_GENERATED_KEYS);
 
-			stmt.setInt(1, ownerId);
-			stmt.setString(2, name);
-			stmt.setString(3, branding);
-			stmt.setDouble(4, latitude);
-			stmt.setDouble(5, longitude);
+				stmt.setInt(1, ownerId);
+				stmt.setString(2, name);
+				stmt.setString(3, branding);
+				stmt.setDouble(4, latitude);
+				stmt.setDouble(5, longitude);
+			}else{
+				stmt = conn.prepareStatement(
+						"INSERT INTO shops (OwnerId, Name, Branding, LogoUrl, Latitude, Longitude) VALUES (?,?,?,?,?)",
+						java.sql.Statement.RETURN_GENERATED_KEYS);
+
+				stmt.setInt(1, ownerId);
+				stmt.setString(2, name);
+				stmt.setString(3, branding);
+				stmt.setString(4, url);
+				stmt.setDouble(5, latitude);
+				stmt.setDouble(6, longitude);
+			}
 
 			ResultSet set = stmt.executeQuery();
 			int genKey = -1;
@@ -266,19 +280,32 @@ public class RewarderDriverImpl implements RewarderDriver {
 	}
 
 	@Override
-	public boolean updateShop(int id, String name, String branding, double latitude, double longitude)
+	public boolean updateShop(int id, String name, String branding, String url, double latitude, double longitude)
 			throws UnableToPerformOperation {
 		PreparedStatement stmt;
 
 //		.prepareStatement("UPDATE shops SET Name=?, Branding=?, Latitude=?, Longitude=? where OwnerId=?;");
 		try {
-			stmt = conn
-					.prepareStatement("UPDATE shops SET Name=?, Branding=?, Latitude=?, Longitude=? where Id=?;");
-			stmt.setString(1, name);
-			stmt.setString(2, branding);
-			stmt.setDouble(3, latitude);
-			stmt.setDouble(4, longitude);
-			stmt.setInt(5, id);
+			
+			if(url.equals("")){
+				stmt = conn
+						.prepareStatement("UPDATE shops SET Name=?, Branding=?, Latitude=?, Longitude=? where Id=?;");
+				stmt.setString(1, name);
+				stmt.setString(2, branding);
+				stmt.setDouble(3, latitude);
+				stmt.setDouble(4, longitude);
+				stmt.setInt(5, id);
+			}else{
+				stmt = conn
+						.prepareStatement("UPDATE shops SET Name=?, Branding=?, LogoUrl=?, Latitude=?, Longitude=? where Id=?;");
+				stmt.setString(1, name);
+				stmt.setString(2, branding);
+				stmt.setString(3, url);
+				stmt.setDouble(4, latitude);
+				stmt.setDouble(5, longitude);
+				stmt.setInt(6, id);
+			}
+			
 
 			int result = stmt.executeUpdate();
 			stmt.close();

@@ -33,13 +33,13 @@ public interface RewarderDriver {
 
 	public double getUserDistance(int userId) throws UnableToPerformOperation;
 	
-	public int registerShop(int ownerId, String name, String branding, double latitude, double longitude) throws UnableToPerformOperation;
+	public int registerShop(int ownerId, String name, String branding, String url, double latitude, double longitude) throws UnableToPerformOperation;
 
 	public Shop getShop(int ownerId) throws UnableToPerformOperation;
 	
 	public List<Shop> getShops(int ownerId) throws UnableToPerformOperation;
 	
-	public boolean updateShop(int id, String name, String branding, double latitude, double longitude) throws UnableToPerformOperation;
+	public boolean updateShop(int id, String name, String branding, String url, double latitude, double longitude) throws UnableToPerformOperation;
 
 	public Shop getShopDetails(int shopId) throws UnableToPerformOperation;
 	

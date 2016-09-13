@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class RegisterShopRequest {
 	
-	private String name, branding, type;
+	private String name, branding, type, url;
 	private double latitude,longitude;
 	private int id;
 	
@@ -26,13 +26,14 @@ public class RegisterShopRequest {
 		this.type = type;
 	}
 	
-	public RegisterShopRequest(String name, String branding, double latitude, double longitude, String type, int id){
+	public RegisterShopRequest(String name, String branding, double latitude, double longitude, String type, int id, String url){
 		this.name = name;
 		this.branding = name;
 		this.latitude = latitude;
 		this.longitude = longitude;
 		this.type = type;
 		this.id = id;
+		this.url = url;
 	}
 
 	public String getName() {
@@ -82,4 +83,13 @@ public class RegisterShopRequest {
 	public void setId(int id) {
 		this.id = id;
 	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	
 }
