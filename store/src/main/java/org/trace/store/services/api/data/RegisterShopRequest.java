@@ -26,6 +26,15 @@ public class RegisterShopRequest {
 		this.type = type;
 	}
 	
+	public RegisterShopRequest(String name, String branding, double latitude, double longitude, String type, int id){
+		this.name = name;
+		this.branding = name;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.type = type;
+		this.id = id;
+	}
+	
 	public RegisterShopRequest(String name, String branding, double latitude, double longitude, String type, int id, String url){
 		this.name = name;
 		this.branding = name;
