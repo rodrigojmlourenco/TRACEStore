@@ -195,6 +195,13 @@ public class RewarderDriverImpl implements RewarderDriver {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
 	}
+	
+	@Override
+	public int registerShop(int ownerId, String name, String branding, double latitude, double longitude)
+			throws UnableToPerformOperation {
+
+		return registerShop(ownerId,name,branding,"",latitude,longitude);
+	}
 
 	@Override
 	public int registerShop(int ownerId, String name, String branding, String url, double latitude, double longitude)
@@ -279,6 +286,13 @@ public class RewarderDriverImpl implements RewarderDriver {
 		}
 	}
 
+	@Override
+	public boolean updateShop(int id, String name, String branding, double latitude, double longitude)
+			throws UnableToPerformOperation {
+		
+		return updateShop(id,name,branding,"",latitude,longitude);
+	}
+	
 	@Override
 	public boolean updateShop(int id, String name, String branding, String url, double latitude, double longitude)
 			throws UnableToPerformOperation {
