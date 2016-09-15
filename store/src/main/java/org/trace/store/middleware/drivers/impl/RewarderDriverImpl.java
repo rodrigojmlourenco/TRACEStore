@@ -223,7 +223,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 				stmt.setDouble(5, longitude);
 			}else{
 				stmt = conn.prepareStatement(
-						"INSERT INTO shops (OwnerId, Name, Branding, LogoUrl, Latitude, Longitude) VALUES (?,?,?,?,?)",
+						"INSERT INTO shops (OwnerId, Name, Branding, LogoUrl, Latitude, Longitude) VALUES (?,?,?,?,?,?)",
 						java.sql.Statement.RETURN_GENERATED_KEYS);
 
 				stmt.setInt(1, ownerId);
