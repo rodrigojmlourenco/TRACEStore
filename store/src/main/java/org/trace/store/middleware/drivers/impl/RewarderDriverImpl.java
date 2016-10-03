@@ -213,7 +213,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 			
 			if(url.equals("")){
 				stmt = conn.prepareStatement(
-						"INSERT INTO shops (OwnerId, Name, Branding, Latitude, Longitude) VALUES (?,?,?,?,?)",
+						"INSERT INTO shops (OwnerId, Name, Branding, Latitude, Longitude, MapUrl) VALUES (?,?,?,?,?,?)",
 						java.sql.Statement.RETURN_GENERATED_KEYS);
 
 				stmt.setInt(1, ownerId);
@@ -221,9 +221,10 @@ public class RewarderDriverImpl implements RewarderDriver {
 				stmt.setString(3, branding);
 				stmt.setDouble(4, latitude);
 				stmt.setDouble(5, longitude);
+				stmt.setString(6, createMapUrl(latitude, longitude));
 			}else{
 				stmt = conn.prepareStatement(
-						"INSERT INTO shops (OwnerId, Name, Branding, LogoUrl, Latitude, Longitude) VALUES (?,?,?,?,?,?)",
+						"INSERT INTO shops (OwnerId, Name, Branding, LogoUrl, Latitude, Longitude, MapUrl) VALUES (?,?,?,?,?,?,?)",
 						java.sql.Statement.RETURN_GENERATED_KEYS);
 
 				stmt.setInt(1, ownerId);
@@ -232,6 +233,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 				stmt.setString(4, url);
 				stmt.setDouble(5, latitude);
 				stmt.setDouble(6, longitude);
+				stmt.setString(7, createMapUrl(latitude, longitude));
 			}
 
 			ResultSet set = stmt.executeQuery();
@@ -303,21 +305,23 @@ public class RewarderDriverImpl implements RewarderDriver {
 			
 			if(url.equals("")){
 				stmt = conn
-						.prepareStatement("UPDATE shops SET Name=?, Branding=?, Latitude=?, Longitude=? where Id=?;");
+						.prepareStatement("UPDATE shops SET Name=?, Branding=?, Latitude=?, Longitude=?, MapUrl=? where Id=?;");
 				stmt.setString(1, name);
 				stmt.setString(2, branding);
 				stmt.setDouble(3, latitude);
 				stmt.setDouble(4, longitude);
 				stmt.setInt(5, id);
+				stmt.setString(6, createMapUrl(latitude, longitude));
 			}else{
 				stmt = conn
-						.prepareStatement("UPDATE shops SET Name=?, Branding=?, LogoUrl=?, Latitude=?, Longitude=? where Id=?;");
+						.prepareStatement("UPDATE shops SET Name=?, Branding=?, LogoUrl=?, Latitude=?, Longitude=?, MapUrl=? where Id=?;");
 				stmt.setString(1, name);
 				stmt.setString(2, branding);
 				stmt.setString(3, url);
 				stmt.setDouble(4, latitude);
 				stmt.setDouble(5, longitude);
 				stmt.setInt(6, id);
+				stmt.setString(7, createMapUrl(latitude, longitude));
 			}
 			
 
@@ -601,5 +605,20 @@ public class RewarderDriverImpl implements RewarderDriver {
 		} catch (SQLException e) {
 			throw new UnableToPerformOperation(e.getMessage());
 		}
+	}
+	
+	private String createMapUrl(double latitude, double longitude){
+		String mapUrl = ""
+				+ "https://maps.googleapis.com/maps/api/staticmap?center="
+				+ latitude
+				+ ","
+				+ longitude
+				+ "&zoom=17&size=100x200&markers=color:red%7C"
+				+ latitude
+				+ ","
+				+ longitude
+				+ "key="
+				+ System.getenv("GOOGLE_MAPS_API_KEY");
+		return mapUrl;
 	}
 }
