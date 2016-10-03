@@ -310,8 +310,8 @@ public class RewarderDriverImpl implements RewarderDriver {
 				stmt.setString(2, branding);
 				stmt.setDouble(3, latitude);
 				stmt.setDouble(4, longitude);
-				stmt.setInt(5, id);
-				stmt.setString(6, createMapUrl(latitude, longitude));
+				stmt.setString(5, createMapUrl(latitude, longitude));
+				stmt.setInt(6, id);
 			}else{
 				stmt = conn
 						.prepareStatement("UPDATE shops SET Name=?, Branding=?, LogoUrl=?, Latitude=?, Longitude=?, MapUrl=? where Id=?;");
@@ -320,8 +320,8 @@ public class RewarderDriverImpl implements RewarderDriver {
 				stmt.setString(3, url);
 				stmt.setDouble(4, latitude);
 				stmt.setDouble(5, longitude);
-				stmt.setInt(6, id);
-				stmt.setString(7, createMapUrl(latitude, longitude));
+				stmt.setString(6, createMapUrl(latitude, longitude));
+				stmt.setInt(7, id);
 			}
 			
 
