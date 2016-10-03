@@ -617,7 +617,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 				+ latitude
 				+ ","
 				+ longitude
-				+ "key="
+				+ "&key="
 				+ System.getenv("GOOGLE_MAPS_API_KEY");
 		
 		Log.info("createMapUrl","++++++++++++++++++++++++++++++++++++++++++++++++" + mapUrl);
