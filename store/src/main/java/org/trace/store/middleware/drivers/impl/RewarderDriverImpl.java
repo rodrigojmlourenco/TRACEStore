@@ -613,7 +613,7 @@ public class RewarderDriverImpl implements RewarderDriver {
 				+ latitude
 				+ ","
 				+ longitude
-				+ "&zoom=15&size=100x200&markers=color:red%7C"
+				+ "&zoom=17&size=150x300&markers=color:red%7C"
 				+ latitude
 				+ ","
 				+ longitude
